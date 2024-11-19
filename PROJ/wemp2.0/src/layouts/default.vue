@@ -1,18 +1,21 @@
 <template>
   <v-app>
-    <v-app-bar color="primary" dark flat app>
-      <v-container class="d-flex align-center justify-space-between" fluid>
-        <v-img
-          src="@/assets/wemp-logo.png"
-          alt="Logo"
-          max-height="50"
-          contain
-        />
-
-        <v-row class="d-flex align-center">
-          <v-btn text>Home</v-btn>
-          <v-btn text>Create Account</v-btn>
-          <v-btn outlined color="white">Sign In</v-btn>
+    <v-app-bar app color="white" elevate-on-scroll>
+      <v-container>
+        <v-row align="center" justify="space-between">
+          <v-col cols="auto">
+            <v-img
+              src="@/assets/logo large.png"
+              alt=" Wemp Logo"
+              width="80"
+              height="80"
+            />
+          </v-col>
+          <v-col cols="auto">
+            <v-btn text href="#">Home</v-btn>
+            <v-btn text href="#">Create Account</v-btn>
+            <v-btn outlined color="primary" href="#">Sign In</v-btn>
+          </v-col>
         </v-row>
       </v-container>
     </v-app-bar>
@@ -21,31 +24,42 @@
       <router-view />
     </v-main>
 
-    <v-footer color="light green-lighten-5" padless>
-      <v-container class="d-flex justify-space-between py-4" fluid>
-        <v-col>
-          <v-img
-            src="@/assets/wemp-logo.png"
-            alt="Footer Logo"
-            max-height="30"
-            contain
-          />
-          <p class="text-white mt-1">&copy; All Rights Reserved 2024</p>
-        </v-col>
+    <v-footer app>
+      <v-container>
+        <v-row justify="space-around">
+          <v-col cols="auto">
+            <v-img
+              src="@/assets/logo large.png"
+              alt="Footer Logo"
+              width="70"
+              height="70"
+            />
+            <span class="ml-2 resources">&copy; All Rights Reserved 2024</span>
+          </v-col>
 
-        <v-col>
-          <p class="text-white mb-1">Products</p>
-          <v-list-item class="text-white">AI Predictions</v-list-item>
-          <v-list-item class="text-white">Business Feasibility</v-list-item>
-          <v-list-item class="text-white">Data Visualization</v-list-item>
-        </v-col>
-
-        <v-col>
-          <p class="text-white mb-1">Resources</p>
-          <v-list-item class="text-white">Feedback</v-list-item>
-          <v-list-item class="text-white">Survey</v-list-item>
-          <v-list-item class="text-white">Citations</v-list-item>
-        </v-col>
+          <v-col cols="auto">
+            <v-row>
+              <v-col cols="auto">
+                <h4 class="mb-1 font-weight-bold">Products</h4>
+                <div class="pa-0 ma-0 products">
+                  <div class="products"><a href="#">AI Predictions</a></div>
+                  <div class="products">
+                    <a href="#">Business Feasibility</a>
+                  </div>
+                  <div class="products"><a href="#">Data Visualization</a></div>
+                </div>
+              </v-col>
+              <v-col cols="auto">
+                <h4 class="mb-1 font-weight-bold">Resources</h4>
+                <div class="pa-0 ma-0 resources">
+                  <div class="resources"><a href="#">Feedback</a></div>
+                  <div class="resources"><a href="#">Survey</a></div>
+                  <div class="resources"><a href="#">Release Notes</a></div>
+                </div>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
       </v-container>
     </v-footer>
   </v-app>
@@ -63,8 +77,24 @@ export default {
 }
 .v-main {
   min-height: calc(100vh - 128px);
+  background-color: #f8f9fa;
 }
 .v-footer {
-  background-color: #8bc34a;
+  background-color: #f8f9fa;
+  padding-top: 1rem;
+}
+.resources {
+  transition: transform 0.3s, color 0.3s;
+}
+.resources:hover {
+  color: #59ef0d;
+  transform: translateX(8px);
+}
+.products {
+  transition: transform 0.3s, color 0.3s;
+}
+.products:hover {
+  color: #57f004;
+  transform: translateX(8px);
 }
 </style>

@@ -54,11 +54,9 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-
+<script>
 export default {
-  name: "SignUpPage",
+  name: "SignUp",
   methods: {
     togglePasswordVisibility() {},
   },
