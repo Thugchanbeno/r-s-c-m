@@ -13,7 +13,9 @@
           </v-col>
           <v-col cols="auto">
             <v-btn text href="#">Home</v-btn>
-            <v-btn text href="#">Create Account</v-btn>
+            <v-btn class="mx-2" outlined color="black" @click="navigateToSignUp"
+              >Create Account</v-btn
+            >
             <v-btn outlined color="primary" href="#">Sign In</v-btn>
           </v-col>
         </v-row>
@@ -31,13 +33,13 @@
             <v-img
               src="@/assets/logo large.png"
               alt="Footer Logo"
-              width="70"
-              height="70"
+              width="80"
+              height="80"
             />
             <span class="ml-2 resources">&copy; All Rights Reserved 2024</span>
           </v-col>
 
-          <v-col cols="auto">
+          <v-col cols="auto" justify="end">
             <v-row>
               <v-col cols="auto">
                 <h4 class="mb-1 font-weight-bold">Products</h4>
@@ -68,6 +70,11 @@
 <script>
 export default {
   name: "DefaultLayout",
+  methods: {
+    navigateToSignUp() {
+      this.$router.push("/SignUp");
+    },
+  },
 };
 </script>
 

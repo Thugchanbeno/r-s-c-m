@@ -86,7 +86,9 @@
             Visualize water consumption patterns and regional comparisons
             through in-depth trend charts.
           </p>
-          <v-btn color="primary" text>View More</v-btn>
+          <v-btn color="primary" @click="navigateToDataViz" text
+            >View More</v-btn
+          >
         </v-card>
       </v-col>
 
@@ -103,7 +105,9 @@
             Compare regional disparities and visualize water consumption habits
             through interactive heat maps.
           </p>
-          <v-btn color="primary" text>View More</v-btn>
+          <v-btn color="primary" @click="navigateToHeatMaps" text
+            >View More</v-btn
+          >
         </v-card>
       </v-col>
       <v-col cols="12" md="6">
@@ -119,7 +123,9 @@
             Access in-depth data on demand, revenue opportunities, and market
             trends for sustainable growth.
           </p>
-          <v-btn color="primary" text>View More</v-btn>
+          <v-btn color="primary" @click="navigateToAiPredictions" text
+            >View More</v-btn
+          >
         </v-card>
       </v-col>
 
@@ -136,7 +142,9 @@
             Access in-depth data on demand, revenue opportunities, and market
             trends for sustainable growth.
           </p>
-          <v-btn color="primary" text>View More</v-btn>
+          <v-btn color="primary" @click="navigateToFeasibility" text
+            >View More</v-btn
+          >
         </v-card>
       </v-col>
     </v-row>
@@ -147,6 +155,18 @@
 export default {
   name: "HomePage",
   methods: {
+    navigateToAiPredictions() {
+      this.$router.push("/aipredictions");
+    },
+    navigateToFeasibility() {
+      this.$router.push("/feasibility");
+    },
+    navigateToHeatMaps() {
+      this.$router.push("/heatmaps");
+    },
+    navigateToDataViz() {
+      this.$router.push("/dataviz");
+    },
     goToSignup() {
       this.$router.push("/signup");
     },
