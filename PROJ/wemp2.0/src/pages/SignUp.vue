@@ -24,20 +24,34 @@
           <v-row>
             <v-col cols="12" md="6">
               <v-text-field
-                label="Create Password"
-                type="password"
-                required
-                append-icon="mdi-eye-off"
-                @click:append="togglePasswordVisibility"
+                density="compact"
+                bg-color="white"
+                variant="solo"
+                label="Password *"
+                rounded="xl"
+                v-model="password"
+                :type="passwordFieldType"
+                :append-inner-icon="
+                  passwordFieldType === 'password' ? 'mdi-eye-off' : 'mdi-eye'
+                "
+                @click:append-inner="togglePasswordVisibility"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
-                label="Confirm Password"
-                type="password"
-                required
-                append-icon="mdi-eye-off"
-                @click:append="togglePasswordVisibility"
+                density="compact"
+                bg-color="white"
+                variant="solo"
+                label="Confirm Password *"
+                rounded="xl"
+                v-model="passwordConfirm"
+                :type="passwordConfirmFieldType"
+                :append-inner-icon="
+                  passwordConfirmFieldType === 'password'
+                    ? 'mdi-eye-off'
+                    : 'mdi-eye'
+                "
+                @click:append-inner="togglePasswordConfirmVisibility"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -57,8 +71,25 @@
 <script>
 export default {
   name: "SignUp",
+  data() {
+    return {
+      password: "", // User's password input
+      passwordConfirm: "", // User's confirm password input
+      passwordFieldType: "password", // Default password type for password field
+      passwordConfirmFieldType: "password", // Default password type for confirm field
+    };
+  },
   methods: {
-    togglePasswordVisibility() {},
+    // Toggle visibility for the password field
+    togglePasswordVisibility() {
+      this.passwordFieldType =
+        this.passwordFieldType === "password" ? "text" : "password";
+    },
+    // Toggle visibility for the confirm password field
+    togglePasswordConfirmVisibility() {
+      this.passwordConfirmFieldType =
+        this.passwordConfirmFieldType === "password" ? "text" : "password";
+    },
   },
 };
 </script>

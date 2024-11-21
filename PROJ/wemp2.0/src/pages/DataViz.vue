@@ -1,8 +1,20 @@
 <template>
-  <div class="pa-4">
+  <div class="d-flex flex-column pa-4">
     <v-row cols="auto" justify="space-around" mt="1rem">
-      <v-text-field label="search"></v-text-field>
-      <v-text-field label="search"></v-text-field>
+      <v-col>
+        <v-text-field
+          prepend-inner-icon="mdi-magnify"
+          label="search"
+          placeholder="keywords"
+        />
+      </v-col>
+      <v-col>
+        <v-text-field
+          prepend-inner-icon="mdi-magnify"
+          label="region"
+          placeholder="county"
+        />
+      </v-col>
     </v-row>
     <div class="text-center mb-8">
       <h1 class="text-h4 font-weight-bold mb-2">

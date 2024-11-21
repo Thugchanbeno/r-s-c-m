@@ -12,7 +12,7 @@
             />
           </v-col>
           <v-col cols="auto">
-            <v-btn text href="#">Home</v-btn>
+            <v-btn @click="navigateToIndex">Home</v-btn>
             <v-btn class="mx-2" outlined color="black" @click="navigateToSignUp"
               >Create Account</v-btn
             >
@@ -73,6 +73,9 @@ export default {
   methods: {
     navigateToSignUp() {
       this.$router.push("/SignUp");
+    },
+    navigateToIndex() {
+      this.$router.push("/");
     },
   },
 };
