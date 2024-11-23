@@ -73,19 +73,18 @@ export default {
   name: "SignUp",
   data() {
     return {
-      password: "", // User's password input
-      passwordConfirm: "", // User's confirm password input
-      passwordFieldType: "password", // Default password type for password field
-      passwordConfirmFieldType: "password", // Default password type for confirm field
+      password: "",
+      passwordConfirm: "",
+      passwordFieldType: "password",
+      passwordConfirmFieldType: "password",
     };
   },
   methods: {
-    // Toggle visibility for the password field
     togglePasswordVisibility() {
       this.passwordFieldType =
         this.passwordFieldType === "password" ? "text" : "password";
     },
-    // Toggle visibility for the confirm password field
+
     togglePasswordConfirmVisibility() {
       this.passwordConfirmFieldType =
         this.passwordConfirmFieldType === "password" ? "text" : "password";
