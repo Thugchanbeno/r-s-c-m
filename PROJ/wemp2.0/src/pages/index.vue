@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-row justify="center" class="text-center">
+    <v-row justify="center" class="text-center pa-4">
       <v-col cols="12">
         <h1 class="mb-2">WEMP</h1>
         <p class="text-h5 font-weight-medium">
@@ -9,59 +9,60 @@
         </p>
       </v-col>
     </v-row>
-    <v-row justify="center" class="my-4">
+    <v-row justify="center" class="pa-2">
       <v-col cols="12" md="4">
         <v-text-field
-          class="mb-2"
-          dense
+          class="pa-2"
           label="Search"
-          variant="solo-filled"
-          :append-inner-icon="mdi - magnify"
+          variant="outlined"
+          prepend-inner-icon="mdi-magnify"
           @click:append-inner=""
+          rounded="xl"
         />
       </v-col>
       <v-col cols="12" md="4">
         <v-text-field
-          class="mv-2"
+          class="pa-2"
           label="Region"
-          variant="solo-filled"
-          :append-inner-icon="mdi - magnify"
+          variant="outlined"
+          prepend-inner-icon="mdi-magnify"
           @click:append-inner=""
+          rounded="xl"
         />
       </v-col>
     </v-row>
 
     <v-row>
       <v-col cols="12">
-        <h3 class="my-3">water and health insights</h3>
+        <h3 class="pa-2">water and health insights</h3>
       </v-col>
       <v-col cols="12" md="6">
-        <v-card class="pa-3">
+        <v-card class="pa-4 mx-2" rounded="xl">
           <v-img
             src="@/assets/logo large.png"
             alt="Feature 1"
             max-height="200"
             contain
           />
-          <p class="text-h6 mt-2">Water Quantity per County</p>
-          <p>Summary</p>
-          <p>
+          <p class="text-h6 mx-1">Water Quantity per County</p>
+          <p class="pa-1">Summary</p>
+          <p class="pa-1">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam.
           </p>
         </v-card>
       </v-col>
 
       <v-col cols="12" md="6">
-        <v-card class="pa-3">
+        <v-card class="pa-4 mx-2" rounded="xl">
           <v-img
             src="@/assets/logo large.png"
             alt="Feature 2"
             max-height="200"
             contain
           />
-          <p class="text-h6 mt-2">Population with Access to Water</p>
-          <p>Summary</p>
-          <p>
+          <p class="text-h6 mx-1">Population with Access to Water</p>
+          <p class="pa-1">Summary</p>
+          <p class="pa-1">
             Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet
             sint.
           </p>
@@ -71,83 +72,106 @@
 
     <v-row>
       <v-col cols="12">
-        <h3 class="my-3">discover</h3>
+        <h3 class="pa-4">Discover</h3>
       </v-col>
       <v-col cols="12" md="6">
-        <v-card class="pa-3">
+        <v-card class="pa-4 mx-2" rounded="xl">
           <v-img
             src="@/assets/logo large.png"
             alt="Feature 1"
             max-height="200"
             contain
           />
-          <p class="text-h6 mt-2">Data Visualizations</p>
-          <p>
+          <p class="text-h6 mx-1">Data Visualizations</p>
+          <p class="pa-1">
             Visualize water consumption patterns and regional comparisons
             through in-depth trend charts.
           </p>
-          <v-btn color="primary" @click="navigateToDataViz" text
+          <v-btn
+            variant="text"
+            rounded="xl"
+            class="pa-1"
+            color="blue"
+            @click="navigateToDataViz"
             >View More</v-btn
           >
         </v-card>
       </v-col>
 
       <v-col cols="12" md="6">
-        <v-card class="pa-3">
+        <v-card class="pa-4" rounded="xl">
           <v-img
             src="@/assets/logo large.png"
             alt="Feature 2"
             max-height="200"
             contain
           />
-          <p class="text-h6 mt-2">Heat Maps</p>
-          <p>
+          <p class="text-h6 mx-1">Heat Maps</p>
+          <p class="pa-1">
             Compare regional disparities and visualize water consumption habits
             through interactive heat maps.
           </p>
-          <v-btn color="primary" @click="navigateToHeatMaps" text
+          <v-btn
+            variant="text"
+            rounded="xl"
+            class="pa-1"
+            color="blue"
+            @click="navigateToHeatMaps"
             >View More</v-btn
           >
         </v-card>
       </v-col>
       <v-col cols="12" md="6">
-        <v-card class="pa-3">
+        <v-card class="pa-4" rounded="xl">
           <v-img
             src="@/assets/logo large.png"
             alt="Feature 1"
             max-height="200"
             contain
           />
-          <p class="text-h6 mt-2">AI Predictions</p>
-          <p>
+          <p class="text-h6 mx-1">AI Predictions</p>
+          <p class="pa-1">
             Access in-depth data on demand, revenue opportunities, and market
             trends for sustainable growth.
           </p>
-          <v-btn color="primary" @click="navigateToAiPredictions" text
+          <v-btn
+            variant="text"
+            rounded="xl"
+            class="pa-1"
+            color="blue"
+            @click="navigateToAiPredictions"
+            text
             >View More</v-btn
           >
         </v-card>
       </v-col>
 
       <v-col cols="12" md="6">
-        <v-card class="pa-3">
+        <v-card class="pa-4" rounded="xl">
           <v-img
             src="@/assets/logo large.png"
             alt="Feature 2"
             max-height="200"
             contain
           />
-          <p class="text-h6 mt-2">Business Feasibility Reports</p>
-          <p>
+          <p class="text-h6 mx-1">Business Feasibility Reports</p>
+          <p class="pa-1">
             Access in-depth data on demand, revenue opportunities, and market
             trends for sustainable growth.
           </p>
-          <v-btn color="primary" @click="navigateToFeasibility" text
+          <v-btn
+            variant="text"
+            rounded="xl"
+            class="pa-1"
+            color="blue"
+            @click="navigateToFeasibility"
+            text
             >View More</v-btn
           >
         </v-card>
       </v-col>
     </v-row>
+    <v-divider class="my-8"></v-divider>
   </v-container>
 </template>
 

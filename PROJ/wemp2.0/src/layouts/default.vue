@@ -1,22 +1,37 @@
 <template>
   <v-app>
-    <v-app-bar app color="white" elevate-on-scroll>
+    <v-app-bar color="F8F9FA" app>
       <v-container>
-        <v-row align="center" justify="space-between">
+        <v-row align="center" justify="space-between" no-gutters>
           <v-col cols="auto">
             <v-img
               src="@/assets/logo large.png"
-              alt=" Wemp Logo"
+              alt="Wemp Logo"
               width="80"
               height="80"
             />
           </v-col>
-          <v-col cols="auto">
-            <v-btn @click="navigateToIndex">Home</v-btn>
-            <v-btn class="mx-2" outlined color="black" @click="navigateToSignUp"
-              >Create Account</v-btn
+
+          <v-col cols="auto" class="d-flex flex-wrap justify-end">
+            <v-btn
+              variant="tonal"
+              class="pa-2 mx-1 text-sm"
+              color="#CDDC39"
+              @click="navigateToIndex"
             >
-            <v-btn outlined color="primary" href="#">Sign In</v-btn>
+              Home
+            </v-btn>
+            <v-btn
+              variant="tonal"
+              class="pa-2 mx-1 text-sm"
+              color="#CDDC39"
+              @click="navigateToSignUp"
+            >
+              Create Account
+            </v-btn>
+            <v-btn variant="tonal" class="pa-2 mx-1 text-sm" color="#CDDC39">
+              Sign In
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>
