@@ -14,22 +14,30 @@
 
           <v-col cols="auto" class="d-flex flex-wrap justify-end">
             <v-btn
-              variant="tonal"
-              class="pa-2 mx-1 text-sm"
-              color="#CDDC39"
+              variant="plain"
+              class="pa-2 mx-2"
+              color="#3D23E7"
+              rounded="xl"
               @click="navigateToIndex"
             >
               Home
             </v-btn>
             <v-btn
               variant="tonal"
-              class="pa-2 mx-1 text-sm"
-              color="#CDDC39"
+              class="pa-2 mx-2"
+              color="#3D23E7"
+              rounded="xl"
               @click="navigateToSignUp"
             >
               Create Account
             </v-btn>
-            <v-btn variant="tonal" class="pa-2 mx-1 text-sm" color="#CDDC39">
+            <v-btn
+              variant="outlined"
+              class="pa-2 mx-2"
+              color="#3D23E7"
+              rounded="xl"
+              @click="navigateToSignIn"
+            >
               Sign In
             </v-btn>
           </v-col>
@@ -41,37 +49,37 @@
       <router-view />
     </v-main>
 
-    <v-footer app>
+    <v-footer elevation="16" app>
       <v-container>
         <v-row justify="space-around">
-          <v-col cols="auto">
+          <v-col cols="auto" class="pa-2 mx-4">
             <v-img
               src="@/assets/logo large.png"
               alt="Footer Logo"
               width="80"
               height="80"
             />
-            <span class="ml-2 resources">&copy; All Rights Reserved 2024</span>
+            <span class="pa-2 resources">&copy; All Rights Reserved 2024</span>
           </v-col>
 
           <v-col cols="auto" justify="end">
             <v-row>
-              <v-col cols="auto">
-                <h4 class="mb-1 font-weight-bold">Products</h4>
-                <div class="pa-0 ma-0 products">
-                  <div class="products"><a href="#">AI Predictions</a></div>
+              <v-col cols="auto" class="pa-4">
+                <h4 class="pa-2 font-weight-bold products">Products</h4>
+                <div class="pa-2">
+                  <div class="products"><a>AI Predictions</a></div>
                   <div class="products">
-                    <a href="#">Business Feasibility</a>
+                    <a>Business Feasibility</a>
                   </div>
-                  <div class="products"><a href="#">Data Visualization</a></div>
+                  <div class="products"><a>Data Visualization</a></div>
                 </div>
               </v-col>
-              <v-col cols="auto">
-                <h4 class="mb-1 font-weight-bold">Resources</h4>
-                <div class="pa-0 ma-0 resources">
-                  <div class="resources"><a href="#">Feedback</a></div>
-                  <div class="resources"><a href="#">Survey</a></div>
-                  <div class="resources"><a href="#">Release Notes</a></div>
+              <v-col cols="auto" class="pa-4">
+                <h4 class="pa-2 font-weight-bold products">Resources</h4>
+                <div class="pa-2">
+                  <div class="resources"><a>Feedback</a></div>
+                  <div class="resources"><a>Survey</a></div>
+                  <div class="resources"><a>Release Notes</a></div>
                 </div>
               </v-col>
             </v-row>
@@ -91,6 +99,9 @@ export default {
     },
     navigateToIndex() {
       this.$router.push("/");
+    },
+    navigateToSignIn() {
+      this.$router.push("/signin");
     },
   },
 };

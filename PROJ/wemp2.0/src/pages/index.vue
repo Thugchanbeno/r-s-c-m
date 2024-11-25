@@ -12,6 +12,7 @@
     <v-row justify="center" class="pa-2">
       <v-col cols="12" md="4">
         <v-text-field
+          bg-color="white"
           class="pa-2"
           label="Search"
           variant="outlined"
@@ -22,6 +23,7 @@
       </v-col>
       <v-col cols="12" md="4">
         <v-text-field
+          bg-color="white"
           class="pa-2"
           label="Region"
           variant="outlined"
@@ -34,7 +36,7 @@
 
     <v-row>
       <v-col cols="12">
-        <h3 class="pa-2">water and health insights</h3>
+        <h3 class="mx-4">WATER AND HEALTH INSIGHTS</h3>
       </v-col>
       <v-col cols="12" md="6">
         <v-card class="pa-4 mx-2" rounded="xl">
@@ -72,7 +74,7 @@
 
     <v-row>
       <v-col cols="12">
-        <h3 class="pa-4">Discover</h3>
+        <h3 class="mx-4">DISCOVER</h3>
       </v-col>
       <v-col cols="12" md="6">
         <v-card class="pa-4 mx-2" rounded="xl">
