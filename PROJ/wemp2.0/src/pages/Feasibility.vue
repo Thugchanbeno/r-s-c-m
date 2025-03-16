@@ -41,7 +41,6 @@
         />
       </v-col>
     </v-row>
-    <v-divider class="my-8"></v-divider>
   </div>
 </template>
 <script>

@@ -1,15 +1,15 @@
 <template>
   <v-container fluid>
     <v-row justify="center" class="text-center pa-4">
-      <v-col cols="12">
-        <h1 class="mb-2">WEMP</h1>
-        <p class="text-h5 font-weight-medium">
+      <v-col class="c-margin" cols="12">
+        <h1 class="custom-font">WEMP</h1>
+        <p class="text-h5 font-weight-medium mb-1">
           Unleashing the Power of Water and Health Insights for a Sustainable
           Future
         </p>
       </v-col>
     </v-row>
-    <v-row justify="center" class="pa-2">
+    <v-row justify="center" class="pa-2 mt-2">
       <v-col cols="12" md="4">
         <v-text-field
           bg-color="white"
@@ -72,7 +72,7 @@
       </v-col>
     </v-row>
 
-    <v-row>
+    <v-row class="mb-16">
       <v-col cols="12">
         <h3 class="mx-4">DISCOVER</h3>
       </v-col>
@@ -173,7 +173,6 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-divider class="my-8"></v-divider>
   </v-container>
 </template>
 
@@ -201,6 +200,9 @@ export default {
 </script>
 
 <style scoped>
+.custom-font {
+  font-size: 61px;
+}
 .info-section .v-img {
   max-width: 100%;
 }

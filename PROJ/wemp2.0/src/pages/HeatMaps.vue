@@ -33,6 +33,7 @@
       </p>
 
       <v-select
+        transition="slide-y-reverse-transition"
         class="pa-2"
         label="Region"
         :items="regions"
@@ -99,7 +100,6 @@
         </div>
       </v-col>
     </v-row>
-    <v-divider class="my-2"></v-divider>
   </div>
 </template>
 

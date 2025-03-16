@@ -1,14 +1,14 @@
 <template>
   <v-app>
-    <v-app-bar color="F8F9FA" app>
+    <v-app-bar border color="F8F9FA" elevation="0" height="70">
       <v-container>
         <v-row align="center" justify="space-between" no-gutters>
           <v-col cols="auto">
             <v-img
               src="@/assets/logo large.png"
               alt="Wemp Logo"
-              width="80"
-              height="80"
+              width="100"
+              height="100"
             />
           </v-col>
 
@@ -36,6 +36,7 @@
               class="pa-2 mx-2"
               color="#3D23E7"
               rounded="xl"
+              bg-color="#3D23E7"
               @click="navigateToSignIn"
             >
               Sign In
@@ -44,21 +45,15 @@
         </v-row>
       </v-container>
     </v-app-bar>
-
     <v-main>
       <router-view />
     </v-main>
 
-    <v-footer elevation="16" app>
+    <v-footer border color="#FFFFFF" app>
       <v-container>
         <v-row justify="space-around">
           <v-col cols="auto" class="pa-2 mx-4">
-            <v-img
-              src="@/assets/logo large.png"
-              alt="Footer Logo"
-              width="80"
-              height="80"
-            />
+            <v-img src="@/assets/logo large.png" alt="Footer Logo" />
             <span class="pa-2 resources">&copy; All Rights Reserved 2024</span>
           </v-col>
 
