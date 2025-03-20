@@ -42,17 +42,16 @@ const PropertyCard = ({ property }) => {
 
         <div className="flex justify-center gap-4 text-gray-500 mb-4">
           <p>
-            <FaBed className="inline mr-2" />3
-            <span className="md:hidden lg:inline">{property.beds}</span>
+            <FaBed className="inline mr-2" />
+            {property.beds}
           </p>
           <p>
-            <FaBath className="inline mr-2" />2
-            <span className="md:hidden lg:inline">{property.baths}</span>
+            <FaBath className="inline mr-2" />
+            {property.baths}
           </p>
           <p>
             <FaRulerCombined className="inline mr-2" />
-            1,500{" "}
-            <span className="md:hidden lg:inline">{property.square_feet}</span>
+            {property.square_feet}
           </p>
         </div>
 
@@ -87,7 +86,7 @@ const PropertyCard = ({ property }) => {
             </span>
           </div>
           <Link
-            href={`/property/${property._id}`}
+            href={`/properties/${property._id}`}
             className="h-[36px] bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-center text-sm"
           >
             Details
