@@ -24,7 +24,7 @@ export const authOptions = {
     },
     //Modify the session object
     async session({ session }) {
-      // get user from database
+      //get user from database
       //assign the user id to the session
       //return the session
     },
