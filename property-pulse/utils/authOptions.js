@@ -30,7 +30,7 @@ export const authOptions = {
         await User.create({
           email: profile.email,
           username,
-          image: profile.picture,
+          image: profile.image,
         });
       }
       //return true to allow sign in
