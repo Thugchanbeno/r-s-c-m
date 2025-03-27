@@ -13,7 +13,16 @@ const PropertySchema = new Schema(
     },
     type: {
       type: String,
-      enum: ["Apartment", "House", "Condo", "Townhouse", "Villa"],
+      enum: [
+        "Apartment",
+        "House",
+        "Condo",
+        "Townhouse",
+        "Villa",
+        "Room",
+        "Studio",
+        "Cabin or Cottage",
+      ],
       required: true,
     },
     description: {
