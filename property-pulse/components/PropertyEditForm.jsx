@@ -1,7 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { fetchProperty } from "@/utils/requests";
 
-const AddPropertyForm = () => {
+const PropertyEditForm = () => {
+  const { id } = useParams();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [fields, setFields] = useState({
     type: "",
@@ -27,11 +32,35 @@ const AddPropertyForm = () => {
       email: "",
       phone: "",
     },
-    images: [],
   });
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
+    //fetch property data for form
+    const fetchPropertyData = async () => {
+      try {
+        const propertyData = await fetchProperty(id);
+        //Check rates for null, if so then make empty string
+        if (propertyData && propertyData.rates) {
+          const defaultRates = { ...propertyData.rates };
+          for (const rate in defaultRates) {
+            if (defaultRates[rate] === null) {
+              defaultRates[rate] = "";
+            }
+          }
+          propertyData.rates = defaultRates;
+        }
+
+        setFields(propertyData);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPropertyData();
   }, []);
 
   //check if nested property
@@ -79,30 +108,15 @@ const AddPropertyForm = () => {
       amenities: updatedAmenities,
     }));
   };
-  const handleImageChange = (e) => {
-    const { files } = e.target;
-    //clone images array
-    const updatedImages = [...fields.images];
-    //add new files to the array
-    for (const file of files) {
-      updatedImages.push(file);
-    }
-    //update state with array of images
-    setFields((prevFields) => ({
-      ...prevFields,
-      images: updatedImages,
-    }));
-  };
+
+  const handleSubmit = async () => {};
 
   return (
-    mounted && (
-      <form
-        action="/api/properties"
-        method="POST"
-        encType="multipart/form-data"
-      >
+    mounted &&
+    !loading && (
+      <form onSubmit={handleSubmit}>
         <h2 className="text-3xl text-center font-semibold mb-6">
-          Add Property
+          Edit Property
         </h2>
 
         <div className="mb-4">
@@ -547,31 +561,12 @@ const AddPropertyForm = () => {
           />
         </div>
 
-        <div className="mb-4">
-          <label
-            htmlFor="images"
-            className="block text-gray-700 font-bold mb-2"
-          >
-            Images (Select up to 4 images)
-          </label>
-          <input
-            type="file"
-            id="images"
-            name="images"
-            className="shadow-md rounded w-full py-2 px-3"
-            accept="image/*"
-            multiple
-            required
-            onChange={handleImageChange}
-          />
-        </div>
-
         <div>
           <button
             className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"
             type="submit"
           >
-            Add Property
+            Update Property
           </button>
         </div>
       </form>
@@ -579,4 +574,4 @@ const AddPropertyForm = () => {
   );
 };
 
-export default AddPropertyForm;
+export default PropertyEditForm;
