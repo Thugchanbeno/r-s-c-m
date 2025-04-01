@@ -18,15 +18,15 @@ const MessageSchema = new Schema(
       required: true,
     },
     name: {
-      typr: String,
+      type: String,
       required: [true, "Name is required"],
     },
     email: {
-      typr: String,
+      type: String,
       required: [true, "Email is required"],
     },
     phone: {
-      typr: String,
+      type: String,
     },
     body: {
       type: String,
