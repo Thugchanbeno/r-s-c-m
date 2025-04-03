@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import AuthProvider from "@/components/AuthProvider";
 import { GlobalProvider } from "@/context/GlobalContext";
 import { ToastContainer, toast } from "react-toastify";
+import "photoswipe/dist/photoswipe.css";
 
 export const metadata = {
   title: "PropertyPulse | Find the perfect Rental",
