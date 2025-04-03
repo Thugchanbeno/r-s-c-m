@@ -25,7 +25,7 @@ export const GET = async () => {
       recipient: userId,
       read: false,
     })
-      .sort({ createdAt: -1 }) //sort read messaged in ascending order
+      .sort({ createdAt: -1 }) //sort unread messaged in ascending order
       .populate("sender", "username")
       .populate("property", "name");
 
