@@ -216,35 +216,31 @@ export const useProfileData = () => {
         return;
       }
 
-      // Prevent sending empty payloads if desired (though backend might handle it)
+      // Prevent sending empty payloads
       if (
-        type === "current" &&
-        payload.currentSkills.length === 0 &&
-        type === "desired" &&
-        payload.desiredSkillIds.length === 0 &&
-        !body.currentSkills &&
-        !body.desiredSkillIds
+        (type === "current" && payload.currentSkills.length === 0) ||
+        (type === "desired" && payload.desiredSkillIds.length === 0)
       ) {
-        // Check if original body also empty
         console.warn(
-          "handleSaveSkills: Attempting to save empty skill selection. Sending empty update."
+          `handleSaveSkills: Attempting to save empty ${type} skill selection.`
         );
-        // Decide if you want to abort or send an empty update
-        // To abort:
-        // setSaveError("Cannot save empty skill selection.");
+        // Uncomment if you want to prevent empty saves
+        // setSaveError(`Cannot save empty ${type} skill selection.`);
         // setIsSaving(false);
         // return;
       }
 
       try {
+        console.log(`Saving ${type} skills:`, payload);
+
         const response = await fetch("/api/userskills", {
-          // Ensure this path matches your API route folder name
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
 
         const result = await response.json();
+        console.log(`API response for ${type} skills:`, result);
 
         if (!response.ok || !result.success) {
           throw new Error(
@@ -255,19 +251,26 @@ export const useProfileData = () => {
 
         // Success: Update local state from API response
         const userSkillsData = result.data || [];
+        console.log(`Received ${userSkillsData.length} skills from API`);
+
         const current = userSkillsData.filter((s) => s.isCurrent);
         const desired = userSkillsData.filter((s) => s.isDesired);
 
+        console.log(
+          `Filtered: ${current.length} current, ${desired.length} desired`
+        );
+
         setCurrentSkills(current);
         setDesiredSkills(desired);
+
         // Reset editing states based on the successfully saved data
         setSelectedCurrentSkillsMap(
           new Map(
             current.map((s) => [s.skillId?._id.toString(), s.proficiency])
-          ) // Use toString()
+          )
         );
         setSelectedDesiredSkillIds(
-          new Set(desired.map((s) => s.skillId?._id.toString())) // Use toString()
+          new Set(desired.map((s) => s.skillId?._id.toString()))
         );
 
         // Close the relevant editing section on success
@@ -284,7 +287,7 @@ export const useProfileData = () => {
         setIsSaving(false);
       }
     },
-    [selectedCurrentSkillsMap, selectedDesiredSkillIds, session?.user?.id] // Added session?.user?.id dependency if fetchUserData depends on it indirectly
+    [selectedCurrentSkillsMap, selectedDesiredSkillIds]
   );
 
   // Cancel Handlers

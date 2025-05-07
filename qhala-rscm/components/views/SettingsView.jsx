@@ -1,178 +1,172 @@
-import { useSession } from "next-auth/react";
+import SettingsCard from "@/components/common/SettingsCard";
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/common/Card";
-import Button from "@/components/common/Button.jsx";
-import { Settings, Users, Bell, Shield, Database } from "lucide-react";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+  Users,
+  Lock,
+  Bell,
+  Database,
+  UserCog,
+  Building,
+  UserPlus,
+  Mail,
+  MessageSquare,
+  Code,
+  Cpu,
+  HardDrive,
+  FileText,
+} from "lucide-react";
 
-// Settings sections data structure
-const settingsSections = [
-  {
-    title: "User Management",
-    icon: <Users size={18} className="mr-2" />,
-    items: [
-      {
-        title: "User Roles",
-        description: "Configure roles and permissions",
-        actionLabel: "Manage",
-        action: () => console.log("Navigate to user roles management"),
-      },
-      {
-        title: "Department Configuration",
-        description: "Set up departments and hierarchies",
-        actionLabel: "Manage",
-        action: () => console.log("Navigate to department configuration"),
-      },
-      {
-        title: "User Onboarding",
-        description: "Configure onboarding workflows",
-        actionLabel: "Manage",
-        action: () => console.log("Navigate to user onboarding settings"),
-      },
-    ],
-  },
-  {
-    title: "Security Settings",
-    icon: <Shield size={18} className="mr-2" />,
-    items: [
-      {
-        title: "Password Policy",
-        description: "Configure password requirements",
-        actionLabel: "Manage",
-        action: () => console.log("Navigate to password policy settings"),
-      },
-      {
-        title: "Two-Factor Authentication",
-        description: "Configure 2FA settings",
-        actionLabel: "Manage",
-        action: () => console.log("Navigate to 2FA settings"),
-      },
-      {
-        title: "API Keys",
-        description: "Manage integration access",
-        actionLabel: "Manage",
-        action: () => console.log("Navigate to API keys management"),
-      },
-    ],
-  },
-  {
-    title: "Notification Settings",
-    icon: <Bell size={18} className="mr-2" />,
-    items: [
-      {
-        title: "Email Notifications",
-        description: "Configure email templates and triggers",
-        actionLabel: "Manage",
-        action: () => console.log("Navigate to email notification settings"),
-      },
-      {
-        title: "In-App Notifications",
-        description: "Configure in-app alert settings",
-        actionLabel: "Manage",
-        action: () => console.log("Navigate to in-app notification settings"),
-      },
-    ],
-  },
-  {
-    title: "System Configuration",
-    icon: <Database size={18} className="mr-2" />,
-    items: [
-      {
-        title: "Skills Database",
-        description: "Manage available skills and categories",
-        actionLabel: "Manage",
-        action: () => console.log("Navigate to skills database management"),
-      },
-      {
-        title: "System Backup",
-        description: "Configure backup schedule and retention",
-        actionLabel: "Manage",
-        action: () => console.log("Navigate to system backup settings"),
-      },
-      {
-        title: "System Logs",
-        description: "View system activity and audit logs",
-        actionLabel: "View",
-        action: () => console.log("Navigate to system logs view"),
-      },
-    ],
-  },
-];
-
-export const SettingsView = () => {
-  const { data: session, status } = useSession();
-  const isLoading = status === "loading";
-
-  // Show loading state while session is being fetched
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <LoadingSpinner />
-      </div>
-    );
-  }
-
-  // Check if user is authenticated and has admin role
-  if (!session || session.user.role !== "admin") {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-700">
-            Access Restricted
-          </h2>
-          <p className="text-gray-500 mt-2">
-            You don't have permission to access settings.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
+const SettingsLayout = () => {
   return (
-    <div className="settings-view transition-opacity duration-300 opacity-100">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">System Settings</h1>
-        <p className="text-gray-600">
-          Manage organization-wide settings and configurations
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">
+          Admin Settings
+        </h1>
+        <p className="text-slate-600 dark:text-slate-400">
+          Configure system-wide settings and permissions
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {settingsSections.map((section, idx) => (
-          <Card key={idx}>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                {section.icon}
-                {section.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+      <div className="mb-10">
+        <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">
+          System Settings
+        </h2>
+        <p className="text-slate-600 dark:text-slate-400 mb-6">
+          Manage organization-wide settings and configurations
+        </p>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <SettingsCard
+              icon={<Users />}
+              title="User Management"
+              description=""
+            >
               <div className="space-y-4">
-                {section.items.map((item, subIdx) => (
-                  <div
-                    key={subIdx}
-                    className="flex justify-between items-center p-3 rounded-lg hover:bg-gray-50"
-                  >
-                    <div>
-                      <div className="font-medium">{item.title}</div>
-                      <div className="text-sm text-gray-500">
-                        {item.description}
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm" onClick={item.action}>
-                      {item.actionLabel}
-                    </Button>
-                  </div>
-                ))}
+                <SettingItem
+                  icon={<UserCog size={16} />}
+                  title="User Roles"
+                  description="Configure roles and permissions"
+                />
+                <SettingItem
+                  icon={<Building size={16} />}
+                  title="Department Configuration"
+                  description="Set up departments and hierarchies"
+                />
+                <SettingItem
+                  icon={<UserPlus size={16} />}
+                  title="User Onboarding"
+                  description="Configure onboarding workflows"
+                />
               </div>
-            </CardContent>
-          </Card>
-        ))}
+            </SettingsCard>
+
+            <SettingsCard
+              icon={<Bell />}
+              title="Notification Settings"
+              description=""
+            >
+              <div className="space-y-4">
+                <SettingItem
+                  icon={<Mail size={16} />}
+                  title="Email Notifications"
+                  description="Configure email templates and triggers"
+                />
+                <SettingItem
+                  icon={<MessageSquare size={16} />}
+                  title="In-App Notifications"
+                  description="Configure in-app alert settings"
+                />
+              </div>
+            </SettingsCard>
+          </div>
+
+          <div className="space-y-6">
+            <SettingsCard
+              icon={<Lock />}
+              title="Security Settings"
+              description=""
+            >
+              <div className="space-y-4">
+                <SettingItem
+                  icon={<Lock size={16} />}
+                  title="Password Policy"
+                  description="Configure password requirements"
+                />
+                <SettingItem
+                  icon={<UserCog size={16} />}
+                  title="Two-Factor Authentication"
+                  description="Configure 2FA settings"
+                />
+                <SettingItem
+                  icon={<Code size={16} />}
+                  title="API Keys"
+                  description="Manage integration access"
+                />
+              </div>
+            </SettingsCard>
+
+            <SettingsCard
+              icon={<Database />}
+              title="System Configuration"
+              description=""
+            >
+              <div className="space-y-4">
+                <SettingItem
+                  icon={<Cpu size={16} />}
+                  title="Skills Database"
+                  description="Manage available skills and categories"
+                />
+                <SettingItem
+                  icon={<HardDrive size={16} />}
+                  title="System Backup"
+                  description="Configure backup schedule and retention"
+                />
+                <SettingItem
+                  icon={<FileText size={16} />}
+                  title="System Logs"
+                  description="View system activity and audit logs"
+                  actionType="view"
+                />
+              </div>
+            </SettingsCard>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
+
+const SettingItem = ({ icon, title, description, actionType = "manage" }) => {
+  return (
+    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-slate-700 last:border-0">
+      <div className="flex items-start">
+        <div className="mr-3 mt-0.5 text-slate-400 dark:text-slate-500">
+          {icon}
+        </div>
+        <div>
+          <h4 className="text-sm font-medium text-slate-800 dark:text-white">
+            {title}
+          </h4>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {description}
+          </p>
+        </div>
+      </div>
+      <button
+        className={`
+        text-xs font-medium px-3 py-1 rounded transition-colors
+        ${
+          actionType === "manage"
+            ? "text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+            : "text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50"
+        }
+      `}
+      >
+        {actionType === "manage" ? "Manage" : "View"}
+      </button>
+    </div>
+  );
+};
+
+export default SettingsLayout;
