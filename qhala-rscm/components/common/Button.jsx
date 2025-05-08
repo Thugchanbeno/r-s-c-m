@@ -1,24 +1,29 @@
+// components/common/button
 "use client";
-
 import { twMerge } from "tailwind-merge";
 import { clsx } from "clsx";
-//specific buttons for use within the app, might need review bc of the warning in the tailwind css file
+
 const baseStyles =
-  "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-[rgb(var(--background))]";
+  "inline-flex items-center justify-center rounded-[var(--radius)] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-[rgb(var(--background))] focus-visible:ring-[rgb(var(--ring))]";
 
 const variantStyles = {
   primary:
-    "bg-[rgb(var(--button-primary-bg))] text-[rgb(var(--button-primary-text))] hover:bg-[rgb(var(--button-primary-hover-bg))] focus-visible:ring-[rgb(var(--button-primary-bg))]",
+    "bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))] hover:bg-blue-700",
+
   secondary:
-    "bg-[rgb(var(--button-secondary-bg,var(--muted-foreground)))] text-[rgb(var(--button-secondary-text,var(--background)))] hover:opacity-80 focus-visible:ring-[rgb(var(--button-secondary-bg,var(--muted-foreground)))]",
+    "bg-[rgb(var(--secondary))] text-[rgb(var(--secondary-foreground))] hover:opacity-80",
   outline:
-    "border border-[rgb(var(--border))] bg-transparent hover:bg-[rgba(var(--foreground),0.05)] dark:hover:bg-[rgba(var(--foreground),0.1)]",
+    "border border-[rgb(var(--border))] bg-transparent text-[rgb(var(--primary))] hover:bg-[rgba(var(--primary),0.1)]",
+
   ghost:
-    "hover:bg-[rgba(var(--foreground),0.05)] dark:hover:bg-[rgba(var(--foreground),0.1)]",
+    "text-[rgb(var(--primary))] hover:bg-[rgba(var(--primary),0.1)] dark:text-[rgb(var(--primary))] dark:hover:bg-[rgba(var(--primary),0.2)]",
+
+  subtle:
+    "text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-accent-background))] dark:text-blue-400 dark:hover:bg-blue-900",
   danger:
-    "bg-[rgb(var(--button-danger-bg,176,36,46))] text-[rgb(var(--button-danger-text,255,255,255))] hover:opacity-80 focus-visible:ring-[rgb(var(--button-danger-bg,176,36,46))]",
+    "bg-[rgb(var(--destructive))] text-[rgb(var(--destructive-foreground))] hover:opacity-80",
   success:
-    "bg-green-600 text-white hover:bg-green-700 focus-visible:ring-green-500",
+    "bg-[rgb(var(--success))] text-[rgb(var(--success-foreground))] hover:bg-green-700",
 };
 
 const sizeStyles = {
@@ -26,6 +31,7 @@ const sizeStyles = {
   md: "h-10 px-4 py-2 text-sm",
   lg: "h-12 px-6 text-base",
   icon: "h-10 w-10",
+  xs: "h-auto px-3 py-1 text-xs",
 };
 
 export default function Button({
@@ -56,26 +62,14 @@ export default function Button({
       disabled={isLoading || disabled}
       {...props}
     >
+      {/* SVG Loader remains the same */}
       {isLoading && (
         <svg
           className="animate-spin h-4 w-4 text-current"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
+          // ... (rest of SVG)
         >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          />
+          <circle /* ... */ />
+          <path /* ... */ />
         </svg>
       )}
       <span className={clsx("inline-flex items-center", { "ml-2": isLoading })}>

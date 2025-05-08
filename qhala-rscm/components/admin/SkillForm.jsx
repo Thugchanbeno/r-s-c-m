@@ -1,8 +1,9 @@
 "use client";
 import { useState } from "react";
 import Button from "@/components/common/Button";
+import { AlertCircle, CheckCircle } from "lucide-react";
 
-const AddSkillForm = ({ onSkillAdded }) => {
+const AddSkillForm = ({ onSkillAdded, onCancel }) => {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
@@ -30,11 +31,10 @@ const AddSkillForm = ({ onSkillAdded }) => {
       }
 
       setSuccess(`Skill "${result.data.name}" added successfully!`);
-      // Clear form
       setName("");
       setCategory("");
       setDescription("");
-      if (onSkillAdded) onSkillAdded(); // Notify parent (e.g., close form, refresh list)
+      if (onSkillAdded) onSkillAdded();
     } catch (err) {
       setError(err.message || "Could not add skill.");
     } finally {
@@ -42,23 +42,28 @@ const AddSkillForm = ({ onSkillAdded }) => {
     }
   };
 
+  const inputBaseClasses =
+    "mt-1 block w-full rounded-[var(--radius)] border-[rgb(var(--border))] bg-[rgb(var(--background))] text-[rgb(var(--foreground))] shadow-sm focus:border-[rgb(var(--primary))] focus:ring-1 focus:ring-[rgb(var(--primary))] sm:text-sm p-2 placeholder:text-[rgb(var(--muted-foreground))] disabled:opacity-50 disabled:cursor-not-allowed";
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 p-1">
       {error && (
-        <p className="text-sm text-red-600 bg-red-100 p-2 rounded">
-          Error: {error}
-        </p>
+        <div className="flex items-center p-3 text-sm rounded-[var(--radius)] bg-red-50 text-red-700 border border-red-200 shadow-sm">
+          <AlertCircle size={16} className="mr-2 flex-shrink-0" />
+          <span>{error}</span>
+        </div>
       )}
       {success && (
-        <p className="text-sm text-green-600 bg-green-100 p-2 rounded">
-          {success}
-        </p>
+        <div className="flex items-center p-3 text-sm rounded-[var(--radius)] bg-green-50 text-green-700 border border-green-200 shadow-sm">
+          <CheckCircle size={16} className="mr-2 flex-shrink-0" />
+          <span>{success}</span>
+        </div>
       )}
 
       <div>
         <label
           htmlFor="skill-name"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="block text-sm font-medium text-[rgb(var(--foreground))]"
         >
           Skill Name*
         </label>
@@ -68,14 +73,15 @@ const AddSkillForm = ({ onSkillAdded }) => {
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+          className={`${inputBaseClasses.replace("p-2", "")} px-4 py-2 `}
+          placeholder="e.g., JavaScript, Python"
         />
       </div>
 
       <div>
         <label
           htmlFor="skill-category"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="block text-sm font-medium text-[rgb(var(--foreground))]"
         >
           Category (Optional)
         </label>
@@ -84,15 +90,15 @@ const AddSkillForm = ({ onSkillAdded }) => {
           id="skill-category"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
-          placeholder="e.g., Programming, Data Science, Cloud"
+          className={`${inputBaseClasses.replace("p-2", "")} px-4 py-2 `}
+          placeholder="e.g., Programming, Design, Cloud"
         />
       </div>
 
       <div>
         <label
           htmlFor="skill-description"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="block text-sm font-medium text-[rgb(var(--foreground))]"
         >
           Description (Optional)
         </label>
@@ -100,14 +106,32 @@ const AddSkillForm = ({ onSkillAdded }) => {
           id="skill-description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          rows={2}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+          rows={3}
+          className={`${inputBaseClasses.replace("p-2", "")} px-4 py-2 `}
+          placeholder="Briefly describe the skill"
         />
       </div>
 
-      <div className="flex justify-end">
-        <Button type="submit" disabled={submitting} isLoading={submitting}>
-          {submitting ? "Adding..." : "Add Skill"}
+      <div className="flex justify-end space-x-3 pt-2">
+        {" "}
+        {/* Added space-x-3 */}
+        {onCancel && ( // Conditionally render Cancel button
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={submitting}
+          >
+            Cancel
+          </Button>
+        )}
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={submitting}
+          isLoading={submitting}
+        >
+          Add Skill
         </Button>
       </div>
     </form>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import ProjectForm from "@/components/ProjectForm";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { ArrowLeft } from "lucide-react";
+import { Card, CardContent } from "@/components/common/Card";
 
 export default function NewProjectPage() {
   const { data: session, status } = useSession({ required: true });
@@ -20,7 +21,6 @@ export default function NewProjectPage() {
     async (projectData) => {
       setIsSubmitting(true);
       setError(null);
-      console.log("Submitting new project data:", projectData);
 
       try {
         const response = await fetch("/api/projects", {
@@ -41,25 +41,28 @@ export default function NewProjectPage() {
           throw new Error(result.error || "API returned success: false");
         }
 
-        console.log("Project created successfully:", result.data);
-
-        // alert('Project created successfully!'); set up toast
         router.push("/projects");
-        // router.refresh(); // Optionally refresh data on the target page if needed
       } catch (err) {
         console.error("Failed to create project:", err);
         setError(
           err.message || "Could not create project. Please check details."
         );
-        setIsSubmitting(false);
+      } finally {
+        let requestSuccessful = false;
+        if (typeof response !== "undefined" && typeof result !== "undefined") {
+          requestSuccessful = response.ok && result.success;
+        }
+        if (error || !requestSuccessful) {
+          setIsSubmitting(false);
+        }
       }
     },
-    [router]
+    [router, error]
   );
 
   if (status === "loading") {
     return (
-      <div className="flex justify-center items-center pt-20">
+      <div className="flex justify-center items-center min-h-screen bg-[rgb(var(--background))]">
         <LoadingSpinner size={30} />
       </div>
     );
@@ -67,16 +70,23 @@ export default function NewProjectPage() {
 
   if (!canCreateProject) {
     return (
-      <div className="p-6 text-center">
-        <p className="text-red-600">
-          Access Denied: You do not have permission to create projects.
-        </p>
-        <Link
-          href="/dashboard"
-          className="text-blue-600 hover:underline mt-4 inline-block"
-        >
-          Go to Dashboard
-        </Link>
+      <div className="flex justify-center items-center min-h-screen bg-[rgb(var(--muted))] p-4">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="p-8">
+            <p className="text-lg font-medium text-red-600 mb-4">
+              Access Denied
+            </p>
+            <p className="text-[rgb(var(--muted-foreground))] mb-6">
+              You do not have permission to create projects.
+            </p>
+            <Link
+              href="/dashboard"
+              className="text-[rgb(var(--primary))] hover:underline font-medium"
+            >
+              Go to Dashboard
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -86,21 +96,17 @@ export default function NewProjectPage() {
       <div className="mb-6">
         <Link
           href="/projects"
-          className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 inline-flex items-center mb-2 text-sm"
+          className="text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))] inline-flex items-center text-sm font-medium"
         >
           <ArrowLeft size={16} className="mr-1" /> Back to Projects
         </Link>
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
-          Create New Project
-        </h1>
       </div>
 
       <ProjectForm
         onSubmit={handleCreateProject}
         isSubmitting={isSubmitting}
         submitError={error}
-        // onCancel={() => router.push('/projects')}
-        // isEditMode={false} // Explicitly set if form is reused for editing
+        onCancel={() => router.push("/projects")}
       />
     </div>
   );

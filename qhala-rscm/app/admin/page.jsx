@@ -1,13 +1,16 @@
 "use client";
+
 import { useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
   CardFooter,
-} from "@/components/common/Card.jsx";
+} from "@/components/common/Card.jsx"; // Themed
+import Button from "@/components/common/Button.jsx"; // Themed
 import {
   Users,
   Wrench,
@@ -15,11 +18,40 @@ import {
   TrendingUp,
   Eye,
   ArrowRight,
+  Plus,
+  ChevronRight,
+  Shield,
+  Activity,
 } from "lucide-react";
+
+// Animation variants (unchanged)
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 24,
+    },
+  },
+};
 
 export default function AdminDashboardPage() {
   const [hoveredCard, setHoveredCard] = useState(null);
-  //might need to be moved to a separate component for granularity
+
   const adminCards = [
     {
       id: "users",
@@ -28,7 +60,9 @@ export default function AdminDashboardPage() {
       icon: <Users size={22} />,
       href: "/admin/users",
       stats: "24 active users",
-      color: "bg-blue-50 dark:bg-blue-900/20",
+      color: "bg-[rgb(var(--primary-accent-background))]",
+      gradient:
+        "from-[rgba(var(--primary),0.1)] to-[rgba(var(--primary),0.15)]",
     },
     {
       id: "skills",
@@ -37,7 +71,8 @@ export default function AdminDashboardPage() {
       icon: <Wrench size={22} />,
       href: "/admin/skills",
       stats: "86 skills defined",
-      color: "bg-emerald-50 dark:bg-emerald-900/20",
+      color: "bg-emerald-50",
+      gradient: "from-emerald-500/10 to-emerald-600/10",
     },
     {
       id: "settings",
@@ -46,7 +81,8 @@ export default function AdminDashboardPage() {
       icon: <Settings size={22} />,
       href: "/admin/settings",
       stats: "Last updated 2 days ago",
-      color: "bg-purple-50 dark:bg-purple-900/20",
+      color: "bg-purple-50",
+      gradient: "from-purple-500/10 to-purple-600/10",
     },
     {
       id: "analytics",
@@ -55,90 +91,162 @@ export default function AdminDashboardPage() {
       icon: <TrendingUp size={22} />,
       href: "/admin/analytics",
       stats: "12 reports available",
-      color: "bg-amber-50 dark:bg-amber-900/20",
+      color: "bg-amber-50",
+      gradient: "from-amber-500/10 to-amber-600/10",
+    },
+  ];
+
+  const quickActions = [
+    {
+      id: "add-user",
+      title: "Add New User",
+      icon: <Users size={16} />,
+      color:
+        "bg-[rgba(var(--primary),0.1)] hover:bg-[rgba(var(--primary),0.2)]",
+      textColor: "text-[rgb(var(--primary))]",
+    },
+    {
+      id: "add-skill",
+      title: "Create Skill",
+      icon: <Wrench size={16} />,
+      color: "bg-emerald-100 hover:bg-emerald-200",
+      textColor: "text-emerald-800",
+    },
+    {
+      id: "backup",
+      title: "System Backup",
+      icon: <Shield size={16} />,
+      color: "bg-purple-100 hover:bg-purple-200",
+      textColor: "text-purple-800",
     },
   ];
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-3  dark:text-gray-100">
-          Admin Dashboard
-        </h1>
-        <p className="text-gray-950 dark:text-gray-100 max-w-2xl">
-          Welcome to the administration panel. Manage all aspects of your system
-          from this central dashboard.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {adminCards.map((card) => (
-          <Link
-            key={card.id}
-            href={card.href}
-            className="block group"
-            onMouseEnter={() => setHoveredCard(card.id)}
-            onMouseLeave={() => setHoveredCard(null)}
-          >
-            <Card
-              className={`h-full border-transparent hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 ${
-                hoveredCard === card.id
-                  ? "shadow-lg transform -translate-y-1"
-                  : "shadow"
-              }`}
-            >
-              <CardHeader className={`${card.color} rounded-t-lg`}>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center text-gray-950 dark:text-gray-100">
-                    <span className="p-2 rounded-full bg-white dark:bg-gray-800 shadow-sm mr-3">
-                      {card.icon}
-                    </span>
-                    {card.title}
-                  </CardTitle>
-                  <ArrowRight
-                    size={20}
-                    className={`text-gray-400 transform transition-transform duration-300 ${
-                      hoveredCard === card.id
-                        ? "translate-x-1 text-blue-500"
-                        : ""
-                    }`}
-                  />
-                </div>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <p className="text-sm text-gray-600 dark:text-gray-100">
-                  {card.description}
-                </p>
-              </CardContent>
-              <CardFooter className="text-xs text-gray-500 dark:text-gray-100 flex items-center">
-                <Eye size={12} className="mr-1" />
-                {card.stats}
-              </CardFooter>
-            </Card>
-          </Link>
-        ))}
-      </div>
-
-      <div className="mt-8 p-6 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
-          Quick Actions
-        </h2>
-        {/* this section's functionality hasn't been implemented yet */}
-        <div className="flex flex-wrap gap-3">
-          <button className="px-4 py-2 text-sm bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-800/40 text-blue-800 dark:text-blue-200 rounded-md transition-colors flex items-center">
-            <Users size={16} className="mr-2" />
-            Add New User
-          </button>
-          <button className="px-4 py-2 text-sm bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:hover:bg-emerald-800/40 text-emerald-800 dark:text-emerald-200 rounded-md transition-colors flex items-center">
-            <Wrench size={16} className="mr-2" />
-            Create Skill
-          </button>
-          <button className="px-4 py-2 text-sm bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:hover:bg-purple-800/40 text-purple-800 dark:text-purple-200 rounded-md transition-colors flex items-center">
-            <Settings size={16} className="mr-2" />
-            System Backup
-          </button>
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="min-h-screen bg-[rgb(var(--muted))] p-4 sm:p-6 lg:p-8 rounded-lg"
+    >
+      <header className="pb-6 mb-6 border-b border-[rgb(var(--border))]">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-between items-center">
+            <div>
+              <motion.h1
+                variants={itemVariants}
+                className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
+              >
+                Admin Dashboard
+              </motion.h1>
+              <motion.p
+                variants={itemVariants}
+                className="mt-1 text-[rgb(var(--muted-foreground))]"
+              >
+                Manage and monitor your system
+              </motion.p>
+            </div>
+            <div className="flex items-center gap-4">
+              <motion.div variants={itemVariants}>
+                <Button variant="outline" size="sm">
+                  <Activity size={16} className="mr-2" />
+                  System Status
+                </Button>
+              </motion.div>
+            </div>
+          </div>
         </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto">
+        {/* Admin Cards */}
+        <motion.div
+          variants={containerVariants}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          {adminCards.map((card) => (
+            <motion.div key={card.id} variants={itemVariants}>
+              <Link
+                href={card.href}
+                className="block group"
+                onMouseEnter={() => setHoveredCard(card.id)}
+                onMouseLeave={() => setHoveredCard(null)}
+              >
+                <Card className="h-full border-transparent hover:border-[rgba(var(--primary),0.5)] transition-all duration-300 flex flex-col">
+                  <CardHeader
+                    className={`relative overflow-hidden ${card.color} rounded-t-[var(--radius)] p-5`}
+                  >
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-r ${
+                        card.gradient
+                      } transform transition-transform duration-500 ${
+                        hoveredCard === card.id ? "scale-110" : "scale-100"
+                      }`}
+                    />
+                    <div className="relative z-10 flex items-center justify-between">
+                      <CardTitle className="flex items-center text-[rgb(var(--card-foreground))]">
+                        <span className="p-2 rounded-lg bg-[rgba(var(--card),0.8)] shadow-sm backdrop-blur-sm mr-3">
+                          {card.icon}
+                        </span>
+                        {card.title}
+                      </CardTitle>
+                      <ArrowRight
+                        size={20}
+                        className={`text-[rgb(var(--muted-foreground))] transform transition-all duration-300 ${
+                          hoveredCard === card.id
+                            ? "translate-x-1 text-[rgb(var(--primary))]"
+                            : ""
+                        }`}
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-5 flex-grow">
+                    <p className="text-sm text-[rgb(var(--muted-foreground))]">
+                      {card.description}
+                    </p>
+                  </CardContent>
+                  <CardFooter className="text-xs text-[rgb(var(--muted-foreground))] flex items-center p-5">
+                    <Eye size={12} className="mr-1" />
+                    {card.stats}
+                  </CardFooter>
+                </Card>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Quick Actions */}
+        <motion.div variants={itemVariants} className="mt-8">
+          <Card>
+            <CardHeader className="border-b border-[rgb(var(--border))]">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-[rgb(var(--card-foreground))]">
+                  <Plus size={20} className="text-[rgb(var(--primary))]" />
+                  Quick Actions
+                </CardTitle>
+                <button className="text-sm text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))] flex items-center gap-1">
+                  View All
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="flex flex-wrap gap-3">
+                {quickActions.map((action) => (
+                  <button
+                    key={action.id}
+                    className={`px-4 py-2 rounded-[var(--radius)] text-sm font-medium ${action.color} ${action.textColor} transition-colors flex items-center gap-2 group`}
+                  >
+                    <span className="group-hover:scale-110 transition-transform duration-200">
+                      {action.icon}
+                    </span>
+                    {action.title}
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }

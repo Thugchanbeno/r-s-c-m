@@ -2,19 +2,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import qlogo from "@/assets/qlogo.png";
-import { cn } from "@/lib/utils";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
+  const footerBg = "bg-slate-900";
+  const footerBorder = "border-slate-700";
+  const footerTextPrimary = "text-slate-100";
+  const footerTextSecondary = "text-slate-400";
+  const footerHoverBg = "hover:bg-slate-800";
+  const footerFocusRing = "focus:ring-slate-500";
+  const footerLinkHoverText = "hover:text-slate-100";
+
   return (
-    <footer
-      className={cn(
-        "border-t mt-auto p-4",
-        "bg-white border-gray-200",
-        "dark:bg-gray-900 dark:border-gray-800"
-      )}
-    >
+    <footer className={` mt-auto p-4 ${footerBg}`}>
       <div className="container mx-auto flex flex-col md:flex-row items-center justify-between px-4">
         <div className="flex items-center mb-4 md:mb-0">
           <div className="relative h-8 w-8 mr-2">
@@ -23,26 +24,20 @@ export default function Footer() {
               alt="Qhala Logo"
               fill
               className="object-contain"
+              sizes="32px"
             />
           </div>
-
-          <span className="text-xl font-bold text-gray-900 dark:text-white">
+          <span className={`text-xl font-bold ${footerTextPrimary}`}>
             Qhala RSCM
           </span>
         </div>
 
         <div className="flex flex-wrap justify-center md:justify-start mb-4 md:mb-0">
           <ul className="flex items-center space-x-4">
-            {" "}
             <li>
               <Link
                 href="/privacy"
-                className={cn(
-                  "p-2 rounded-md transition-colors duration-200 text-sm",
-                  "text-gray-600 hover:text-gray-900 hover:bg-gray-100",
-                  "dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-800",
-                  "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-gray-900 dark:focus:ring-gray-600"
-                )}
+                className={`p-2 rounded-[var(--radius)] transition-colors duration-200 text-sm ${footerTextSecondary} ${footerHoverBg} ${footerLinkHoverText} focus:outline-none focus:ring-2 focus:ring-offset-2 ${footerFocusRing} ring-offset-slate-900`}
               >
                 Privacy Policy
               </Link>
@@ -50,12 +45,7 @@ export default function Footer() {
             <li>
               <Link
                 href="/terms"
-                className={cn(
-                  "p-2 rounded-md transition-colors duration-200 text-sm",
-                  "text-gray-600 hover:text-gray-900 hover:bg-gray-100",
-                  "dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-800",
-                  "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-gray-900 dark:focus:ring-gray-600"
-                )}
+                className={`p-2 rounded-[var(--radius)] transition-colors duration-200 text-sm ${footerTextSecondary} ${footerHoverBg} ${footerLinkHoverText} focus:outline-none focus:ring-2 focus:ring-offset-2 ${footerFocusRing} ring-offset-slate-900`}
               >
                 Terms of Service
               </Link>
@@ -64,7 +54,7 @@ export default function Footer() {
         </div>
 
         <div className="text-center md:text-right">
-          <p className={cn("text-sm text-gray-600", "dark:text-gray-400")}>
+          <p className={`text-sm ${footerTextSecondary}`}>
             &copy; {currentYear} Qhala. All rights reserved.
           </p>
         </div>

@@ -23,21 +23,27 @@ const ResourcesView = () => {
 
   if (status === "loading") {
     return (
-      <div className="flex justify-center items-center p-10">
-        <LoadingSpinner size={20} />
+      <div className="flex flex-col justify-center items-center min-h-screen bg-[rgb(var(--background))] p-10 text-center">
+        <LoadingSpinner size={30} />
+        <p className="mt-3 text-[rgb(var(--muted-foreground))]">
+          Loading resources...
+        </p>
       </div>
     );
   }
+
+  const inputBaseClasses =
+    "block w-full rounded-[var(--radius)] border-[rgb(var(--border))] bg-[rgb(var(--background))] text-[rgb(var(--foreground))] shadow-sm focus:border-[rgb(var(--primary))] focus:ring-1 focus:ring-[rgb(var(--primary))] sm:text-sm placeholder:text-[rgb(var(--muted-foreground))]";
 
   return (
     <div className="animate-fade-in p-4 md:p-6">
       {/* Header and Search/Tabs */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-[rgb(var(--foreground))]">
             Resources
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-[rgb(var(--muted-foreground))]">
             View users and manage resource requests.
           </p>
         </div>
@@ -64,11 +70,11 @@ const ResourcesView = () => {
           {/* Search Input - Show only for Users tab for now */}
           {activeTab === "users" && (
             <div className="relative flex-grow md:flex-grow-0">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--muted-foreground))] pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search name, email, dept..." // Updated placeholder
-                className="pl-10 pr-4 py-2 border border-border rounded-md w-full text-sm dark:bg-gray-800 focus:ring-indigo-500 focus:border-indigo-500" // Themed border/bg + focus
+                placeholder="Search name, email, dept..."
+                className={`${inputBaseClasses} pl-10 pr-4 py-2 text-sm`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -85,8 +91,6 @@ const ResourcesView = () => {
               <CardTitle>User Directory</CardTitle>
             </CardHeader>
             <CardContent>
-              {/* Render UserList component, passing the search term */}
-              {/* UserList will need to be modified to accept and use this prop */}
               <UserList searchTerm={searchTerm} />
             </CardContent>
           </Card>
@@ -98,8 +102,7 @@ const ResourcesView = () => {
               <CardTitle>Resource Requests</CardTitle>
             </CardHeader>
             <CardContent>
-              {/* Placeholder for Requests - Implement when data/API is ready */}
-              <div className="text-center py-10 text-gray-500 dark:text-gray-400">
+              <div className="text-center py-10 text-[rgb(var(--muted-foreground))]">
                 <BellRing size={32} className="mx-auto mb-2" />
                 Resource request functionality is not yet implemented.
               </div>

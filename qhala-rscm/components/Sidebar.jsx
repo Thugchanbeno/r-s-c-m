@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -16,14 +15,12 @@ import {
   Menu,
   X,
 } from "lucide-react";
-
-// Import Button instead of defining it
-import Button from "@/components/common/Button.jsx"; // Adjust the import path as needed
+import Button from "@/components/common/Button.jsx";
 
 const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const pathname = usePathname();
 
   const userRole = session?.user?.role || "employee";
@@ -90,37 +87,44 @@ const Sidebar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, [isMobileOpen]);
 
-  // Use CSS classes to control width instead of flexible width classes
   const sidebarWidthClass = isExpanded ? "w-64" : "w-20";
   const mobileTransformClass = isMobileOpen
     ? "translate-x-0"
     : "-translate-x-full";
 
+  const sidebarBg = "bg-slate-900";
+  const sidebarBorder = "border-slate-700";
+  const sidebarTextPrimary = "text-slate-100";
+  const sidebarTextSecondary = "text-slate-400";
+  const sidebarHoverBg = "hover:bg-slate-800";
+  const sidebarActiveBg = "bg-[rgb(var(--primary))]";
+  const sidebarActiveText = "text-white";
+
   return (
     <>
-      {/* Mobile Menu Button (Hamburger) - Positioned top-left */}
+      {/* Mobile Menu Button (Hamburger) - Uses page theme */}
       <div className="fixed top-4 left-4 z-40 md:hidden">
         <Button
           variant="ghost"
           onClick={toggleMobileSidebar}
-          className="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-md p-2 shadow transition-all duration-300 ease-in-out"
+          className="text-[rgb(var(--muted-foreground))] bg-[rgb(var(--background))] hover:bg-[rgb(var(--muted))] p-2 shadow-md rounded-md"
           aria-label="Open sidebar"
         >
           <Menu size={24} />
         </Button>
       </div>
 
-      {/* Mobile Overlay - Dims background when mobile menu is open */}
+      {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 md:hidden transition-opacity duration-500 ease-in-out"
+          className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-500 ease-in-out"
           onClick={toggleMobileSidebar}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700
+        className={`fixed left-0 top-0 z-50 h-screen ${sidebarBg} border-r ${sidebarBorder}
                    transition-all duration-300 ease-in-out md:sticky md:translate-x-0
                    ${sidebarWidthClass} ${mobileTransformClass}`}
         aria-label="Sidebar"
@@ -128,11 +132,10 @@ const Sidebar = () => {
         <div className="flex h-full flex-col">
           {/* Sidebar Header */}
           <div
-            className={`flex h-16 items-center border-b dark:border-gray-700 px-4 shrink-0 ${
+            className={`flex h-16 items-center border-b ${sidebarBorder} px-4 shrink-0 ${
               isExpanded ? "justify-between" : "justify-center"
             } transition-all duration-300 ease-in-out`}
           >
-            {/* Show title only when expanded */}
             <div
               className={`overflow-hidden transition-all duration-300 ease-in-out ${
                 isExpanded ? "w-auto opacity-100" : "w-0 opacity-0"
@@ -140,16 +143,15 @@ const Sidebar = () => {
             >
               <Link
                 href="/dashboard"
-                className="text-xl font-bold text-indigo-600 dark:text-indigo-400 whitespace-nowrap"
+                className={`text-xl font-bold text-blue-400 whitespace-nowrap`}
               >
                 Qhala RSCM
               </Link>
             </div>
-            {/* Desktop Toggle Button */}
             <Button
               variant="ghost"
               onClick={toggleSidebar}
-              className="hidden md:inline-flex text-gray-600 dark:text-gray-400 transition-transform duration-300 ease-in-out"
+              className={`hidden md:inline-flex ${sidebarTextSecondary} hover:bg-slate-800`}
               aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
             >
               <ChevronLeft
@@ -159,18 +161,17 @@ const Sidebar = () => {
                 }`}
               />
             </Button>
-            {/* Mobile Close Button (X) - Placed inside header */}
             <Button
               variant="ghost"
               onClick={toggleMobileSidebar}
-              className="md:hidden text-gray-600 dark:text-gray-400 transition-all duration-300 ease-in-out"
+              className={`md:hidden ${sidebarTextSecondary} hover:bg-slate-800`}
               aria-label="Close sidebar"
             >
               <X size={24} />
             </Button>
           </div>
 
-          {/* Navigation Links - No overflow-y, let the parent handle that */}
+          {/* Navigation Links */}
           <nav className="flex-1 px-3 py-4 overflow-y-auto">
             <ul className="space-y-1">
               {filteredNavigation.map((item) => {
@@ -185,16 +186,16 @@ const Sidebar = () => {
                       className={`flex items-center p-2 rounded-md text-base font-medium group transition-all duration-300 ease-in-out
                                   ${
                                     isActive
-                                      ? "bg-indigo-600 text-white"
-                                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                      ? `${sidebarActiveBg} ${sidebarActiveText}`
+                                      : `${sidebarTextPrimary} ${sidebarHoverBg}`
                                   }
                                   ${!isExpanded ? "justify-center" : ""}`}
                     >
                       <span
                         className={`transition-colors duration-300 ease-in-out ${
                           isActive
-                            ? "text-white"
-                            : "text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100"
+                            ? sidebarActiveText
+                            : `${sidebarTextSecondary} group-hover:${sidebarTextPrimary}`
                         }`}
                       >
                         {item.icon}
@@ -216,7 +217,7 @@ const Sidebar = () => {
           </nav>
 
           {/* User Info & Logout */}
-          <div className="shrink-0 border-t border-gray-200 dark:border-gray-700 p-4">
+          <div className={`shrink-0 border-t ${sidebarBorder} p-4`}>
             <div className="flex items-center gap-3">
               <Image
                 className="h-10 w-10 rounded-full object-cover transition-all duration-300 ease-in-out"
@@ -225,24 +226,24 @@ const Sidebar = () => {
                 width={40}
                 height={40}
               />
-              {/* User info with transition */}
               <div
                 className={`flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
                   isExpanded ? "w-auto opacity-100" : "w-0 opacity-0"
                 }`}
               >
-                <span className="font-medium text-sm truncate text-gray-900 dark:text-gray-100">
+                <span
+                  className={`font-medium text-sm truncate ${sidebarTextPrimary}`}
+                >
                   {userName}
                 </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                <span className={`text-xs ${sidebarTextSecondary} capitalize`}>
                   {userRole}
                 </span>
               </div>
-              {/* Logout Button */}
               <Button
                 variant="ghost"
                 onClick={handleSignOut}
-                className={`ml-auto text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 ease-in-out ${
+                className={`ml-auto ${sidebarTextSecondary} ${sidebarHoverBg} transition-all duration-300 ease-in-out ${
                   !isExpanded ? "w-full justify-center" : ""
                 }`}
                 aria-label="Sign out"

@@ -1,19 +1,43 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
-import Image from "next/image";
-import Button from "@/components/common/Button";
-import { Card, CardContent } from "@/components/common/Card";
-import Badge from "@/components/common/Badge";
-import { Edit, Trash2, Mail, Building, UserCheck } from "lucide-react";
 
-// Accepts searchTerm for filtering, and callbacks for edit/delete actions
+import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
+import LoadingSpinner from "@/components/common/LoadingSpinner"; // Themed
+import Image from "next/image";
+import Button from "@/components/common/Button"; // Themed
+import { Card, CardContent } from "@/components/common/Card"; // Themed
+import Badge from "@/components/common/Badge"; // Themed
+import { Edit, Trash2, Mail, Building, UserCheck, Search } from "lucide-react";
+
+// Animation variants (unchanged)
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 24,
+    },
+  },
+};
+
 const UserList = ({ searchTerm = "", onEditUser, onDeleteUser }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Memoized fetch function (remains the same)
   const fetchUsers = useCallback(async (search) => {
     setLoading(true);
     setError(null);
@@ -46,12 +70,10 @@ const UserList = ({ searchTerm = "", onEditUser, onDeleteUser }) => {
     }
   }, []);
 
-  // Effect to fetch users (remains the same)
   useEffect(() => {
     fetchUsers(searchTerm);
   }, [searchTerm, fetchUsers]);
 
-  // Action Handlers (remain the same)
   const handleEditClick = (userId) => {
     if (onEditUser) onEditUser(userId);
     else console.warn("UserList: onEditUser prop not provided.");
@@ -64,121 +86,149 @@ const UserList = ({ searchTerm = "", onEditUser, onDeleteUser }) => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center p-6 min-h-[200px]">
-        <LoadingSpinner size={20} />
+      <div className="flex justify-center items-center min-h-[300px] bg-[rgb(var(--muted))] rounded-[var(--radius)] shadow-sm">
+        <div className="flex flex-col items-center gap-3">
+          <LoadingSpinner size={24} />
+          <p className="text-sm text-[rgb(var(--muted-foreground))]">
+            Loading users...
+          </p>
+        </div>
       </div>
     );
   }
+
   if (error) {
     return (
-      <div className="text-center text-red-600 p-4 border border-red-200 bg-red-50 rounded">
-        Error loading users: {error}
-      </div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="p-6 bg-red-50 border border-red-200 rounded-[var(--radius)] shadow-sm"
+      >
+        <div className="flex items-center gap-3 text-red-600">
+          <span className="p-2 bg-red-100 rounded-lg">
+            <Search className="w-5 h-5" /> {/* Or AlertCircle */}
+          </span>
+          <p className="font-medium">Error loading users: {error}</p>
+        </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="space-y-4"
+    >
       {users.length === 0 ? (
-        <div className="text-center py-10 text-gray-500 dark:text-gray-400 italic border border-dashed rounded-md">
-          {searchTerm
-            ? `No users found matching "${searchTerm}".`
-            : "No users found."}
-        </div>
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-col items-center justify-center py-12 px-6 bg-[rgb(var(--muted))] rounded-[var(--radius)] border-2 border-dashed border-[rgb(var(--border))]"
+        >
+          <Search className="w-12 h-12 text-[rgb(var(--muted-foreground))] mb-3" />
+          <p className="text-[rgb(var(--muted-foreground))] text-center">
+            {searchTerm
+              ? `No users found matching "${searchTerm}"`
+              : "No users found."}
+          </p>
+        </motion.div>
       ) : (
-        // Map users to Card components the ui for the cards might need extra work to spread out the info more evenly within the card
         users.map((user) => (
-          <Card key={user._id} className="p-0 overflow-hidden">
-            <CardContent className="p-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <div className="flex items-center flex-shrink-0">
-                  {user.avatarUrl && (
-                    <div className="relative h-16 w-16 mr-4">
-                      <Image
-                        className="rounded-full object-cover"
-                        src={user.avatarUrl}
-                        alt={`${user.name}'s avatar`}
-                        fill
-                        sizes="64px"
-                      />
+          <motion.div key={user._id} variants={itemVariants}>
+            {/* Card component handles its own border and shadow */}
+            <Card className="group overflow-hidden transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex flex-col sm:flex-row items-start gap-6">
+                  {/* User Avatar and Basic Info */}
+                  <div className="flex items-center gap-5">
+                    <div className="relative">
+                      {/* Gradient hover effect - kept as it's a specific design */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-[rgb(var(--primary))] to-purple-500 rounded-full opacity-0 group-hover:opacity-75 transition-opacity duration-300" />
+                      {user.avatarUrl && (
+                        <div className="relative h-16 w-16">
+                          <Image
+                            className="rounded-full object-cover border-4 border-[rgb(var(--card))]" // Border matches card background
+                            src={user.avatarUrl}
+                            alt={`${user.name}'s avatar`}
+                            fill
+                            sizes="64px"
+                          />
+                        </div>
+                      )}
                     </div>
-                  )}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                      {user.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
-                      <Mail size={14} className="mr-1.5 opacity-70" />{" "}
-                      {user.email}
-                    </p>
+                    <div>
+                      <h3 className="text-xl font-semibold text-[rgb(var(--card-foreground))] group-hover:text-[rgb(var(--primary))] transition-colors duration-300">
+                        {user.name}
+                      </h3>
+                      <p className="text-sm text-[rgb(var(--muted-foreground))] flex items-center mt-1">
+                        <Mail size={14} className="mr-2 opacity-70" />
+                        {user.email}
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex-grow hidden sm:block"></div>
-                <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 w-full sm:w-auto mt-3 sm:mt-0">
-                  <div className="flex flex-col items-start sm:items-end text-sm w-full sm:w-auto">
-                    <div className="flex items-center mb-1">
-                      <UserCheck
-                        size={14}
-                        className="mr-1.5 text-gray-500 dark:text-gray-400"
-                      />
-                      <span className="font-medium mr-2 text-gray-600 dark:text-gray-300">
-                        Role:
-                      </span>
-                      <Badge
-                        variant={
-                          // Use Badge component for role
-                          user.role === "admin" || user.role === "hr"
-                            ? "destructive"
-                            : user.role === "pm"
-                            ? "warning"
-                            : "success"
-                        }
-                        className="capitalize"
+                  {/* User Details and Actions */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 ml-auto">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <UserCheck
+                          size={16}
+                          className="text-[rgb(var(--muted-foreground))]"
+                        />
+                        <Badge
+                          variant={
+                            user.role === "admin" || user.role === "hr"
+                              ? "error" // Assuming 'error' variant for destructive/red
+                              : user.role === "pm"
+                              ? "warning"
+                              : "success" // Or 'primary'/'default'
+                          }
+                          className="capitalize px-3 py-1"
+                          pill={true} // Or false for squared
+                        >
+                          {user.role}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Building
+                          size={16}
+                          className="text-[rgb(var(--muted-foreground))]"
+                        />
+                        <span className="text-sm font-medium text-[rgb(var(--card-foreground))]">
+                          {user.department || "N/A"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 sm:ml-6">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditClick(user._id)}
+                        className="text-[rgb(var(--primary))] hover:bg-[rgba(var(--primary),0.1)] p-2"
+                        aria-label="Edit user"
                       >
-                        {user.role}
-                      </Badge>
+                        <Edit size={18} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteClick(user._id)}
+                        className="text-red-600 hover:bg-red-50 p-2"
+                        aria-label="Delete user"
+                      >
+                        <Trash2 size={18} />
+                      </Button>
                     </div>
-                    <div className="flex items-center">
-                      <Building
-                        size={14}
-                        className="mr-1.5 text-gray-500 dark:text-gray-400"
-                      />
-                      <span className="font-medium mr-2 text-gray-600 dark:text-gray-300">
-                        Dept:
-                      </span>
-                      <span className="text-gray-700 dark:text-gray-200">
-                        {user.department || "N/A"}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 mt-2 sm:mt-0 self-start sm:self-center">
-                    <Button
-                      variant="ghost"
-                      size="sm" // Use sm for potentially smaller buttons
-                      onClick={() => handleEditClick(user._id)}
-                      className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 p-1"
-                      aria-label={`Edit user ${user.name}`}
-                    >
-                      <Edit size={18} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteClick(user._id)}
-                      className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1"
-                      aria-label={`Delete user ${user.name}`}
-                    >
-                      <Trash2 size={18} />
-                    </Button>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
         ))
       )}
-    </div>
+    </motion.div>
   );
 };
 

@@ -1,25 +1,23 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import Button from "@/components/common/Button"; // Adjust path
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import Button from "@/components/common/Button"; // Themed
+import LoadingSpinner from "@/components/common/LoadingSpinner"; // Themed
+import { AlertCircle, CheckCircle } from "lucide-react"; // Icons for messages
 
-// This form fetches user data and allows editing specific fields (role, department)
 const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
-  // Form state - initialize empty, will be filled by fetched data
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    role: "employee", // Default role
+    role: "employee",
     department: "",
     authProviderId: "",
   });
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // True initially to fetch data
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // Fetch existing user data when userId changes
   const fetchUserData = useCallback(async () => {
     if (!userId) {
       setError("No User ID provided for editing.");
@@ -41,7 +39,6 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
       }
       const result = await response.json();
       if (result.success && result.data) {
-        // Populate form state with fetched data
         setFormData({
           name: result.data.name || "",
           email: result.data.email || "",
@@ -62,18 +59,16 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
 
   useEffect(() => {
     fetchUserData();
-  }, [fetchUserData]); // Trigger fetch on mount and when fetchUserData changes (due to userId)
+  }, [fetchUserData]);
 
-  // Handle changes only for editable fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value, // Update only role or department
+      [name]: value,
     }));
   };
 
-  // Handle form submission (Update via PUT)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -84,7 +79,6 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
       const response = await fetch(`/api/users/${userId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        // Only send fields that are meant to be updated
         body: JSON.stringify({
           role: formData.role,
           department: formData.department,
@@ -101,10 +95,8 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
 
       setSuccess(`User "${formData.name}" updated successfully!`);
       if (onUserUpdated) {
-        onUserUpdated(result.data);
+        onUserUpdated(result.data); // Pass updated data back
       }
-      // Optionally close modal after a delay or let parent handle it via onUserUpdated
-      // setTimeout(onCancel, 1500);
     } catch (err) {
       console.error("EditUserForm: Failed to update user:", err);
       setError(err.message || "Could not update user.");
@@ -113,58 +105,68 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
     }
   };
 
-  // Render loading state while fetching initial data
+  const inputBaseClasses =
+    "mt-1 block w-full rounded-[var(--radius)] border-[rgb(var(--border))] bg-[rgb(var(--background))] text-[rgb(var(--foreground))] shadow-sm focus:border-[rgb(var(--primary))] focus:ring-1 focus:ring-[rgb(var(--primary))] sm:text-sm p-2 placeholder:text-[rgb(var(--muted-foreground))] disabled:opacity-50 disabled:cursor-not-allowed";
+
   if (loading) {
     return (
-      <div className="p-4 text-center">
-        <LoadingSpinner size={20} />
+      <div className="p-10 text-center min-h-[200px] flex flex-col justify-center items-center">
+        <LoadingSpinner size={24} />
+        <p className="mt-2 text-sm text-[rgb(var(--muted-foreground))]">
+          Loading user data...
+        </p>
       </div>
     );
   }
 
-  // Render form content
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-1">
       {error && (
-        <p className="text-sm text-red-600 bg-red-100 p-3 rounded -mt-1 mb-3">
-          Error: {error}
-        </p>
+        <div className="flex items-center p-3 text-sm rounded-[var(--radius)] bg-red-50 text-red-700 border border-red-200 shadow-sm">
+          <AlertCircle size={16} className="mr-2 flex-shrink-0" />
+          <span>{error}</span>
+        </div>
       )}
       {success && (
-        <p className="text-sm text-green-600 bg-green-100 p-3 rounded -mt-1 mb-3">
-          {success}
-        </p>
+        <div className="flex items-center p-3 text-sm rounded-[var(--radius)] bg-green-50 text-green-700 border border-green-200 shadow-sm">
+          <CheckCircle size={16} className="mr-2 flex-shrink-0" />
+          <span>{success}</span>
+        </div>
       )}
-      <div className="border-b pb-3 mb-3">
-        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+
+      {/* Display-only fields */}
+      <div className="border-b border-[rgb(var(--border))] pb-3 mb-3">
+        <p className="text-sm font-medium text-[rgb(var(--muted-foreground))]">
           Name
         </p>
-        <p className="mt-1 text-base text-gray-900 dark:text-gray-100">
+        <p className="mt-1 text-base text-[rgb(var(--foreground))]">
           {formData.name || "(Not Available)"}
         </p>
       </div>
-      <div className="border-b pb-3 mb-3">
-        <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">
+      <div className="border-b border-[rgb(var(--border))] pb-3 mb-3">
+        <label className="block text-sm font-medium text-[rgb(var(--muted-foreground))]">
           Email Address
         </label>
-        <p className="mt-1 text-base text-gray-900 dark:text-gray-100">
+        <p className="mt-1 text-base text-[rgb(var(--foreground))]">
           {formData.email || "(Not Available)"}
         </p>
       </div>
+
+      {/* Editable fields */}
       <div>
         <label
           htmlFor="role"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="block text-sm font-medium text-[rgb(var(--foreground))]"
         >
           Role*
         </label>
         <select
           id="role"
-          name="role" // Name matches state key
+          name="role"
           value={formData.role}
           onChange={handleChange}
           required
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" // Added padding
+          className={`${inputBaseClasses} appearance-none px-4 py-2`}
         >
           <option value="employee">Employee</option>
           <option value="pm">Project Manager</option>
@@ -175,22 +177,23 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
       <div>
         <label
           htmlFor="department"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="block text-sm font-medium text-[rgb(var(--foreground))]"
         >
           Department
         </label>
         <input
           type="text"
           id="department"
-          name="department" // Name matches state key
+          name="department"
           value={formData.department}
           onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+          className={`${inputBaseClasses.replace("p-2", "")} px-4 py-2 `}
+          placeholder="Enter department"
         />
       </div>
-      {/* Action Buttons */}
+
       <div className="flex justify-end space-x-3 pt-4">
-        {onCancel && ( // Show cancel button only if handler is provided
+        {onCancel && (
           <Button
             type="button"
             variant="outline"
@@ -200,8 +203,14 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
             Cancel
           </Button>
         )}
-        <Button type="submit" disabled={submitting} isLoading={submitting}>
-          {submitting ? "Saving..." : "Save Changes"}
+        <Button
+          type="submit"
+          variant="primary" // Explicitly use primary variant
+          disabled={submitting}
+          isLoading={submitting}
+        >
+          {/* isLoading prop handles text change in Button component */}
+          Save Changes
         </Button>
       </div>
     </form>

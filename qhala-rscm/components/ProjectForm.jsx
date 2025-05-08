@@ -7,9 +7,9 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  CardFooter,
 } from "@/components/common/Card.jsx";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import Badge from "@/components/common/Badge";
 import { CalendarIcon, AlertCircle, Briefcase } from "lucide-react";
 // import SkillSelector from '@/components/profile/SkillSelector';
 
@@ -34,69 +34,62 @@ const ProjectForm = ({
   // const [allSkills, setAllSkills] = useState([]);
   // const [loadingSkills, setLoadingSkills] = useState(false);
 
-  // TODO: Fetch all skills if implementing skill selector here
-  // useEffect(() => { fetch skills... setAllSkills... }, []);
+  useEffect(() => {
+    // If initialData changes (e.g., when switching to edit a different project),
+    // update the form's state.
+    setProjectData(initialData);
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProjectData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // TODO: Implement handler for skill selection component
-  // const handleSkillsChange = (selectedSkillIds) => {
-  //   setProjectData((prev) => ({ ...prev, requiredSkills: selectedSkillIds }));
-  // };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (onSubmit) {
-      const dataToSend = {
-        ...projectData,
-        // Ensure dates are in correct format if needed by backend
-        // startDate: projectData.startDate ? new Date(projectData.startDate).toISOString() : null,
-        // endDate: projectData.endDate ? new Date(projectData.endDate).toISOString() : null,
-        // Ensure requiredSkills contains only IDs if using selector component
-      };
-      onSubmit(dataToSend);
+      onSubmit(projectData);
     }
   };
 
-  // Status badge styling based on status value
-  const getStatusBadgeClass = (status) => {
-    const baseClass =
-      "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium";
+  const getStatusBadgeVariant = (status) => {
     switch (status) {
       case "Planning":
-        return `${baseClass} bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200`;
+        return "primary";
       case "Active":
-        return `${baseClass} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200`;
+        return "success";
       case "On Hold":
-        return `${baseClass} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200`;
+        return "warning";
       case "Completed":
-        return `${baseClass} bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200`;
+        return "secondary";
       case "Cancelled":
-        return `${baseClass} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200`;
+        return "error";
       default:
-        return `${baseClass} bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200`;
+        return "default";
     }
   };
 
+  const inputBaseClasses =
+    "mt-1 block w-full rounded-[var(--radius)] border-[rgb(var(--border))] bg-[rgb(var(--background))] text-[rgb(var(--foreground))] shadow-sm focus:border-[rgb(var(--primary))] focus:ring-1 focus:ring-[rgb(var(--primary))] sm:text-sm transition-all duration-200 placeholder:text-[rgb(var(--muted-foreground))] disabled:opacity-50 disabled:cursor-not-allowed";
+
   return (
-    <Card className="animate-fade-in shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg">
-      {/* Remove Header if rendered on page already */}
-      {/* <CardHeader className="bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-gray-800 dark:to-gray-700 border-b border-gray-200 dark:border-gray-700">
-        <CardTitle className="text-indigo-700 dark:text-indigo-300 flex items-center gap-2">
+    <Card className="animate-fade-in overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-[rgb(var(--primary-accent-background))] to-blue-100 border-b border-[rgb(var(--border))]">
+        <CardTitle className="text-[rgb(var(--primary))] flex items-center gap-2">
           <Briefcase size={20} />
-          {isEditMode ? 'Edit Project' : 'Create New Project'}
+          {isEditMode ? "Edit Project" : "Create New Project"}
         </CardTitle>
-        <CardDescription className="text-gray-600 dark:text-gray-400">
-          {isEditMode ? 'Update the project details below.' : 'Fill out the form to create a new project.'}
+        <CardDescription className="text-[rgb(var(--muted-foreground))]">
+          {isEditMode
+            ? "Update the project details below."
+            : "Fill out the form to create a new project."}
         </CardDescription>
-      </CardHeader> */}
+      </CardHeader>
+
       <CardContent className="pt-6 px-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           {submitError && (
-            <div className="flex items-center p-4 mb-4 text-sm rounded-lg bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200 border-l-4 border-red-500 dark:border-red-500">
+            <div className="flex items-center p-4 mb-4 text-sm rounded-[var(--radius)] bg-red-50 text-red-700 border-l-4 border-red-500">
               <AlertCircle size={16} className="mr-2 flex-shrink-0" />
               <span>Error: {submitError}</span>
             </div>
@@ -106,7 +99,7 @@ const ProjectForm = ({
             <div className="space-y-2">
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="block text-sm font-medium text-[rgb(var(--foreground))]"
               >
                 Project Name*
               </label>
@@ -118,15 +111,14 @@ const ProjectForm = ({
                 onChange={handleChange}
                 required
                 placeholder="Enter project name"
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition-all duration-200 
-                placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                className={`${inputBaseClasses.replace("p-2", "")} px-4 py-3 `}
               />
             </div>
 
             <div className="space-y-2">
               <label
                 htmlFor="status"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="block text-sm font-medium text-[rgb(var(--foreground))]"
               >
                 Status*
               </label>
@@ -137,7 +129,7 @@ const ProjectForm = ({
                   value={projectData.status}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm appearance-none pl-3 pr-10 py-2 transition-all duration-200"
+                  className={`${inputBaseClasses} appearance-none pl-3 pr-10 py-3`}
                 >
                   <option value="Planning">Planning</option>
                   <option value="Active">Active</option>
@@ -147,7 +139,7 @@ const ProjectForm = ({
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                   <svg
-                    className="h-4 w-4 text-gray-400"
+                    className="h-4 w-4 text-[rgb(var(--muted-foreground))]"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -162,18 +154,25 @@ const ProjectForm = ({
                 </div>
               </div>
               <div className="mt-2">
-                <span className={getStatusBadgeClass(projectData.status)}>
+                <Badge
+                  variant={getStatusBadgeVariant(projectData.status)}
+                  pill={true} // Or false for squared corners, matching original
+                  size="sm" // text-xs, px-2.5 py-0.5
+                >
                   {projectData.status}
-                </span>
+                </Badge>
               </div>
             </div>
 
             <div className="space-y-2">
               <label
                 htmlFor="startDate"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
+                className="block text-sm font-medium text-[rgb(var(--foreground))] flex items-center gap-2"
               >
-                <CalendarIcon size={16} className="text-indigo-500" />
+                <CalendarIcon
+                  size={16}
+                  className="text-[rgb(var(--primary))]"
+                />
                 Start Date
               </label>
               <input
@@ -182,16 +181,19 @@ const ProjectForm = ({
                 name="startDate"
                 value={projectData.startDate}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition-all duration-200"
+                className={`${inputBaseClasses.replace("p-2", "")} px-4 py-3 `}
               />
             </div>
 
             <div className="space-y-2">
               <label
                 htmlFor="endDate"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
+                className="block text-sm font-medium text-[rgb(var(--foreground))] flex items-center gap-2"
               >
-                <CalendarIcon size={16} className="text-indigo-500" />
+                <CalendarIcon
+                  size={16}
+                  className="text-[rgb(var(--primary))]"
+                />
                 End Date
               </label>
               <input
@@ -200,14 +202,14 @@ const ProjectForm = ({
                 name="endDate"
                 value={projectData.endDate}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition-all duration-200"
+                className={`${inputBaseClasses.replace("p-2", "")} px-4 py-3 `}
               />
             </div>
 
             <div className="md:col-span-2 space-y-2">
               <label
                 htmlFor="description"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="block text-sm font-medium text-[rgb(var(--foreground))]"
               >
                 Description*
               </label>
@@ -219,23 +221,17 @@ const ProjectForm = ({
                 required
                 placeholder="Provide a detailed description of the project"
                 rows={4}
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition-all duration-200
-                placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                className={`${inputBaseClasses.replace("p-2", "")} px-4 py-2 `}
               />
             </div>
 
             <div className="md:col-span-2 space-y-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium text-[rgb(var(--foreground))]">
                 Required Skills
               </label>
-              <div className="min-h-[60px] p-4 rounded-md border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/40">
-                {/* <SkillSelector
-                      allSkills={allSkillsTaxonomy}
-                      selectedSkillIds={projectData.requiredSkills}
-                      onChange={handleSkillsChange}
-                      loading={loadingSkills}
-                  /> */}
-                <p className="text-sm text-gray-500 dark:text-gray-400 italic flex items-center gap-2 justify-center">
+              <div className="min-h-[60px] p-4 rounded-[var(--radius)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--muted))]">
+                {/* SkillSelector placeholder */}
+                <p className="text-sm text-[rgb(var(--muted-foreground))] italic flex items-center gap-2 justify-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"
@@ -254,34 +250,26 @@ const ProjectForm = ({
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700 mt-6">
+          <div className="flex justify-end space-x-3 pt-6 border-t border-[rgb(var(--border))] mt-6">
             {onCancel && (
               <Button
                 type="button"
-                variant="outline"
+                variant="outline" // Uses themed outline button
                 onClick={onCancel}
                 disabled={isSubmitting}
-                className="transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Cancel
               </Button>
             )}
             <Button
               type="submit"
+              variant="primary" // Uses themed primary button
               disabled={isSubmitting}
               isLoading={isSubmitting}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white transition-all duration-200 flex items-center gap-2"
+              className="flex items-center gap-2" // Keep gap for icon if isLoading
             >
-              {isSubmitting ? (
-                <>
-                  <LoadingSpinner size="sm" />
-                  Saving...
-                </>
-              ) : isEditMode ? (
-                "Update Project"
-              ) : (
-                "Create Project"
-              )}
+              {/* isLoading prop handles spinner internally in Button component */}
+              {isEditMode ? "Update Project" : "Create Project"}
             </Button>
           </div>
         </form>

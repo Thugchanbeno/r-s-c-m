@@ -1,55 +1,97 @@
 "use client";
-import React from "react";
 import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { motion } from "framer-motion";
 
 import EmployeeDashboard from "@/components/dashboard/EmployeeDashboard.jsx";
-import HRAdminDashboard from "@/components/dashboard/HRAdminDashboard.jsx";
-import PMDashboard from "@/components/dashboard/PMDashboard.jsx";
+import HrAdminDashboard from "@/components/dashboard/HRAdminDashboard.jsx";
+import PmDashboard from "@/components/dashboard/PMDashboard.jsx";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 24,
+    },
+  },
+};
 
 export default function DashboardPage() {
   const { data: session, status } = useSession({
     required: true,
     onUnauthenticated() {
-      // redirect('/api/auth/signin?callbackUrl=/dashboard');
-      console.log("Redirecting unauthenticated user from dashboard...");
+      redirect("/api/auth/signin?callbackUrl=/dashboard");
     },
   });
-  const isLoadingSession = status === "loading";
 
-  const renderDashboardContent = () => {
-    const userRole = session.user.role;
-    const userName = session.user.name || session.user.email || "User";
-
+  if (status === "loading") {
     return (
-      <div className="space-y-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-900">
-            Welcome back, {userName}!
-          </h1>
-          <p className="text-gray-900 dark:text-gray-900">
-            Resource Management Dashboard
-          </p>
-        </div>
-        {(userRole === "employee" ||
-          userRole === "pm" ||
-          userRole === "hr" ||
-          userRole === "admin") && <EmployeeDashboard user={session.user} />}
-        {(userRole === "pm" || userRole === "hr" || userRole === "admin") && (
-          <PMDashboard user={session.user} />
-        )}
-        {(userRole === "hr" || userRole === "admin") && (
-          <HRAdminDashboard user={session.user} />
-        )}
-      </div>
-    );
-  };
-  if (isLoadingSession) {
-    return (
-      <div className="flex justify-center items-center pt-20">
+      <div className="flex flex-col justify-center items-center min-h-screen bg-[rgb(var(--background))] p-10 text-center">
         <LoadingSpinner size={30} />
+        <p className="mt-3 text-[rgb(var(--muted-foreground))]">
+          Loading dashboard...
+        </p>
       </div>
     );
   }
-  return <div>{renderDashboardContent()}</div>;
+
+  const userRole = session.user.role;
+  const userName = session.user.name || session.user.email || "User";
+
+  return (
+    <motion.div
+      className="p-4 md:p-6 bg-[rgb(var(--muted))] min-h-screen rounded-lg"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div className="mb-8" variants={itemVariants}>
+        {" "}
+        {/* Animated header */}
+        <h1 className="text-2xl md:text-3xl font-bold text-[rgb(var(--foreground))]">
+          Welcome back, {userName}!
+        </h1>
+        <p className="text-[rgb(var(--muted-foreground))] mt-1">
+          Your Resource Management Dashboard
+        </p>
+      </motion.div>
+
+      <div className="space-y-6">
+        {(userRole === "employee" ||
+          userRole === "pm" ||
+          userRole === "hr" ||
+          userRole === "admin") && (
+          <motion.div variants={itemVariants}>
+            <EmployeeDashboard user={session.user} />
+          </motion.div>
+        )}
+        {(userRole === "pm" || userRole === "hr" || userRole === "admin") && (
+          <motion.div variants={itemVariants}>
+            <PmDashboard user={session.user} />
+          </motion.div>
+        )}
+        {(userRole === "hr" || userRole === "admin") && (
+          <motion.div variants={itemVariants}>
+            <HrAdminDashboard user={session.user} />
+          </motion.div>
+        )}
+      </div>
+    </motion.div>
+  );
 }

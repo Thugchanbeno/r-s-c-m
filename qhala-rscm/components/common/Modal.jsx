@@ -46,10 +46,10 @@ export default function Modal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <div className="w-full max-w-md transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 p-6 text-left align-middle shadow-xl transition-all">
-                <div className="flex items-center justify-between border-b border-border pb-4 mb-4">
+              <div className="w-full max-w-md transform overflow-hidden rounded-[var(--radius)] bg-[rgb(var(--card))] p-6 text-left align-middle shadow-xl transition-all">
+                <div className="flex items-center justify-between border-b border-[rgb(var(--border))] pb-4 mb-4">
                   <h3
-                    className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100"
+                    className="text-lg font-medium leading-6 text-[rgb(var(--card-foreground))]"
                     id="modal-title"
                   >
                     {title}
@@ -58,7 +58,7 @@ export default function Modal({
                     variant="ghost"
                     size="icon"
                     onClick={onClose}
-                    className="p-1 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="text-slate-400 hover:bg-slate-100 p-1 rounded-full"
                     aria-label="Close modal"
                   >
                     <X size={20} />

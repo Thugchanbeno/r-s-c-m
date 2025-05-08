@@ -4,10 +4,11 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Trash2, AlertCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Button from "@/components/common/Button";
+import { Card, CardHeader, CardContent } from "@/components/common/Card";
 
 const SkillTaxonomyList = () => {
   const { data: session } = useSession();
-  const [skills, setSkills] = useState([]);
+  const [skills, setSkills] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [deletingSkill, setDeletingSkill] = useState(null);
@@ -15,10 +16,6 @@ const SkillTaxonomyList = () => {
   const [confirmDelete, setConfirmDelete] = useState(null);
 
   const isAdmin = session?.user?.role === "admin";
-
-  useEffect(() => {
-    fetchSkills();
-  }, []);
 
   const fetchSkills = async () => {
     setLoading(true);
@@ -36,7 +33,6 @@ const SkillTaxonomyList = () => {
         throw new Error(errorMsg);
       }
       const result = await response.json();
-      // Check if the result is an object and has the expected properties
       const isSuccess =
         result && result.hasOwnProperty("success") && result.success === true;
       const dataIsArray =
@@ -60,13 +56,6 @@ const SkillTaxonomyList = () => {
           failureReason =
             "API response 'data' field is missing or not an array.";
         if (result && result.error) failureReason = result.error;
-
-        console.error(
-          "Data validation failed:",
-          failureReason,
-          "Raw result:",
-          result
-        );
         throw new Error(failureReason);
       }
     } catch (err) {
@@ -77,14 +66,17 @@ const SkillTaxonomyList = () => {
     }
   };
 
+  useEffect(() => {
+    fetchSkills();
+  }, []);
+
   const handleDeleteSkill = async (skillId) => {
     if (confirmDelete !== skillId) {
-      // First click - show confirmation
       setConfirmDelete(skillId);
+      setDeleteError(null);
       return;
     }
 
-    // Second click - proceed with deletion
     setDeletingSkill(skillId);
     setDeleteError(null);
 
@@ -99,8 +91,6 @@ const SkillTaxonomyList = () => {
           errorData.error || `Failed to delete skill (${response.status})`
         );
       }
-
-      // Success - refresh the skills list
       await fetchSkills();
     } catch (err) {
       console.error("Error deleting skill:", err);
@@ -113,83 +103,106 @@ const SkillTaxonomyList = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-6">
-        <LoadingSpinner size={15} />
-        <span className="ml-3 text-gray-600">Loading skill taxonomy...</span>
+      <div className="flex flex-col items-center justify-center p-10 text-center bg-[rgb(var(--background))] min-h-[200px]">
+        <LoadingSpinner size={30} />
+        <span className="ml-3 mt-2 text-[rgb(var(--muted-foreground))]">
+          Loading skill taxonomy...
+        </span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 bg-red-100 text-red-700 border border-red-300 rounded-md">
-        <p>
-          <strong>Error loading skills:</strong> {error}
-        </p>
+      <div className="p-4 bg-red-50 text-red-700 border border-red-200 rounded-[var(--radius)] shadow-sm">
+        <p className="font-semibold">Error loading skills:</p>
+        <p>{error}</p>
       </div>
     );
   }
 
-  const categories = Object.keys(skills).sort(); // Get sorted category names
+  const categories = Object.keys(skills).sort();
 
-  if (categories.length === 0) {
+  if (categories.length === 0 && !loading) {
     return (
-      <p className="text-gray-500 italic">No skills found in the taxonomy.</p>
+      <Card>
+        <CardHeader>
+          <h2 className="text-xl font-semibold text-[rgb(var(--card-foreground))]">
+            Available Skills Taxonomy
+          </h2>
+        </CardHeader>
+        <CardContent>
+          <p className="text-[rgb(var(--muted-foreground))] italic py-4 text-center">
+            No skills found in the taxonomy.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 border-b p-4">
-        Available Skills Taxonomy
-      </h2>
+    <Card>
+      <CardHeader className="border-b border-[rgb(var(--border))]">
+        <h2 className="text-xl font-semibold text-[rgb(var(--card-foreground))]">
+          Available Skills Taxonomy
+        </h2>
+      </CardHeader>
+      <CardContent className="pt-6">
+        {deleteError && (
+          <div className="p-3 bg-red-50 text-red-700 border border-red-200 rounded-[var(--radius)] flex items-center mb-4 shadow-sm">
+            <AlertCircle size={18} className="mr-2 flex-shrink-0" />
+            <span>{deleteError}</span>
+          </div>
+        )}
 
-      {deleteError && (
-        <div className="p-3 bg-red-100 text-red-700 border border-red-300 rounded-md flex items-center mb-4">
-          <AlertCircle size={18} className="mr-2" />
-          <span>{deleteError}</span>
-        </div>
-      )}
-
-      {categories.map((category) => (
-        <div key={category}>
-          <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-400">
-            {category}
-          </h3>
-          <ul className="list-disc list-inside space-y-1 pl-4">
-            {skills[category]
-              .sort((a, b) => a.name.localeCompare(b.name)) // Sort skills within category
-              .map((skill) => (
-                <li
-                  key={skill._id}
-                  className="flex items-center justify-between py-1 text-sm text-gray-700 dark:text-gray-300"
-                >
-                  <span className="flex-grow">{skill.name}</span>
-
-                  {isAdmin && (
-                    <Button
-                      variant={confirmDelete === skill._id ? "danger" : "ghost"}
-                      size="sm"
-                      onClick={() => handleDeleteSkill(skill._id)}
-                      disabled={deletingSkill === skill._id}
-                      className="ml-2"
+        <div className="space-y-6">
+          {categories.map((category) => (
+            <div key={category}>
+              <h3 className="text-lg font-medium mb-3 text-[rgb(var(--primary))]">
+                {category}
+              </h3>
+              <ul className="space-y-2 pl-1">
+                {skills[category]
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((skill) => (
+                    <li
+                      key={skill._id}
+                      className="flex items-center justify-between py-2 px-3 text-sm text-[rgb(var(--foreground))] border border-transparent rounded-[var(--radius)] hover:bg-[rgb(var(--muted))] hover:border-[rgb(var(--border))] transition-colors duration-150"
                     >
-                      {deletingSkill === skill._id ? (
-                        <LoadingSpinner size={14} />
-                      ) : (
-                        <>
-                          <Trash2 size={14} className="mr-1" />
-                          {confirmDelete === skill._id ? "Confirm" : "Delete"}
-                        </>
+                      <span className="flex-grow">{skill.name}</span>
+                      {isAdmin && (
+                        <Button
+                          variant={
+                            confirmDelete === skill._id ? "danger" : "ghost"
+                          }
+                          size="xs"
+                          onClick={() => handleDeleteSkill(skill._id)}
+                          disabled={deletingSkill === skill._id}
+                          className="ml-3"
+                        >
+                          {deletingSkill === skill._id ? (
+                            <LoadingSpinner
+                              size={14}
+                              className="text-current"
+                            />
+                          ) : (
+                            <>
+                              <Trash2 size={14} className="mr-1" />
+                              {confirmDelete === skill._id
+                                ? "Confirm"
+                                : "Delete"}
+                            </>
+                          )}
+                        </Button>
                       )}
-                    </Button>
-                  )}
-                </li>
-              ))}
-          </ul>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

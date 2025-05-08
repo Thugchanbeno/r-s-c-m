@@ -1,5 +1,5 @@
 "use client";
-import ProfileView from "@/components/views/ProfileView.jsx"; // Adjust path if needed
+import ProfileView from "@/components/views/ProfileView.jsx";
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 

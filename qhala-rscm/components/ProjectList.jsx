@@ -1,8 +1,9 @@
-//component to display projects from the db.
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import LoadingSpinner from "@/components/common/LoadingSpinner.jsx";
+import Badge from "@/components/common/Badge";
+import { Card } from "@/components/common/Card";
 
 const ProjectList = () => {
   const [projects, setProjects] = useState([]);
@@ -20,9 +21,10 @@ const ProjectList = () => {
           try {
             const errorData = await response.json();
             errorMsg = errorData.message || errorMsg || errorData.error;
-          } catch (error) {
-            throw new Error(errorMsg);
+          } catch (parseError) {
+            console.error("Error parsing error response:", parseError);
           }
+          throw new Error(errorMsg);
         }
 
         const result = await response.json();
@@ -41,79 +43,90 @@ const ProjectList = () => {
     };
     fetchProjects();
   }, []);
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-10">
+      <div className="flex flex-col items-center justify-center p-10 text-center bg-[rgb(var(--background))] min-h-[200px]">
         <LoadingSpinner loading={loading} size={32} />
-        <span className="ml-3 text-gray-600"></span>
+        <span className="ml-3 mt-2 text-[rgb(var(--muted-foreground))]">
+          Loading projects...
+        </span>
       </div>
     );
   }
+
   if (error) {
     return (
-      <div className="text-center p-6 bg-red-100 text-red-700 border border-red-300 rounded-md">
-        <p>
-          <strong>Error loading projects:</strong>
-        </p>
+      <div className="text-center p-6 bg-red-50 text-red-700 border border-red-200 rounded-[var(--radius)] shadow-sm">
+        <p className="font-semibold">Error loading projects:</p>
         <p>{error}</p>
       </div>
     );
   }
+
   if (projects.length === 0) {
     return (
-      <div className="text-center p-6 text-gray-500 border border-dashed rounded-md">
+      <div className="text-center p-6 text-[rgb(var(--muted-foreground))] border border-dashed border-[rgb(var(--border))] rounded-[var(--radius)]">
         No projects found.
       </div>
     );
   }
 
-  // Render the list of projects
+  const getStatusBadgeVariant = (status) => {
+    switch (status) {
+      case "Active":
+        return "success";
+      case "Completed":
+        return "primary";
+      case "Planning":
+        return "warning";
+      default:
+        return "default";
+    }
+  };
   return (
     <div className="space-y-4">
       {projects.map((project) => (
-        <div
-          key={project._id}
-          className="p-4 bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow"
-        >
-          <div className="flex justify-between items-start">
-            <h3 className="text-lg font-semibold text-indigo-700 mb-1">
-              <Link
-                href={`/projects/${project._id}`}
-                className="hover:underline"
-              >
-                {project.name}
-              </Link>
-            </h3>
-            <span
-              className={`px-2 py-0.5 rounded text-xs font-medium ${
-                project.status === "Active"
-                  ? "bg-green-100 text-green-800"
-                  : project.status === "Completed"
-                  ? "bg-blue-100 text-blue-800"
-                  : project.status === "Planning"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-gray-100 text-gray-800"
-              }`}
-            >
-              {project.status}
-            </span>
-          </div>
-          <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+        <Card key={project._id} className="overflow-hidden">
+          {" "}
+          {/* Use themed Card */}
+          {/* CardContent will provide padding and themed background */}
+          <div className="p-4">
             {" "}
-            {project.description}
-          </p>
-          <div className="text-xs text-gray-500">
-            {project.pmId?.name
-              ? `PM: ${project.pmId.name}`
-              : "PM: Not Assigned"}
+            {/* Explicit padding if CardContent isn't used directly or for override */}
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="text-lg font-semibold text-[rgb(var(--foreground))] mb-1">
+                <Link
+                  href={`/projects/${project._id}`}
+                  className="text-[rgb(var(--primary))] hover:underline"
+                >
+                  {project.name}
+                </Link>
+              </h3>
+              <Badge
+                variant={getStatusBadgeVariant(project.status)}
+                size="sm"
+                pill={false}
+              >
+                {project.status}
+              </Badge>
+            </div>
+            <p className="text-sm text-[rgb(var(--muted-foreground))] mb-3 line-clamp-2">
+              {project.description}
+            </p>
+            <div className="text-xs text-[rgb(var(--muted-foreground))]">
+              {project.pmId?.name
+                ? `PM: ${project.pmId.name}`
+                : "PM: Not Assigned"}
 
-            {project.requiredSkills && project.requiredSkills.length > 0 && (
-              <span className="ml-4">
-                Skills Required: {project.requiredSkills.length}
-              </span>
-            )}
+              {project.requiredSkills && project.requiredSkills.length > 0 && (
+                <span className="ml-4">
+                  Skills Required: {project.requiredSkills.length}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
+        </Card>
       ))}
     </div>
   );
