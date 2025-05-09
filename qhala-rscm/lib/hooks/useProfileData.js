@@ -1,3 +1,4 @@
+// lib/hooks/useProfileData.js
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 
@@ -8,7 +9,7 @@ export const useProfileData = () => {
 
   const [currentSkills, setCurrentSkills] = useState([]);
   const [desiredSkills, setDesiredSkills] = useState([]);
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState([]); // Allocations for ProjectsList
   const [allSkillsTaxonomy, setAllSkillsTaxonomy] = useState([]);
 
   const [isEditingCurrentSkills, setIsEditingCurrentSkills] = useState(false);
@@ -29,7 +30,16 @@ export const useProfileData = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
-  // Fetch Skill Taxonomy
+  const [totalAllocationSummary, setTotalAllocationSummary] = useState({
+    percentage: 0,
+    hours: 0,
+    count: 0,
+    standardHours: 40,
+  });
+  const [loadingAllocationSummary, setLoadingAllocationSummary] =
+    useState(true);
+  const [allocationSummaryError, setAllocationSummaryError] = useState(null);
+
   useEffect(() => {
     const fetchTaxonomy = async () => {
       setLoadingTaxonomy(true);
@@ -45,7 +55,7 @@ export const useProfileData = () => {
         }
       } catch (error) {
         console.error("Error fetching skill taxonomy:", error);
-        // Optionally set a specific taxonomy error state here
+        // Optionally set a specific taxonomy error state
       } finally {
         setLoadingTaxonomy(false);
       }
@@ -53,117 +63,159 @@ export const useProfileData = () => {
     fetchTaxonomy();
   }, []);
 
-  // Fetch User Data (Skills & Projects)
-  const fetchUserData = useCallback(async () => {
-    // Ensure session exists before trying to use its properties
+  const fetchAllUserData = useCallback(async () => {
     if (!session?.user?.id) {
-      console.warn(
-        "fetchUserData called without authenticated session or user ID."
-      );
-      // Optionally set errors or return early if session is required but missing
       setLoadingSkills(false);
       setLoadingProjects(false);
+      setLoadingAllocationSummary(false);
       return;
     }
     const userId = session.user.id;
+
     setLoadingSkills(true);
     setLoadingProjects(true);
+    setLoadingAllocationSummary(true);
     setSkillsError(null);
     setProjectsError(null);
+    setAllocationSummaryError(null);
 
-    // Fetch Skills
     try {
-      const skillsResponse = await fetch(`/api/userskills`); // Assumes API gets user from session
-      if (!skillsResponse.ok)
-        throw new Error(
-          `HTTP error fetching skills! status: ${skillsResponse.status}`
-        );
-      const skillsResult = await skillsResponse.json();
+      const [
+        skillsResponse,
+        allocationsForProfileResponse,
+        totalAllocationResponse,
+      ] = await Promise.all([
+        fetch(`/api/userskills`), // Assumes API gets user from session
+        fetch(`/api/allocations?userId=${userId}`),
+        fetch(`/api/users/${userId}/allocation-summary`),
+      ]);
 
+      // Process Skills
+      if (!skillsResponse.ok) {
+        const skillsErrData = await skillsResponse.json().catch(() => ({}));
+        throw new Error(
+          skillsErrData.error ||
+            `HTTP error fetching skills! status: ${skillsResponse.status}`
+        );
+      }
+      const skillsResult = await skillsResponse.json();
       if (skillsResult.success && Array.isArray(skillsResult.data)) {
         const userSkillsData = skillsResult.data;
         const current = userSkillsData.filter((s) => s.isCurrent);
         const desired = userSkillsData.filter((s) => s.isDesired);
-
         setCurrentSkills(current);
         setDesiredSkills(desired);
-        // Initialize editing states based on fetched data
         setSelectedCurrentSkillsMap(
           new Map(
             current.map((s) => [s.skillId?._id.toString(), s.proficiency])
-          ) // Use toString() for keys
+          )
         );
         setSelectedDesiredSkillIds(
-          new Set(desired.map((s) => s.skillId?._id.toString())) // Use toString() for Set values
+          new Set(desired.map((s) => s.skillId?._id.toString()))
         );
-        setSkillsError(null);
       } else {
-        throw new Error(skillsResult.error || "Invalid skills data format");
+        setSkillsError(skillsResult.error || "Invalid skills data format");
+      }
+
+      // Process Projects/Allocations for Profile List
+      if (!allocationsForProfileResponse.ok) {
+        const allocErrData = await allocationsForProfileResponse
+          .json()
+          .catch(() => ({}));
+        throw new Error(
+          allocErrData.error ||
+            `Error fetching allocations status: ${allocationsForProfileResponse.status}`
+        );
+      }
+      const projectsResult = await allocationsForProfileResponse.json();
+      if (projectsResult.success && Array.isArray(projectsResult.data)) {
+        setProjects(projectsResult.data);
+      } else {
+        setProjectsError(
+          projectsResult.error || "Invalid allocations data format."
+        );
+      }
+
+      // Process Total Allocation Summary
+      if (!totalAllocationResponse.ok) {
+        const summaryErrData = await totalAllocationResponse
+          .json()
+          .catch(() => ({}));
+        throw new Error(
+          summaryErrData.error ||
+            `Error fetching total allocation summary: ${totalAllocationResponse.status}`
+        );
+      }
+      const summaryResult = await totalAllocationResponse.json();
+      if (summaryResult.success && summaryResult.data) {
+        const newSummary = {
+          // Create a new object to ensure state update
+          percentage: summaryResult.data.totalCurrentCapacityPercentage,
+          hours: summaryResult.data.totalAllocatedHours,
+          count: summaryResult.data.activeAllocationCount,
+          standardHours: summaryResult.data.standardWorkWeekHours,
+        };
+        console.log(
+          "useProfileData - Setting totalAllocationSummary to:",
+          newSummary
+        );
+        setTotalAllocationSummary(newSummary);
+      } else {
+        setAllocationSummaryError(
+          summaryResult.error || "Invalid total allocation summary data."
+        );
       }
     } catch (error) {
-      console.error("Error fetching user skills:", error);
-      setSkillsError(error.message || "Could not load skills.");
+      // This catch block will handle errors from Promise.all or any subsequent processing
+      console.error(
+        "Error fetching user data (skills, projects, or summary):",
+        error
+      );
+      // Set a general error or specific ones if not already set
+      if (!skillsError) setSkillsError(error.message);
+      if (!projectsError) setProjectsError(error.message);
+      if (!allocationSummaryError) setAllocationSummaryError(error.message);
     } finally {
       setLoadingSkills(false);
-    }
-
-    // Fetch Projects/Allocations
-    try {
-      // Pass userId as query param if needed by the backend
-      const projectsResponse = await fetch(`/api/allocations?userId=${userId}`);
-      if (!projectsResponse.ok) {
-        throw new Error(
-          `error fetching allocations status: ${projectsResponse.status}`
-        );
-      }
-      const projectsResult = await projectsResponse.json();
-      // Ensure correct property name 'data' is used
-      if (projectsResult.success && Array.isArray(projectsResult.data)) {
-        const allocationsData = projectsResult.data;
-        setProjects(allocationsData);
-        setProjectsError(null);
-      } else {
-        throw new Error(
-          projectsResult.error || "invalid allocations data format."
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching user projects:", error);
-      setProjectsError(error.message || "Could not load projects.");
-    } finally {
       setLoadingProjects(false);
+      setLoadingAllocationSummary(false);
     }
-  }, [session?.user?.id]); // Add session.user.id as dependency
+  }, [session?.user?.id]);
 
-  // Effect to trigger fetch when authenticated
   useEffect(() => {
     if (status === "authenticated") {
-      fetchUserData();
+      fetchAllUserData();
     }
-    // Clear data on logout
     if (status === "unauthenticated") {
       setCurrentSkills([]);
       setDesiredSkills([]);
       setProjects([]);
+      // setAllSkillsTaxonomy([]); // Taxonomy might not need reset if not user-specific
       setSelectedCurrentSkillsMap(new Map());
       setSelectedDesiredSkillIds(new Set());
       setSkillsError(null);
       setProjectsError(null);
+      setAllocationSummaryError(null);
       setSaveError(null);
       setIsEditingCurrentSkills(false);
       setIsEditingDesiredSkills(false);
-      // Reset loading states if needed
+      setTotalAllocationSummary({
+        percentage: 0,
+        hours: 0,
+        count: 0,
+        standardHours: 40,
+      });
       setLoadingSkills(true);
       setLoadingProjects(true);
-      setLoadingTaxonomy(true);
+      // setLoadingTaxonomy(true); // Taxonomy loading is independent
+      setLoadingAllocationSummary(true);
     }
-  }, [status, fetchUserData]);
+  }, [status, fetchAllUserData]);
 
-  // Skill Editing Handlers
   const handleToggleCurrentSkill = useCallback((skillId) => {
     setSelectedCurrentSkillsMap((prevMap) => {
       const newMap = new Map(prevMap);
-      const key = skillId.toString(); // Ensure key is string
+      const key = skillId.toString();
       if (newMap.has(key)) {
         newMap.delete(key);
       } else {
@@ -176,7 +228,7 @@ export const useProfileData = () => {
   const handleSetProficiency = useCallback((skillId, proficiency) => {
     setSelectedCurrentSkillsMap((prevMap) => {
       const newMap = new Map(prevMap);
-      const key = skillId.toString(); // Ensure key is string
+      const key = skillId.toString();
       if (newMap.has(key)) {
         newMap.set(key, proficiency);
       }
@@ -187,7 +239,7 @@ export const useProfileData = () => {
   const handleToggleDesiredSkill = useCallback((skillId) => {
     setSelectedDesiredSkillIds((prev) => {
       const newSet = new Set(prev);
-      const value = skillId.toString(); // Ensure value is string
+      const value = skillId.toString();
       if (newSet.has(value)) {
         newSet.delete(value);
       } else {
@@ -197,7 +249,6 @@ export const useProfileData = () => {
     });
   }, []);
 
-  // Save Handler
   const handleSaveSkills = useCallback(
     async (type) => {
       setIsSaving(true);
@@ -211,59 +262,37 @@ export const useProfileData = () => {
       } else if (type === "desired") {
         payload.desiredSkillIds = Array.from(selectedDesiredSkillIds);
       } else {
-        console.error("Invalid type for handleSaveSkills");
         setIsSaving(false);
         return;
       }
 
-      // Prevent sending empty payloads
-      if (
-        (type === "current" && payload.currentSkills.length === 0) ||
-        (type === "desired" && payload.desiredSkillIds.length === 0)
-      ) {
-        console.warn(
-          `handleSaveSkills: Attempting to save empty ${type} skill selection.`
-        );
-        // Uncomment if you want to prevent empty saves
-        // setSaveError(`Cannot save empty ${type} skill selection.`);
-        // setIsSaving(false);
-        // return;
-      }
+      // Consider if an empty payload should still be sent to clear skills
+      // if (
+      //   (type === "current" && payload.currentSkills.length === 0 && currentSkills.length === 0) ||
+      //   (type === "desired" && payload.desiredSkillIds.length === 0 && desiredSkills.length === 0)
+      // ) {
+      //   setIsSaving(false);
+      //   return; // Or proceed to allow clearing skills
+      // }
 
       try {
-        console.log(`Saving ${type} skills:`, payload);
-
         const response = await fetch("/api/userskills", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-
         const result = await response.json();
-        console.log(`API response for ${type} skills:`, result);
-
         if (!response.ok || !result.success) {
           throw new Error(
             result.error ||
               `Failed to save ${type} skills. Status: ${response.status}`
           );
         }
-
-        // Success: Update local state from API response
         const userSkillsData = result.data || [];
-        console.log(`Received ${userSkillsData.length} skills from API`);
-
         const current = userSkillsData.filter((s) => s.isCurrent);
         const desired = userSkillsData.filter((s) => s.isDesired);
-
-        console.log(
-          `Filtered: ${current.length} current, ${desired.length} desired`
-        );
-
         setCurrentSkills(current);
         setDesiredSkills(desired);
-
-        // Reset editing states based on the successfully saved data
         setSelectedCurrentSkillsMap(
           new Map(
             current.map((s) => [s.skillId?._id.toString(), s.proficiency])
@@ -272,46 +301,43 @@ export const useProfileData = () => {
         setSelectedDesiredSkillIds(
           new Set(desired.map((s) => s.skillId?._id.toString()))
         );
-
-        // Close the relevant editing section on success
         if (type === "current") setIsEditingCurrentSkills(false);
         if (type === "desired") setIsEditingDesiredSkills(false);
       } catch (err) {
-        console.error(`Error saving ${type} skills:`, err);
         setSaveError(
           err.message ||
             `An unexpected error occurred while saving ${type} skills.`
         );
-        // Keep editing mode open on error
       } finally {
         setIsSaving(false);
       }
     },
-    [selectedCurrentSkillsMap, selectedDesiredSkillIds]
+    [
+      selectedCurrentSkillsMap,
+      selectedDesiredSkillIds,
+      currentSkills,
+      desiredSkills,
+    ] // Added currentSkills & desiredSkills
   );
 
-  // Cancel Handlers
   const handleCancelEditCurrent = useCallback(() => {
     setIsEditingCurrentSkills(false);
-    // Reset to the last known saved state
     setSelectedCurrentSkillsMap(
       new Map(
         currentSkills.map((s) => [s.skillId?._id.toString(), s.proficiency])
-      ) // Use toString()
+      )
     );
     setSaveError(null);
   }, [currentSkills]);
 
   const handleCancelEditDesired = useCallback(() => {
     setIsEditingDesiredSkills(false);
-    // Reset to the last known saved state
     setSelectedDesiredSkillIds(
-      new Set(desiredSkills.map((s) => s.skillId?._id.toString())) // Use toString()
+      new Set(desiredSkills.map((s) => s.skillId?._id.toString()))
     );
     setSaveError(null);
   }, [desiredSkills]);
 
-  // Return all state and handlers needed by the component
   return {
     session,
     status,
@@ -339,5 +365,8 @@ export const useProfileData = () => {
     handleSaveSkills,
     handleCancelEditCurrent,
     handleCancelEditDesired,
+    totalAllocationSummary,
+    loadingAllocationSummary,
+    allocationSummaryError,
   };
 };

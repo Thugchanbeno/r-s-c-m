@@ -43,6 +43,9 @@ const ProfileData = () => {
     handleSaveSkills,
     handleCancelEditCurrent,
     handleCancelEditDesired,
+    totalAllocationSummary,
+    loadingAllocationSummary,
+    allocationSummaryError,
   } = useProfileData();
 
   if (status === "loading") {
@@ -100,7 +103,13 @@ const ProfileData = () => {
         <Card className="lg:col-span-2">
           {/* UserInfo is already styled as a card-like item, so CardHeader can be minimal */}
           <CardHeader>
-            <UserInfo user={session.user} />
+            <UserInfo
+              className="p-2"
+              user={session.user}
+              totalAllocation={totalAllocationSummary}
+              loadingAllocationSummary={loadingAllocationSummary}
+              allocationSummaryError={allocationSummaryError}
+            />
           </CardHeader>
           {/* CardContent will have the default card background (e.g., white) */}
           <CardContent>

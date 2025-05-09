@@ -66,26 +66,24 @@ export const getSkillLevelName = (level) => {
   }
 };
 export const getAllocationPercentageColor = (percentage) => {
-  if (percentage == null || percentage < 0 || percentage > 100) {
-    // Default for invalid or out-of-range percentages
+  if (percentage == null || percentage < 0) {
+    // Allow > 100
     return "bg-slate-50 text-slate-700 ring-1 ring-inset ring-slate-200";
   }
 
   if (percentage <= 20) {
-    // 0-20%
     return "bg-green-50 text-green-700 ring-1 ring-inset ring-green-200";
   } else if (percentage <= 40) {
-    // 21-40%
     return "bg-lime-50 text-lime-700 ring-1 ring-inset ring-lime-200";
   } else if (percentage <= 60) {
-    // 41-60%
     return "bg-yellow-50 text-yellow-700 ring-1 ring-inset ring-yellow-200";
   } else if (percentage <= 80) {
-    // 61-80%
     return "bg-orange-50 text-orange-700 ring-1 ring-inset ring-orange-200";
-  } else {
-    // 81-100%
+  } else if (percentage <= 100) {
     return "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200";
+  } else {
+    // Over 100% - distinct "overallocated" style
+    return "bg-rose-100 text-rose-700 ring-1 ring-inset ring-rose-300 border-2 border-rose-500"; // Example: Rose color, stronger border
   }
 };
 // New function for User Availability Status Border and Shadow Styles

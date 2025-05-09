@@ -10,6 +10,7 @@ import {
   Percent,
   UserCog,
   CalendarDays,
+  Activity,
 } from "lucide-react";
 import {
   Card,
@@ -79,12 +80,15 @@ export const ProfileHeader = ({ title, description }) => (
 );
 
 // User Info Component
-export const UserInfo = ({ user }) => (
+export const UserInfo = ({
+  user,
+  totalAllocation,
+  loadingAllocationSummary,
+}) => (
   <motion.div
     initial="hidden"
     animate="visible"
-    variants={fadeIn} // Assuming fadeIn is defined in this file or imported
-    // Applied the gradient background here, replacing bg-[rgb(var(--card))]
+    variants={fadeIn}
     className="flex flex-col sm:flex-row items-start sm:items-center bg-gradient-to-r from-[rgb(var(--primary-accent-background))] to-purple-50 rounded-[var(--radius)] p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
   >
     <div className="relative">
@@ -93,16 +97,11 @@ export const UserInfo = ({ user }) => (
         alt={user.name || "User"}
         width={80}
         height={80}
-        // The avatar border was border-[rgb(var(--card))] (white).
-        // On a very light gradient, this might still look fine.
-        // If it clashes, consider border-transparent or a very light gray like border-slate-100.
         className="h-20 w-20 rounded-full object-cover mr-6 mb-3 sm:mb-0 border-4 border-white relative z-10 shadow-sm" // Kept border-white for now, added shadow-sm
       />
     </div>
     <div className="flex-grow">
       <CardTitle className="text-xl mb-1 text-[rgb(var(--foreground))]">
-        {" "}
-        {/* Ensured foreground color for good contrast */}
         {user.name || "Name not set"}
       </CardTitle>
       <p className="text-[rgb(var(--muted-foreground))] mb-3 text-sm">
@@ -124,6 +123,32 @@ export const UserInfo = ({ user }) => (
           </Badge>
         )}
       </div>
+      {loadingAllocationSummary ? (
+        <div className="flex items-center text-xs text-[rgb(var(--muted-foreground))]">
+          <LoadingSpinner size={12} className="mr-2" /> Loading allocation...
+        </div>
+      ) : totalAllocation && totalAllocation.percentage !== undefined ? (
+        <div className="flex items-center text-sm">
+          <Activity size={16} className="mr-2 text-[rgb(var(--primary))]" />
+          <span className="text-[rgb(var(--muted-foreground))] mr-1">
+            Current Capacity:
+          </span>
+          <Badge
+            size="sm"
+            pill={true}
+            className={getAllocationPercentageColor(totalAllocation.percentage)}
+          >
+            {totalAllocation.percentage}%
+          </Badge>
+          <span className="text-xs text-[rgb(var(--muted-foreground))] ml-2">
+            ({totalAllocation.hours}h / {totalAllocation.standardHours}h week)
+          </span>
+        </div>
+      ) : (
+        <div className="text-xs text-[rgb(var(--muted-foreground))]">
+          Allocation data not available.
+        </div>
+      )}
     </div>
   </motion.div>
 );
