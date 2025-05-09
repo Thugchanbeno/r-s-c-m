@@ -147,7 +147,7 @@ const AdminSidebar = () => {
                 href="/admin"
                 className="text-xl font-bold text-blue-400 whitespace-nowrap" // Light blue for title
               >
-                Qhala RSCM Admin
+                Qhala Admin
               </Link>
             </div>
             <Button
