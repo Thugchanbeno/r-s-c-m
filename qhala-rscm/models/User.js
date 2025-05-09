@@ -20,6 +20,12 @@ const UserSchema = new Schema(
       index: true,
     },
     avatarUrl: { type: String, required: false },
+    availabilityStatus: {
+      type: String,
+      enum: ["available", "unavailable", "on_leave"],
+      default: "available",
+      required: true,
+    },
   },
   { timestamps: true }
 );

@@ -28,7 +28,7 @@ export default function ProjectsPage() {
         </h1>
 
         {canCreateProject && (
-          <Link href="/projects/new" passHref legacyBehavior>
+          <Link href="/projects/new" passHref>
             <Button variant="primary">
               <PlusCircle size={18} className="mr-2" /> Create New Project
             </Button>

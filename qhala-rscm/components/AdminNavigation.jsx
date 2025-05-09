@@ -115,7 +115,6 @@ const AdminSidebar = () => {
           <Menu size={24} />
         </Button>
       </div>
-
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
@@ -123,7 +122,6 @@ const AdminSidebar = () => {
           onClick={toggleMobileSidebar}
         />
       )}
-
       {/* Sidebar */}
       <aside
         className={`fixed left-0 top-0 z-50 h-screen ${sidebarBg} border-r ${sidebarBorder}

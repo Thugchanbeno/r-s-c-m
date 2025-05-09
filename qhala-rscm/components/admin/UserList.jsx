@@ -1,13 +1,15 @@
+// components/admin/UserList.jsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import LoadingSpinner from "@/components/common/LoadingSpinner"; // Themed
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Image from "next/image";
-import Button from "@/components/common/Button"; // Themed
-import { Card, CardContent } from "@/components/common/Card"; // Themed
-import Badge from "@/components/common/Badge"; // Themed
+import Button from "@/components/common/Button";
+import { Card, CardContent } from "@/components/common/Card";
+import Badge from "@/components/common/Badge";
 import { Edit, Trash2, Mail, Building, UserCheck, Search } from "lucide-react";
+import { getAvailabilityStyles } from "@/components/common/skillcolors";
 
 // Animation variants (unchanged)
 const containerVariants = {
@@ -134,99 +136,113 @@ const UserList = ({ searchTerm = "", onEditUser, onDeleteUser }) => {
           </p>
         </motion.div>
       ) : (
-        users.map((user) => (
-          <motion.div key={user._id} variants={itemVariants}>
-            {/* Card component handles its own border and shadow */}
-            <Card className="group overflow-hidden transition-all duration-300">
-              <CardContent className="p-6">
-                <div className="flex flex-col sm:flex-row items-start gap-6">
-                  {/* User Avatar and Basic Info */}
-                  <div className="flex items-center gap-5">
-                    <div className="relative">
-                      {/* Gradient hover effect - kept as it's a specific design */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-[rgb(var(--primary))] to-purple-500 rounded-full opacity-0 group-hover:opacity-75 transition-opacity duration-300" />
-                      {user.avatarUrl && (
-                        <div className="relative h-16 w-16">
-                          <Image
-                            className="rounded-full object-cover border-4 border-[rgb(var(--card))]" // Border matches card background
-                            src={user.avatarUrl}
-                            alt={`${user.name}'s avatar`}
-                            fill
-                            sizes="64px"
+        users.map((user) => {
+          const availabilityStyleClasses = getAvailabilityStyles(
+            user.availabilityStatus
+          );
+
+          return (
+            <motion.div key={user._id} variants={itemVariants}>
+              <Card
+                className={`group overflow-hidden transition-all duration-300 border-2 ${availabilityStyleClasses}`}
+              >
+                <CardContent className="p-6">
+                  <div className="flex flex-col sm:flex-row items-start gap-6">
+                    {/* User Avatar and Basic Info */}
+                    <div className="flex items-center gap-5">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-[rgb(var(--primary))] to-purple-500 rounded-full opacity-0 group-hover:opacity-75 transition-opacity duration-300" />
+                        {user.avatarUrl ? ( // Check if avatarUrl exists
+                          <div className="relative h-16 w-16">
+                            <Image
+                              className="rounded-full object-cover border-4 border-[rgb(var(--card))]"
+                              src={user.avatarUrl}
+                              alt={`${user.name}'s avatar`}
+                              fill
+                              sizes="64px"
+                            />
+                          </div>
+                        ) : (
+                          // Placeholder if no avatarUrl
+                          <div className="relative h-16 w-16 bg-[rgb(var(--muted))] rounded-full flex items-center justify-center border-4 border-[rgb(var(--card))]">
+                            <UserCheck
+                              size={32}
+                              className="text-[rgb(var(--muted-foreground))]"
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-[rgb(var(--card-foreground))] group-hover:text-[rgb(var(--primary))] transition-colors duration-300">
+                          {user.name}
+                        </h3>
+                        <p className="text-sm text-[rgb(var(--muted-foreground))] flex items-center mt-1">
+                          <Mail size={14} className="mr-2 opacity-70" />
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* User Details and Actions */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 ml-auto">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <UserCheck
+                            size={16}
+                            className="text-[rgb(var(--muted-foreground))]"
                           />
+                          <Badge
+                            variant={
+                              user.role === "admin" || user.role === "hr"
+                                ? "error"
+                                : user.role === "pm"
+                                ? "warning"
+                                : "success"
+                            }
+                            className="capitalize px-3 py-1"
+                            pill={true}
+                          >
+                            {user.role}
+                          </Badge>
                         </div>
-                      )}
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-[rgb(var(--card-foreground))] group-hover:text-[rgb(var(--primary))] transition-colors duration-300">
-                        {user.name}
-                      </h3>
-                      <p className="text-sm text-[rgb(var(--muted-foreground))] flex items-center mt-1">
-                        <Mail size={14} className="mr-2 opacity-70" />
-                        {user.email}
-                      </p>
-                    </div>
-                  </div>
+                        <div className="flex items-center gap-2">
+                          <Building
+                            size={16}
+                            className="text-[rgb(var(--muted-foreground))]"
+                          />
+                          <span className="text-sm font-medium text-[rgb(var(--card-foreground))]">
+                            {user.department || "N/A"}
+                          </span>
+                        </div>
+                      </div>
 
-                  {/* User Details and Actions */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 ml-auto">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <UserCheck
-                          size={16}
-                          className="text-[rgb(var(--muted-foreground))]"
-                        />
-                        <Badge
-                          variant={
-                            user.role === "admin" || user.role === "hr"
-                              ? "error" // Assuming 'error' variant for destructive/red
-                              : user.role === "pm"
-                              ? "warning"
-                              : "success" // Or 'primary'/'default'
-                          }
-                          className="capitalize px-3 py-1"
-                          pill={true} // Or false for squared
+                      <div className="flex items-center gap-2 sm:ml-6">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditClick(user._id)}
+                          className="text-[rgb(var(--primary))] hover:bg-[rgba(var(--primary),0.1)] p-2"
+                          aria-label="Edit user"
                         >
-                          {user.role}
-                        </Badge>
+                          <Edit size={18} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteClick(user._id)}
+                          className="text-red-600 hover:bg-red-50 p-2"
+                          aria-label="Delete user"
+                        >
+                          <Trash2 size={18} />
+                        </Button>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Building
-                          size={16}
-                          className="text-[rgb(var(--muted-foreground))]"
-                        />
-                        <span className="text-sm font-medium text-[rgb(var(--card-foreground))]">
-                          {user.department || "N/A"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 sm:ml-6">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEditClick(user._id)}
-                        className="text-[rgb(var(--primary))] hover:bg-[rgba(var(--primary),0.1)] p-2"
-                        aria-label="Edit user"
-                      >
-                        <Edit size={18} />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteClick(user._id)}
-                        className="text-red-600 hover:bg-red-50 p-2"
-                        aria-label="Delete user"
-                      >
-                        <Trash2 size={18} />
-                      </Button>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))
+                </CardContent>
+              </Card>
+            </motion.div>
+          );
+        })
       )}
     </motion.div>
   );

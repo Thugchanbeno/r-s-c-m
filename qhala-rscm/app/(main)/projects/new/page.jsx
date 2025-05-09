@@ -101,7 +101,6 @@ export default function NewProjectPage() {
           <ArrowLeft size={16} className="mr-1" /> Back to Projects
         </Link>
       </div>
-
       <ProjectForm
         onSubmit={handleCreateProject}
         isSubmitting={isSubmitting}

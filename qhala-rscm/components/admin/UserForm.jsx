@@ -1,8 +1,9 @@
+// components/admin/EditUserForm.jsx
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import Button from "@/components/common/Button"; // Themed
-import LoadingSpinner from "@/components/common/LoadingSpinner"; // Themed
-import { AlertCircle, CheckCircle } from "lucide-react"; // Icons for messages
+import Button from "@/components/common/Button";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { AlertCircle, CheckCircle } from "lucide-react";
 
 const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -10,10 +11,11 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
     email: "",
     role: "employee",
     department: "",
+    availabilityStatus: "available", // Add and initialize
     authProviderId: "",
   });
 
-  const [loading, setLoading] = useState(true); // True initially to fetch data
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -24,11 +26,9 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
       setLoading(false);
       return;
     }
-
     setLoading(true);
     setError(null);
     setSuccess(null);
-
     try {
       const response = await fetch(`/api/users/${userId}`);
       if (!response.ok) {
@@ -44,6 +44,7 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
           email: result.data.email || "",
           role: result.data.role || "employee",
           department: result.data.department || "",
+          availabilityStatus: result.data.availabilityStatus || "available", // Populate from fetched data
           authProviderId: result.data.authProviderId || "",
         });
       } else {
@@ -74,7 +75,6 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
     setSubmitting(true);
     setError(null);
     setSuccess(null);
-
     try {
       const response = await fetch(`/api/users/${userId}`, {
         method: "PUT",
@@ -82,17 +82,15 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
         body: JSON.stringify({
           role: formData.role,
           department: formData.department,
+          availabilityStatus: formData.availabilityStatus, // Send new status
         }),
       });
-
       const result = await response.json();
-
       if (!response.ok || !result.success) {
         throw new Error(
           result.error || `Error updating user: ${response.status}`
         );
       }
-
       setSuccess(`User "${formData.name}" updated successfully!`);
       if (onUserUpdated) {
         onUserUpdated(result.data); // Pass updated data back
@@ -166,7 +164,7 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
           value={formData.role}
           onChange={handleChange}
           required
-          className={`${inputBaseClasses} appearance-none px-4 py-2`}
+          className={`${inputBaseClasses} appearance-none`}
         >
           <option value="employee">Employee</option>
           <option value="pm">Project Manager</option>
@@ -187,9 +185,31 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
           name="department"
           value={formData.department}
           onChange={handleChange}
-          className={`${inputBaseClasses.replace("p-2", "")} px-4 py-2 `}
+          className={inputBaseClasses}
           placeholder="Enter department"
         />
+      </div>
+
+      {/* New Availability Status Field */}
+      <div>
+        <label
+          htmlFor="availabilityStatus"
+          className="block text-sm font-medium text-[rgb(var(--foreground))]"
+        >
+          Availability Status*
+        </label>
+        <select
+          id="availabilityStatus"
+          name="availabilityStatus"
+          value={formData.availabilityStatus}
+          onChange={handleChange}
+          required
+          className={`${inputBaseClasses} appearance-none`}
+        >
+          <option value="available">Available</option>
+          <option value="unavailable">Unavailable</option>
+          <option value="on_leave">On Leave</option>
+        </select>
       </div>
 
       <div className="flex justify-end space-x-3 pt-4">
@@ -205,11 +225,10 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
         )}
         <Button
           type="submit"
-          variant="primary" // Explicitly use primary variant
+          variant="primary"
           disabled={submitting}
           isLoading={submitting}
         >
-          {/* isLoading prop handles text change in Button component */}
           Save Changes
         </Button>
       </div>

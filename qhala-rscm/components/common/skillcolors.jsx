@@ -88,3 +88,16 @@ export const getAllocationPercentageColor = (percentage) => {
     return "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200";
   }
 };
+// New function for User Availability Status Border and Shadow Styles
+export const getAvailabilityStyles = (status) => {
+  switch (status) {
+    case "available":
+      return "border-green-400 shadow-[0_0_12px_2px_rgba(74,222,128,0.4)]";
+    case "unavailable":
+      return "border-red-400 shadow-[0_0_12px_2px_rgba(239,68,68,0.4)]";
+    case "on_leave":
+      return "border-slate-400 shadow-[0_0_12px_2px_rgba(148,163,184,0.3)]";
+    default:
+      return "border-transparent shadow-none";
+  }
+};

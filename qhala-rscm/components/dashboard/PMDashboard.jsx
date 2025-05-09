@@ -135,7 +135,7 @@ const PmDashboardSummary = ({ user }) => {
               </span>
             </div>
             <div className="pt-4 border-t border-[rgb(var(--border))] mt-4 flex flex-wrap items-center gap-3">
-              <Link href="/projects/new" passHref legacyBehavior>
+              <Link href="/projects/new" passHref>
                 <Button variant="primary" size="sm">
                   Create Project
                 </Button>

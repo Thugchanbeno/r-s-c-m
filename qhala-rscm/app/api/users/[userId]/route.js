@@ -63,66 +63,84 @@ export async function PUT(request, { params }) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  // Authorization Check
-  // const allowedRoles = ['hr', 'admin'];
-  // if (!session.user?.role || !allowedRoles.includes(session.user.role)) {
-  //   console.warn(`User ${session.user?.email} attempted to access restricted route PUT /api/users/[id]`);
-  //   return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
-  // }
+  // Ensure only admin/hr can update user roles/details
+  const allowedUpdateRoles = ["admin", "hr"];
+  if (!session.user?.role || !allowedUpdateRoles.includes(session.user.role)) {
+    return NextResponse.json(
+      { message: "Forbidden: Cannot update user details" },
+      { status: 403 }
+    );
+  }
+
+  const { userId } = params;
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return NextResponse.json(
+      { success: false, error: "Invalid User ID format" },
+      { status: 400 }
+    );
+  }
 
   try {
     await connectDB();
-
-    const { userId } = params;
     const body = await request.json();
 
-    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-      return NextResponse.json(
-        { success: false, error: "Invalid User ID format" },
-        { status: 400 }
-      );
-    }
-    const { role, department } = body;
+    // Fields that can be updated by admin/hr
     const updateData = {};
-    if (role) {
-      const allowedRoles = User.schema.path("role").enumValues;
-      if (!allowedRoles.includes(role)) {
+    if (body.role) {
+      // Validate role if provided
+      const allowedRolesEnum = User.schema.path("role").enumValues;
+      if (!allowedRolesEnum.includes(body.role)) {
         return NextResponse.json(
-          { success: false, error: "Invalid role" },
+          { success: false, error: `Invalid role value: ${body.role}` },
           { status: 400 }
         );
       }
-      updateData.role = role;
+      updateData.role = body.role;
     }
-    if (department !== undefined) {
-      updateData.department = department;
+    if (body.department !== undefined) {
+      // Allow setting department to empty string
+      updateData.department = body.department;
     }
+    if (body.availabilityStatus) {
+      // Check if availabilityStatus is provided
+      // Validate availabilityStatus if provided
+      const allowedAvailabilityStatusEnum =
+        User.schema.path("availabilityStatus").enumValues;
+      if (!allowedAvailabilityStatusEnum.includes(body.availabilityStatus)) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Invalid availability status: ${body.availabilityStatus}`,
+          },
+          { status: 400 }
+        );
+      }
+      updateData.availabilityStatus = body.availabilityStatus;
+    }
+
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
-        { success: false, error: "No valid fields to update" },
+        { success: false, error: "No update data provided" },
         { status: 400 }
       );
     }
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { $set: updateData },
-      { new: true, runValidators: true }
-    ).select("-authProviderId");
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true, // Return the updated document
+      runValidators: true, // Ensure schema validations are run
+    }).select("-authProviderId"); // Exclude sensitive fields
+
     if (!updatedUser) {
       return NextResponse.json(
         { success: false, error: "User not found" },
         { status: 404 }
       );
     }
+
     return NextResponse.json({ success: true, data: updatedUser });
   } catch (error) {
-    console.error(`API Error updating user ${params.userId}:`, error);
-    if (error instanceof mongoose.Error.CastError) {
-      return NextResponse.json(
-        { success: false, error: "Invalid User ID format" },
-        { status: 400 }
-      );
-    }
+    console.error(`API Error updating user ${userId}:`, error);
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((val) => val.message);
       return NextResponse.json(

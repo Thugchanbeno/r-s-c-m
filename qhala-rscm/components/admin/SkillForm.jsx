@@ -59,7 +59,6 @@ const AddSkillForm = ({ onSkillAdded, onCancel }) => {
           <span>{success}</span>
         </div>
       )}
-
       <div>
         <label
           htmlFor="skill-name"
@@ -77,7 +76,6 @@ const AddSkillForm = ({ onSkillAdded, onCancel }) => {
           placeholder="e.g., JavaScript, Python"
         />
       </div>
-
       <div>
         <label
           htmlFor="skill-category"
@@ -94,7 +92,6 @@ const AddSkillForm = ({ onSkillAdded, onCancel }) => {
           placeholder="e.g., Programming, Design, Cloud"
         />
       </div>
-
       <div>
         <label
           htmlFor="skill-description"
@@ -111,19 +108,17 @@ const AddSkillForm = ({ onSkillAdded, onCancel }) => {
           placeholder="Briefly describe the skill"
         />
       </div>
-
       <div className="flex justify-end space-x-3 pt-2">
         {" "}
         {/* Added space-x-3 */}
         {onCancel && ( // Conditionally render Cancel button
-          <Button
+          (<Button
             type="button"
             variant="outline"
             onClick={onCancel}
             disabled={submitting}
-          >
-            Cancel
-          </Button>
+          >Cancel
+                      </Button>)
         )}
         <Button
           type="submit"

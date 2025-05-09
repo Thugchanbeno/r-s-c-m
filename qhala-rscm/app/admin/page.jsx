@@ -156,7 +156,6 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       </header>
-
       <div className="max-w-7xl mx-auto">
         {/* Admin Cards */}
         <motion.div
