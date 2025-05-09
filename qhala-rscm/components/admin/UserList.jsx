@@ -1,6 +1,4 @@
-// components/admin/UserList.jsx
 "use client";
-
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
@@ -11,13 +9,13 @@ import Badge from "@/components/common/Badge";
 import { Edit, Trash2, Mail, Building, UserCheck, Search } from "lucide-react";
 import { getAvailabilityStyles } from "@/components/common/skillcolors";
 
-// Animation variants (unchanged)
+// Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.07, // Adjusted stagger
     },
   },
 };
@@ -35,18 +33,29 @@ const itemVariants = {
   },
 };
 
-const UserList = ({ searchTerm = "", onEditUser, onDeleteUser }) => {
+const UserList = ({
+  searchTerm = "",
+  skillSearchTerm = "",
+  onEditUser,
+  onDeleteUser,
+}) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchUsers = useCallback(async (search) => {
+  const fetchUsers = useCallback(async (textSearch, skillSearch) => {
     setLoading(true);
     setError(null);
     try {
-      const apiUrl = search
-        ? `/api/users?search=${encodeURIComponent(search)}`
-        : "/api/users";
+      const params = new URLSearchParams();
+      if (textSearch) {
+        params.append("search", textSearch);
+      }
+      if (skillSearch) {
+        params.append("skillName", skillSearch);
+      }
+
+      const apiUrl = `/api/users?${params.toString()}`;
       const response = await fetch(apiUrl);
 
       if (!response.ok) {
@@ -73,17 +82,23 @@ const UserList = ({ searchTerm = "", onEditUser, onDeleteUser }) => {
   }, []);
 
   useEffect(() => {
-    fetchUsers(searchTerm);
-  }, [searchTerm, fetchUsers]);
+    const handler = setTimeout(() => {
+      fetchUsers(searchTerm, skillSearchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm, skillSearchTerm, fetchUsers]);
 
   const handleEditClick = (userId) => {
     if (onEditUser) onEditUser(userId);
-    else console.warn("UserList: onEditUser prop not provided.");
+    // else console.warn("UserList: onEditUser prop not provided.");
   };
 
   const handleDeleteClick = (userId) => {
     if (onDeleteUser) onDeleteUser(userId);
-    else console.warn("UserList: onDeleteUser prop not provided.");
+    // else console.warn("UserList: onDeleteUser prop not provided.");
   };
 
   if (loading) {
@@ -130,8 +145,8 @@ const UserList = ({ searchTerm = "", onEditUser, onDeleteUser }) => {
         >
           <Search className="w-12 h-12 text-[rgb(var(--muted-foreground))] mb-3" />
           <p className="text-[rgb(var(--muted-foreground))] text-center">
-            {searchTerm
-              ? `No users found matching "${searchTerm}"`
+            {searchTerm || skillSearchTerm
+              ? `No users found matching your criteria.`
               : "No users found."}
           </p>
         </motion.div>
@@ -148,11 +163,10 @@ const UserList = ({ searchTerm = "", onEditUser, onDeleteUser }) => {
               >
                 <CardContent className="p-6">
                   <div className="flex flex-col sm:flex-row items-start gap-6">
-                    {/* User Avatar and Basic Info */}
-                    <div className="flex items-center gap-5">
+                    <div className="flex items-center gap-4 sm:gap-5">
                       <div className="relative">
                         <div className="absolute inset-0 bg-gradient-to-r from-[rgb(var(--primary))] to-purple-500 rounded-full opacity-0 group-hover:opacity-75 transition-opacity duration-300" />
-                        {user.avatarUrl ? ( // Check if avatarUrl exists
+                        {user.avatarUrl ? (
                           <div className="relative h-16 w-16">
                             <Image
                               className="rounded-full object-cover border-4 border-[rgb(var(--card))]"
@@ -163,7 +177,6 @@ const UserList = ({ searchTerm = "", onEditUser, onDeleteUser }) => {
                             />
                           </div>
                         ) : (
-                          // Placeholder if no avatarUrl
                           <div className="relative h-16 w-16 bg-[rgb(var(--muted))] rounded-full flex items-center justify-center border-4 border-[rgb(var(--card))]">
                             <UserCheck
                               size={32}
@@ -172,25 +185,33 @@ const UserList = ({ searchTerm = "", onEditUser, onDeleteUser }) => {
                           </div>
                         )}
                       </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-[rgb(var(--card-foreground))] group-hover:text-[rgb(var(--primary))] transition-colors duration-300">
+                      <div className="flex-grow">
+                        <h3 className="text-lg sm:text-xl font-semibold text-[rgb(var(--card-foreground))] group-hover:text-[rgb(var(--primary))] transition-colors duration-300">
                           {user.name}
                         </h3>
-                        <p className="text-sm text-[rgb(var(--muted-foreground))] flex items-center mt-1">
+                        <p className="text-xs sm:text-sm text-[rgb(var(--muted-foreground))] flex items-center mt-1">
                           <Mail size={14} className="mr-2 opacity-70" />
                           {user.email}
                         </p>
                       </div>
                     </div>
 
-                    {/* User Details and Actions */}
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 ml-auto">
-                      <div className="space-y-2">
+                    <div className="w-full sm:w-auto flex flex-col sm:items-end sm:ml-auto mt-4 sm:mt-0">
+                      <div className="flex sm:flex-col items-start sm:items-end gap-2 mb-3 sm:mb-0">
                         <div className="flex items-center gap-2">
-                          <UserCheck
-                            size={16}
-                            className="text-[rgb(var(--muted-foreground))]"
-                          />
+                          <Badge
+                            variant={
+                              user.availabilityStatus === "available"
+                                ? "success"
+                                : user.availabilityStatus === "unavailable"
+                                ? "error"
+                                : "default"
+                            }
+                            className="capitalize px-2.5 py-1 text-[10px] sm:text-xs"
+                            pill={true}
+                          >
+                            {user.availabilityStatus?.replace("_", " ")}
+                          </Badge>
                           <Badge
                             variant={
                               user.role === "admin" || user.role === "hr"
@@ -199,41 +220,41 @@ const UserList = ({ searchTerm = "", onEditUser, onDeleteUser }) => {
                                 ? "warning"
                                 : "success"
                             }
-                            className="capitalize px-3 py-1"
+                            className="capitalize px-2.5 py-1 text-[10px] sm:text-xs"
                             pill={true}
                           >
                             {user.role}
                           </Badge>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 text-xs sm:text-sm text-[rgb(var(--muted-foreground))]">
                           <Building
-                            size={16}
+                            size={14}
                             className="text-[rgb(var(--muted-foreground))]"
                           />
-                          <span className="text-sm font-medium text-[rgb(var(--card-foreground))]">
+                          <span className="font-medium text-[rgb(var(--card-foreground))]">
                             {user.department || "N/A"}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 sm:ml-6">
+                      <div className="flex items-center gap-2 mt-auto self-start sm:self-end">
                         <Button
                           variant="ghost"
-                          size="sm"
+                          size="xs"
                           onClick={() => handleEditClick(user._id)}
-                          className="text-[rgb(var(--primary))] hover:bg-[rgba(var(--primary),0.1)] p-2"
+                          className="text-[rgb(var(--primary))] hover:bg-[rgba(var(--primary),0.1)] p-1.5"
                           aria-label="Edit user"
                         >
-                          <Edit size={18} />
+                          <Edit size={16} />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="sm"
+                          size="xs"
                           onClick={() => handleDeleteClick(user._id)}
-                          className="text-red-600 hover:bg-red-50 p-2"
+                          className="text-red-600 hover:bg-red-50 p-1.5"
                           aria-label="Delete user"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={16} />
                         </Button>
                       </div>
                     </div>
