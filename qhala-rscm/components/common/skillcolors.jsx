@@ -65,3 +65,26 @@ export const getSkillLevelName = (level) => {
       return "N/A";
   }
 };
+export const getAllocationPercentageColor = (percentage) => {
+  if (percentage == null || percentage < 0 || percentage > 100) {
+    // Default for invalid or out-of-range percentages
+    return "bg-slate-50 text-slate-700 ring-1 ring-inset ring-slate-200";
+  }
+
+  if (percentage <= 20) {
+    // 0-20%
+    return "bg-green-50 text-green-700 ring-1 ring-inset ring-green-200";
+  } else if (percentage <= 40) {
+    // 21-40%
+    return "bg-lime-50 text-lime-700 ring-1 ring-inset ring-lime-200";
+  } else if (percentage <= 60) {
+    // 41-60%
+    return "bg-yellow-50 text-yellow-700 ring-1 ring-inset ring-yellow-200";
+  } else if (percentage <= 80) {
+    // 61-80%
+    return "bg-orange-50 text-orange-700 ring-1 ring-inset ring-orange-200";
+  } else {
+    // 81-100%
+    return "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200";
+  }
+};

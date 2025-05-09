@@ -45,9 +45,7 @@ const Navbar = () => {
             height={32}
             className="h-8 pt-1 w-auto" // Keep existing image styling
           />
-          <span className={`text-xl font-bold ${logoTextColor}`}>
-            Qhala RSCM
-          </span>
+          <span className={`text-xl font-bold ${logoTextColor}`}>Qhala</span>
         </Link>
       </div>
 

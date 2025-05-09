@@ -28,7 +28,7 @@ export default function Footer() {
             />
           </div>
           <span className={`text-xl font-bold ${footerTextPrimary}`}>
-            Qhala RSCM
+            Qhala
           </span>
         </div>
 

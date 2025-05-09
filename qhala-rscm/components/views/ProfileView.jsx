@@ -194,7 +194,7 @@ const ProfileData = () => {
                 Allocated Projects
               </h3>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <ProjectsList
                 projects={projects}
                 projectsError={projectsError}

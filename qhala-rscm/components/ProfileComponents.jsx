@@ -1,7 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Edit, Save, X, Briefcase, AlertCircle } from "lucide-react";
+import {
+  Edit,
+  Save,
+  X,
+  Briefcase,
+  AlertCircle,
+  Percent,
+  UserCog,
+  CalendarDays,
+} from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -11,7 +20,24 @@ import {
 import Button from "@/components/common/Button";
 import Badge from "@/components/common/Badge";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import { getSkillLevelColor } from "@/components/common/skillcolors";
+import {
+  getSkillLevelColor,
+  getAllocationPercentageColor,
+} from "@/components/common/skillcolors";
+
+//helper function to format dates
+const formatDateRange = (startDate, endDate) => {
+  const options = { year: "numeric", month: "short" };
+  const start = startDate
+    ? new Date(startDate).toLocaleDateString(undefined, options)
+    : "N/A";
+  const end = endDate
+    ? new Date(endDate).toLocaleDateString(undefined, options)
+    : "Present";
+  if (!startDate && !endDate) return "Dates N/A";
+  if (!startDate) return `Until ${end}`;
+  return `${start} - ${end}`;
+};
 
 // Animation variants
 const fadeIn = {
@@ -343,17 +369,16 @@ export const DesiredSkillsDisplay = ({ desiredSkills }) => (
   </motion.div>
 );
 
-// Projects List Component (CardTitle is text-xl, project links are font-medium, likely fine)
+// Projects List Component
 export const ProjectsList = ({ projects, projectsError, loadingProjects }) => (
   <motion.div initial="hidden" animate="visible" variants={fadeIn}>
     <Card className="overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-[rgb(var(--primary-accent-background))] to-purple-50">
-        {/* CardTitle here is text-xl by default from Card component, which is fine for a major section title within a card */}
-        <CardTitle className="flex items-center">
-          <Briefcase size={20} className="mr-3" /> My Projects
+        <CardTitle className="flex items-center text-[rgb(var(--card-foreground))]">
+          <Briefcase size={20} className="mr-3" /> My Projects & Allocations
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-6">
+      <CardContent className="p-4 md:p-6">
         {loadingProjects ? (
           <div className="flex justify-center py-4">
             <LoadingSpinner size={24} />
@@ -369,14 +394,58 @@ export const ProjectsList = ({ projects, projectsError, loadingProjects }) => (
                 <motion.div
                   key={allocation._id}
                   variants={fadeIn}
-                  className="flex items-center justify-between p-3 rounded-[var(--radius)] hover:bg-slate-50 transition-colors duration-200"
+                  className="p-4 rounded-[var(--radius)] border border-[rgb(var(--border))] hover:shadow-md transition-shadow duration-200 bg-[rgb(var(--background))] hover:bg-[rgb(var(--muted))]"
                 >
-                  <Link
-                    href={`/projects/${allocation.projectId?._id}`}
-                    className="font-medium text-sm text-[rgb(var(--primary))] hover:text-blue-700 transition-colors duration-200" // Project link to text-sm
-                  >
-                    {allocation.projectId?.name || "Unknown Project"}
-                  </Link>
+                  <div className="flex justify-between items-start mb-2">
+                    <Link
+                      href={`/projects/${allocation.projectId?._id}`}
+                      className="font-semibold text-base text-[rgb(var(--primary))] hover:underline"
+                    >
+                      {allocation.projectId?.name || "Unknown Project"}
+                    </Link>
+                    <Badge
+                      // Remove variant="outline" if you want the new color to be the primary style
+                      // or ensure your Badge component handles className overrides well.
+                      // variant="default" // Or a new variant that doesn't set bg/text
+                      size="sm"
+                      pill={true}
+                      className={getAllocationPercentageColor(
+                        allocation.allocationPercentage
+                      )} // Apply color classes here
+                    >
+                      {allocation.allocationPercentage}% Allocated
+                    </Badge>
+                  </div>
+
+                  <div className="space-y-1 text-xs text-[rgb(var(--muted-foreground))]">
+                    <div className="flex items-center">
+                      <UserCog
+                        size={14}
+                        className="mr-2 text-[rgb(var(--primary))]"
+                      />
+                      <span>
+                        Role:{" "}
+                        <span className="font-medium text-[rgb(var(--foreground))]">
+                          {allocation.role || "N/A"}
+                        </span>
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <CalendarDays
+                        size={14}
+                        className="mr-2 text-[rgb(var(--primary))]"
+                      />
+                      <span>
+                        Duration:{" "}
+                        <span className="font-medium text-[rgb(var(--foreground))]">
+                          {formatDateRange(
+                            allocation.startDate,
+                            allocation.endDate
+                          )}
+                        </span>
+                      </span>
+                    </div>
+                  </div>
                 </motion.div>
               ))
             ) : (
