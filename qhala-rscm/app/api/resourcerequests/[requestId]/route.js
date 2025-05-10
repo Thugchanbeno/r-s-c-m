@@ -6,7 +6,7 @@ import ResourceRequest from "@/models/ResourceRequest";
 import Allocation from "@/models/Allocation";
 import User from "@/models/User";
 import Project from "@/models/Project";
-// import Notification from "@/models/Notification"; // Import Notification model when ready
+import Notifications from "@/models/Notifications";
 import mongoose from "mongoose";
 
 export async function PUT(request, { params }) {
@@ -110,25 +110,62 @@ export async function PUT(request, { params }) {
         await newAllocation.save();
       }
     }
-
     await resourceRequest.save();
+    //trigger notifications
+    const projectForNotif = await Project.findById(
+      resourceRequest.projectId
+    ).select("name");
+    const userForNotif = await User.findById(
+      resourceRequest.requestedUserId
+    ).select("name");
+    const pmWhoRequested = await User.findById(
+      resourceRequest.requestedByPmId
+    ).select("name");
 
-    // --- TODO: Trigger Notifications ---
-    // 1. Notify PM who made the request (resourceRequest.requestedByPmId)
-    //    Message: "Your request for [User] on [Project] has been [status]."
-    // 2. If approved, notify the allocated user (resourceRequest.requestedUserId)
-    //    Message: "You have been allocated to [Project] as [Role] at [Percentage]%."
+    let pmMessage = "";
+    let userMessage = "";
+    const projectLink = `/projects/${resourceRequest.projectId}`;
 
-    // Example (conceptual, implement with your Notification model):
-    // const projectForNotif = await Project.findById(resourceRequest.projectId).select('name');
-    // const userForNotif = await User.findById(resourceRequest.requestedUserId).select('name');
+    if (resourceRequest.status === "approved") {
+      pmMessage = `Your request for ${
+        userForNotif?.name || "a user"
+      } on project '${projectForNotif?.name || "N/A"}' has been approved.`;
+      if (newAllocation) {
+        // Only notify user if allocation was successfully created
+        userMessage = `You have been allocated to project '${
+          projectForNotif?.name || "N/A"
+        }' as ${newAllocation.role} at ${newAllocation.allocationPercentage}%.`;
+        await Notifications.create({
+          userId: resourceRequest.requestedUserId,
+          message: userMessage,
+          link: projectLink,
+          type: "request_approved",
+          relatedResource: newAllocation._id,
+          onModel: "Allocation",
+        });
+      }
+    } else if (resourceRequest.status === "rejected") {
+      pmMessage = `Your request for ${
+        userForNotif?.name || "a user"
+      } on project '${projectForNotif?.name || "N/A"}' has been rejected.`;
+      if (resourceRequest.approverNotes) {
+        pmMessage += ` Notes: ${resourceRequest.approverNotes}`;
+      }
+    }
 
-    // if (status === 'approved' && newAllocation) {
-    //   await Notification.create({ userId: resourceRequest.requestedUserId, message: `You've been allocated to project ${projectForNotif?.name || 'a project'} as ${newAllocation.role}.` });
-    //   await Notification.create({ userId: resourceRequest.requestedByPmId, message: `Your request for ${userForNotif?.name || 'a user'} on project ${projectForNotif?.name || 'a project'} was approved.` });
-    // } else if (status === 'rejected') {
-    //   await Notification.create({ userId: resourceRequest.requestedByPmId, message: `Your request for ${userForNotif?.name || 'a user'} on project ${projectForNotif?.name || 'a project'} was rejected.` });
-    // }
+    if (pmMessage) {
+      await Notifications.create({
+        userId: resourceRequest.requestedByPmId,
+        message: pmMessage,
+        link: projectLink,
+        type:
+          resourceRequest.status === "approved"
+            ? "request_approved"
+            : "request_rejected",
+        relatedResource: resourceRequest._id,
+        onModel: "ResourceRequest",
+      });
+    }
 
     return NextResponse.json({
       success: true,

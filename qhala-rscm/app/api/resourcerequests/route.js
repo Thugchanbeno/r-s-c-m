@@ -5,6 +5,7 @@ import connectDB from "@/lib/db";
 import ResourceRequest from "@/models/ResourceRequest";
 import Project from "@/models/Project";
 import User from "@/models/User";
+import Notifications from "@/models/Notifications";
 import mongoose from "mongoose";
 
 export async function GET(request) {
@@ -189,7 +190,32 @@ export async function POST(request) {
 
     await newResourceRequest.save();
 
-    // TODO: Trigger notification to Admin/HR about the new pending request
+    // Trigger notification to Admin/HR about the new pending request
+    const adminsAndHr = await User.find({
+      role: { $in: ["admin", "hr"] },
+    }).select("_id");
+    const projectDetails = await Project.findById(projectId).select("name");
+    const requestedUserDetails = await User.findById(requestedUserId).select(
+      "name"
+    );
+
+    const notificationMessage = `New resource request for ${
+      requestedUserDetails?.name || "a user"
+    } on project ${projectDetails?.name || "a project"} by ${
+      session.user.name
+    }.`;
+    const notificationLink = `/resources?tab=requests`;
+
+    for (const recipient of adminsAndHr) {
+      await Notifications.create({
+        userId: recipient._id,
+        message: notificationMessage,
+        link: notificationLink,
+        type: "new_request",
+        relatedResource: newResourceRequest._id,
+        onModel: "ResourceRequest",
+      });
+    }
 
     return NextResponse.json(
       { success: true, data: newResourceRequest },

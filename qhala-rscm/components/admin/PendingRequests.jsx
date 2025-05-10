@@ -168,8 +168,8 @@ const PendingRequestsList = ({ onProcessRequest, processingRequestId }) => {
                   variant="outline"
                   size="sm"
                   onClick={() => onProcessRequest(req._id, "rejected")}
-                  disabled={isThisRequestProcessing} // Disable if this request is being processed
-                  isLoading={isThisRequestProcessing} // Show loading if this request is being processed
+                  disabled={isThisRequestProcessing}
+                  isLoading={isThisRequestProcessing}
                   className="text-red-600 border-red-500 hover:bg-red-50"
                 >
                   <XCircle size={16} className="mr-1.5" /> Reject
@@ -178,8 +178,8 @@ const PendingRequestsList = ({ onProcessRequest, processingRequestId }) => {
                   variant="success"
                   size="sm"
                   onClick={() => onProcessRequest(req._id, "approved")}
-                  disabled={isThisRequestProcessing} // Disable if this request is being processed
-                  isLoading={isThisRequestProcessing} // Show loading if this request is being processed
+                  disabled={isThisRequestProcessing}
+                  isLoading={isThisRequestProcessing}
                 >
                   <CheckCircle size={16} className="mr-1.5" /> Approve
                 </Button>
