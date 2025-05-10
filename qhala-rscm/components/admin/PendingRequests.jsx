@@ -20,7 +20,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 
-const PendingRequestsList = ({ onProcessRequest }) => {
+const PendingRequestsList = ({ onProcessRequest, processingRequestId }) => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -55,7 +55,7 @@ const PendingRequestsList = ({ onProcessRequest }) => {
 
   useEffect(() => {
     fetchPendingRequests();
-  }, [fetchPendingRequests]);
+  }, [fetchPendingRequests]); // Key prop on this component in parent will trigger re-mount and thus re-fetch
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -96,89 +96,98 @@ const PendingRequestsList = ({ onProcessRequest }) => {
 
   return (
     <div className="space-y-4">
-      {requests.map((req) => (
-        <Card key={req._id} className="overflow-hidden">
-          <CardHeader className="bg-[rgb(var(--muted))] p-4 border-b border-[rgb(var(--border))]">
-            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-              <CardTitle className="text-base sm:text-lg text-[rgb(var(--foreground))]">
-                Request for{" "}
-                <span className="font-semibold text-[rgb(var(--primary))]">
-                  {req.requestedUserId?.name || "Unknown User"}
-                </span>
-              </CardTitle>
-              <Badge variant="warning" pill={true} size="sm">
-                {req.status}
-              </Badge>
-            </div>
-            <p className="text-xs text-[rgb(var(--muted-foreground))] mt-1">
-              Project: {req.projectId?.name || "Unknown Project"} | Requested
-              by: {req.requestedByPmId?.name || "Unknown PM"} on{" "}
-              {formatDate(req.createdAt)}
-            </p>
-          </CardHeader>
-          <CardContent className="p-4 space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-              <div>
-                <span className="font-medium text-[rgb(var(--muted-foreground))] block">
-                  Role:
-                </span>
-                <span className="text-[rgb(var(--foreground))]">
-                  {req.requestedRole}
-                </span>
+      {requests.map((req) => {
+        // Determine if this specific request is the one being processed
+        const isThisRequestProcessing = processingRequestId === req._id;
+
+        return (
+          <Card key={req._id} className="overflow-hidden">
+            <CardHeader className="bg-[rgb(var(--muted))] p-4 border-b border-[rgb(var(--border))]">
+              <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                <CardTitle className="text-base sm:text-lg text-[rgb(var(--foreground))]">
+                  Request for{" "}
+                  <span className="font-semibold text-[rgb(var(--primary))]">
+                    {req.requestedUserId?.name || "Unknown User"}
+                  </span>
+                </CardTitle>
+                <Badge variant="warning" pill={true} size="sm">
+                  {req.status}
+                </Badge>
               </div>
-              <div>
-                <span className="font-medium text-[rgb(var(--muted-foreground))] block">
-                  Allocation:
-                </span>
-                <span className="text-[rgb(var(--foreground))]">
-                  {req.requestedPercentage}%
-                </span>
+              <p className="text-xs text-[rgb(var(--muted-foreground))] mt-1">
+                Project: {req.projectId?.name || "Unknown Project"} | Requested
+                by: {req.requestedByPmId?.name || "Unknown PM"} on{" "}
+                {formatDate(req.createdAt)}
+              </p>
+            </CardHeader>
+            <CardContent className="p-4 space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                <div>
+                  <span className="font-medium text-[rgb(var(--muted-foreground))] block">
+                    Role:
+                  </span>
+                  <span className="text-[rgb(var(--foreground))]">
+                    {req.requestedRole}
+                  </span>
+                </div>
+                <div>
+                  <span className="font-medium text-[rgb(var(--muted-foreground))] block">
+                    Allocation:
+                  </span>
+                  <span className="text-[rgb(var(--foreground))]">
+                    {req.requestedPercentage}%
+                  </span>
+                </div>
+                <div>
+                  <span className="font-medium text-[rgb(var(--muted-foreground))] block">
+                    Requested Dates:
+                  </span>
+                  <span className="text-[rgb(var(--foreground))]">
+                    {req.requestedStartDate
+                      ? formatDate(req.requestedStartDate)
+                      : "ASAP"}{" "}
+                    -{" "}
+                    {req.requestedEndDate
+                      ? formatDate(req.requestedEndDate)
+                      : "Ongoing"}
+                  </span>
+                </div>
               </div>
-              <div>
-                <span className="font-medium text-[rgb(var(--muted-foreground))] block">
-                  Requested Dates:
-                </span>
-                <span className="text-[rgb(var(--foreground))]">
-                  {req.requestedStartDate
-                    ? formatDate(req.requestedStartDate)
-                    : "ASAP"}{" "}
-                  -{" "}
-                  {req.requestedEndDate
-                    ? formatDate(req.requestedEndDate)
-                    : "Ongoing"}
-                </span>
+              {req.pmNotes && (
+                <div className="pt-2 border-t border-[rgb(var(--border))]">
+                  <p className="text-xs font-medium text-[rgb(var(--muted-foreground))] mb-0.5">
+                    PM Notes:
+                  </p>
+                  <p className="text-sm text-[rgb(var(--foreground))] whitespace-pre-wrap bg-slate-50 p-2 rounded-md">
+                    {req.pmNotes}
+                  </p>
+                </div>
+              )}
+              <div className="flex justify-end space-x-2 pt-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onProcessRequest(req._id, "rejected")}
+                  disabled={isThisRequestProcessing} // Disable if this request is being processed
+                  isLoading={isThisRequestProcessing} // Show loading if this request is being processed
+                  className="text-red-600 border-red-500 hover:bg-red-50"
+                >
+                  <XCircle size={16} className="mr-1.5" /> Reject
+                </Button>
+                <Button
+                  variant="success"
+                  size="sm"
+                  onClick={() => onProcessRequest(req._id, "approved")}
+                  disabled={isThisRequestProcessing} // Disable if this request is being processed
+                  isLoading={isThisRequestProcessing} // Show loading if this request is being processed
+                >
+                  <CheckCircle size={16} className="mr-1.5" /> Approve
+                </Button>
               </div>
-            </div>
-            {req.pmNotes && (
-              <div className="pt-2 border-t border-[rgb(var(--border))]">
-                <p className="text-xs font-medium text-[rgb(var(--muted-foreground))] mb-0.5">
-                  PM Notes:
-                </p>
-                <p className="text-sm text-[rgb(var(--foreground))] whitespace-pre-wrap bg-slate-50 p-2 rounded-md">
-                  {req.pmNotes}
-                </p>
-              </div>
-            )}
-            <div className="flex justify-end space-x-2 pt-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onProcessRequest(req._id, "rejected")}
-                className="text-red-600 border-red-500 hover:bg-red-50"
-              >
-                <XCircle size={16} className="mr-1.5" /> Reject
-              </Button>
-              <Button
-                variant="success"
-                size="sm"
-                onClick={() => onProcessRequest(req._id, "approved")}
-              >
-                <CheckCircle size={16} className="mr-1.5" /> Approve
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 };

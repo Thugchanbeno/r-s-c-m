@@ -92,12 +92,13 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
         );
       }
       setSuccess(`User "${formData.name}" updated successfully!`);
+      toast.success(`User "${formData.name}" updated successfully!`);
       if (onUserUpdated) {
         onUserUpdated(result.data); // Pass updated data back
       }
     } catch (err) {
-      console.error("EditUserForm: Failed to update user:", err);
       setError(err.message || "Could not update user.");
+      toast.error(err.message || "Could not update user.");
     } finally {
       setSubmitting(false);
     }

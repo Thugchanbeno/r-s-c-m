@@ -7,6 +7,7 @@ import ProjectForm from "@/components/ProjectForm";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/common/Card";
+import { toast } from "react-toastify";
 
 export default function NewProjectPage() {
   const { data: session, status } = useSession({ required: true });
@@ -43,11 +44,12 @@ export default function NewProjectPage() {
         } else {
           router.push("/projects");
         }
+        toast.success("Project created successfuly");
       } catch (err) {
-        console.error("Failed to create project:", err);
         setError(
           err.message || "Could not create project. Please check details."
         );
+        toast.error("Failed to create project:", err);
       } finally {
         let requestSuccessful = false;
         if (typeof response !== "undefined" && typeof result !== "undefined") {

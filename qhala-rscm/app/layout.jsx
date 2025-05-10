@@ -1,10 +1,12 @@
 import AuthProvider from "@/components/auth/AuthProvider";
-import { ThemeProvider } from "@/components/theme-provider"; // Import the ThemeProvider
+import { ThemeProvider } from "@/components/theme-provider";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
 export const metadata = {
   title: "Qhala RSCM",
-  description: "Qhala resource center management application",
+  description: "Resource and Skill Capacity Management",
 };
 
 export default function RootLayout({ children }) {
@@ -24,7 +26,21 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            {children}
+            <ToastContainer
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+            />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

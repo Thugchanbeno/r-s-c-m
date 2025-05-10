@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Button from "@/components/common/Button";
 import { AlertCircle, CheckCircle } from "lucide-react";
+import { toast } from "react-toastify";
 
 const AddSkillForm = ({ onSkillAdded, onCancel }) => {
   const [name, setName] = useState("");
@@ -35,8 +36,10 @@ const AddSkillForm = ({ onSkillAdded, onCancel }) => {
       setCategory("");
       setDescription("");
       if (onSkillAdded) onSkillAdded();
+      toast.success(`Skill "${result.data.name}" added successfully!`);
     } catch (err) {
       setError(err.message || "Could not add skill.");
+      toast.error(err.message || "Could not add skill.");
     } finally {
       setSubmitting(false);
     }
@@ -112,13 +115,14 @@ const AddSkillForm = ({ onSkillAdded, onCancel }) => {
         {" "}
         {/* Added space-x-3 */}
         {onCancel && ( // Conditionally render Cancel button
-          (<Button
+          <Button
             type="button"
             variant="outline"
             onClick={onCancel}
             disabled={submitting}
-          >Cancel
-                      </Button>)
+          >
+            Cancel
+          </Button>
         )}
         <Button
           type="submit"

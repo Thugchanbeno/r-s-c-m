@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { getAllocationPercentageColor } from "@/components/common/skillcolors";
+import { toast } from "react-toastify";
 
 // Animation variants
 const fadeIn = {
@@ -185,12 +186,14 @@ const ProjectDetailPage = () => {
       if (!response.ok || !result.success) {
         throw new Error(result.error || "Failed to submit request");
       }
-      // Handle success (e.g., show toast, refresh something if needed will set up toast later)
-      console.log("Request submitted:", result.data);
+      toast.success(
+        `Request for ${userToRequest.name} submitted successfully!`
+      );
+      handleCloseRequestModal();
       handleCloseRequestModal();
     } catch (error) {
       console.error("Error submitting resource request:", error);
-      // Handle error (e.g., show error message in modal or toast)
+      toast.error(`Error: ${error.message || "Could not submit request."}`);
       alert(`Error: ${error.message}`);
     } finally {
       handleCloseRequestModal();

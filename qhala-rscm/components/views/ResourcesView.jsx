@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Search, Users as UsersIcon, BellRing, Wrench } from "lucide-react";
 import Button from "@/components/common/Button";
@@ -12,26 +12,27 @@ import {
 } from "@/components/common/Card";
 import UserList from "@/components/admin/UserList";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { toast } from "react-toastify";
 
 const ResourcesView = () => {
   const { data: session, status } = useSession({ required: true });
   const [activeTab, setActiveTab] = useState("users");
   const [searchTerm, setSearchTerm] = useState("");
   const [skillSearchTerm, setSkillSearchTerm] = useState("");
-  const [processingRequest, setProcessingRequest] = useState(null);
+  const [processingRequestId, setProcessingRequestId] = useState(null);
+  const [requestListKey, setRequestListKey] = useState(0);
 
   const userRole = session?.user?.role;
   const canManageRequests =
     userRole === "admin" || userRole === "hr" || userRole === "pm";
 
   // Handler for processing requests (approve/reject)
-
   const handleProcessRequest = async (
     requestId,
     newStatus,
     approverNotes = ""
   ) => {
-    setProcessingRequest(requestId);
+    setProcessingRequestId(requestId);
     try {
       const response = await fetch(`/api/resourcerequests/${requestId}`, {
         method: "PUT",
@@ -44,12 +45,8 @@ const ResourcesView = () => {
       if (!response.ok || !result.success) {
         throw new Error(result.error || `Failed to ${newStatus} request.`);
       }
-
-      console.log(
-        `Request ${requestId} successfully ${newStatus}:`,
-        result.data
-      );
-      alert(`Request successfully ${newStatus}!`); // Replace with a toast notification
+      toast.success(`Request successfully ${newStatus}!`);
+      setRequestListKey((prevKey) => prevKey + 1);
 
       // TODO: Trigger a refresh of the PendingRequestsList.
       // This often involves lifting state up or passing a refetch function down.
@@ -61,9 +58,10 @@ const ResourcesView = () => {
       // A better solution is to make PendingRequestsList refetch.
     } catch (error) {
       console.error(`Error processing request ${requestId}:`, error);
+      toast.error(`Error processing request ${requestId}:`, error);
       alert(`Error: ${error.message}`);
     } finally {
-      setProcessingRequest(null);
+      setProcessingRequestId(null);
     }
   };
 
@@ -161,7 +159,11 @@ const ResourcesView = () => {
           )}
 
           {activeTab === "requests" && canManageRequests && (
-            <PendingRequests onProcessRequest={handleProcessRequest} />
+            <PendingRequests
+              onProcessRequest={handleProcessRequest}
+              key={requestListKey}
+              processingRequesId={processingRequestId}
+            />
           )}
         </div>
       </div>
