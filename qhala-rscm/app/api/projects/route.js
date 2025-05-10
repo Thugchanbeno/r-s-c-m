@@ -66,14 +66,13 @@ export async function GET(request) {
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
-  if (!session) {
+  if (!session || !session.user || !session.user.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-
   const allowedRoles = ["pm", "hr", "admin"];
   if (!allowedRoles.includes(session.user.role)) {
     return NextResponse.json(
-      { message: "Forbidden: Insufficient role" },
+      { message: "Forbidden: Insufficient permissions to create projects" },
       { status: 403 }
     );
   }
@@ -90,9 +89,12 @@ export async function POST(request) {
     }
 
     // TODO: Validate requiredSkills structure if provided
-    // TODO: Potentially assign pmId based on logged-in user session.user.id if role is PM
+    const newProjectData = {
+      ...body,
+      pmId: session.user.id,
+    };
 
-    const newProject = await Project.create(body);
+    const newProject = await Project.create(newProjectData);
 
     return NextResponse.json(
       { success: true, data: newProject },

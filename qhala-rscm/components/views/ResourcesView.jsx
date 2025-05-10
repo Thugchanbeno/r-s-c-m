@@ -1,27 +1,71 @@
-// components/admin/ResourcesView.jsx
 "use client";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { Search, Users as UsersIcon, BellRing, Wrench } from "lucide-react"; // Wrench for skill search
+import { Search, Users as UsersIcon, BellRing, Wrench } from "lucide-react";
 import Button from "@/components/common/Button";
+import PendingRequests from "@/components/admin/PendingRequests";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
 } from "@/components/common/Card";
-import UserList from "@/components/admin/UserList"; // Ensure this path is correct
+import UserList from "@/components/admin/UserList";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const ResourcesView = () => {
   const { data: session, status } = useSession({ required: true });
   const [activeTab, setActiveTab] = useState("users");
-  const [searchTerm, setSearchTerm] = useState(""); // For general text search
-  const [skillSearchTerm, setSkillSearchTerm] = useState(""); // For skill search
+  const [searchTerm, setSearchTerm] = useState("");
+  const [skillSearchTerm, setSkillSearchTerm] = useState("");
+  const [processingRequest, setProcessingRequest] = useState(null);
 
   const userRole = session?.user?.role;
   const canManageRequests =
     userRole === "admin" || userRole === "hr" || userRole === "pm";
+
+  // Handler for processing requests (approve/reject)
+
+  const handleProcessRequest = async (
+    requestId,
+    newStatus,
+    approverNotes = ""
+  ) => {
+    setProcessingRequest(requestId);
+    try {
+      const response = await fetch(`/api/resourcerequests/${requestId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus, approverNotes }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || `Failed to ${newStatus} request.`);
+      }
+
+      console.log(
+        `Request ${requestId} successfully ${newStatus}:`,
+        result.data
+      );
+      alert(`Request successfully ${newStatus}!`); // Replace with a toast notification
+
+      // TODO: Trigger a refresh of the PendingRequestsList.
+      // This often involves lifting state up or passing a refetch function down.
+      // A simple way for now, if PendingRequestsList re-fetches on prop change or mount,
+      // would be to force a re-render of it, e.g., by changing a key.
+      // Or, if PendingRequestsList exposes a refetch function:
+      // pendingRequestsListRef.current.fetchPendingRequests();
+      // For now, the user will have to manually see the list update on next load/filter.
+      // A better solution is to make PendingRequestsList refetch.
+    } catch (error) {
+      console.error(`Error processing request ${requestId}:`, error);
+      alert(`Error: ${error.message}`);
+    } finally {
+      setProcessingRequest(null);
+    }
+  };
 
   if (status === "loading") {
     return (
@@ -59,14 +103,15 @@ const ResourcesView = () => {
             >
               <UsersIcon size={16} className="mr-2" /> Users
             </Button>
-            {canManageRequests && (
+            {(session?.user?.role === "admin" ||
+              session?.user?.role === "hr") && (
               <Button
                 variant={activeTab === "requests" ? "primary" : "outline"}
                 onClick={() => setActiveTab("requests")}
                 size="sm"
                 className="flex-1 md:flex-none"
               >
-                <BellRing size={16} className="mr-2" /> Requests
+                <BellRing size={16} className="mr-2" /> Manage Requests
               </Button>
             )}
             {/* Search Inputs - Show only for Users tab */}
@@ -107,8 +152,7 @@ const ResourcesView = () => {
               <CardContent>
                 <UserList
                   searchTerm={searchTerm}
-                  skillSearchTerm={skillSearchTerm} // Pass skill search term
-                  // Add onEditUser and onDeleteUser props if you implement modals for these actions from ResourcesView
+                  skillSearchTerm={skillSearchTerm}
                   // onEditUser={(userId) => console.log("Edit user:", userId)}
                   // onDeleteUser={(userId) => console.log("Delete user:", userId)}
                 />
@@ -117,17 +161,7 @@ const ResourcesView = () => {
           )}
 
           {activeTab === "requests" && canManageRequests && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Resource Requests</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-10 text-[rgb(var(--muted-foreground))]">
-                  <BellRing size={32} className="mx-auto mb-2" />
-                  Resource request functionality is not yet implemented.
-                </div>
-              </CardContent>
-            </Card>
+            <PendingRequests onProcessRequest={handleProcessRequest} />
           )}
         </div>
       </div>

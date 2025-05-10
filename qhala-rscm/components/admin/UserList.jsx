@@ -6,7 +6,15 @@ import Image from "next/image";
 import Button from "@/components/common/Button";
 import { Card, CardContent } from "@/components/common/Card";
 import Badge from "@/components/common/Badge";
-import { Edit, Trash2, Mail, Building, UserCheck, Search } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  Mail,
+  Building,
+  UserCheck,
+  Search,
+  UserPlus,
+} from "lucide-react";
 import { getAvailabilityStyles } from "@/components/common/skillcolors";
 
 // Animation variants
@@ -38,6 +46,7 @@ const UserList = ({
   skillSearchTerm = "",
   onEditUser,
   onDeleteUser,
+  onInitiateRequest,
 }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -238,24 +247,40 @@ const UserList = ({
                       </div>
 
                       <div className="flex items-center gap-2 mt-auto self-start sm:self-end">
-                        <Button
-                          variant="ghost"
-                          size="xs"
-                          onClick={() => handleEditClick(user._id)}
-                          className="text-[rgb(var(--primary))] hover:bg-[rgba(var(--primary),0.1)] p-1.5"
-                          aria-label="Edit user"
-                        >
-                          <Edit size={16} />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="xs"
-                          onClick={() => handleDeleteClick(user._id)}
-                          className="text-red-600 hover:bg-red-50 p-1.5"
-                          aria-label="Delete user"
-                        >
-                          <Trash2 size={16} />
-                        </Button>
+                        {onInitiateRequest && ( // Conditionally render Request button
+                          <Button
+                            variant="outline" // Or a different variant like "success" or "primary"
+                            size="xs"
+                            onClick={() => onInitiateRequest(user)} // Pass the whole user object
+                            className="text-green-600 border-green-600 hover:bg-green-50"
+                            aria-label={`Request ${user.name} for project`}
+                          >
+                            <UserPlus size={16} className="mr-1 sm:mr-1.5" />
+                            <span className="hidden sm:inline">Request</span>
+                          </Button>
+                        )}
+                        {onEditUser && ( // Conditionally render Edit button
+                          <Button
+                            variant="ghost"
+                            size="xs"
+                            onClick={() => handleEditClick(user._id)}
+                            className="text-[rgb(var(--primary))] hover:bg-[rgba(var(--primary),0.1)] p-1.5"
+                            aria-label="Edit user"
+                          >
+                            <Edit size={16} />
+                          </Button>
+                        )}
+                        {onDeleteUser && ( // Conditionally render Delete button
+                          <Button
+                            variant="ghost"
+                            size="xs"
+                            onClick={() => handleDeleteClick(user._id)}
+                            className="text-red-600 hover:bg-red-50 p-1.5"
+                            aria-label="Delete user"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>

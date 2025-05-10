@@ -1,8 +1,9 @@
-// app/projects/[projectId]/page.jsx
 "use client";
-
+import UserList from "@/components/admin/UserList";
+import RequestResourceForm from "@/components/RequestResourceForm";
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
   Card,
@@ -15,6 +16,7 @@ import {
 import Button from "@/components/common/Button";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Badge from "@/components/common/Badge";
+import Modal from "@/components/common/Modal";
 import {
   ArrowLeft,
   Users,
@@ -23,6 +25,7 @@ import {
   UserCog,
   AlertCircle,
   Wrench,
+  UserPlus,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { getAllocationPercentageColor } from "@/components/common/skillcolors";
@@ -48,11 +51,15 @@ const ProjectDetailPage = () => {
   const router = useRouter();
   const params = useParams();
   const projectId = params?.projectId;
+  const { data: session, status: sessionStatus } = useSession();
 
   const [project, setProject] = useState(null);
   const [allocations, setAllocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
+  const [userToRequest, setUserToRequest] = useState(null);
 
   const fetchProjectData = useCallback(async () => {
     if (!projectId) {
@@ -108,8 +115,10 @@ const ProjectDetailPage = () => {
   }, [projectId]);
 
   useEffect(() => {
-    fetchProjectData();
-  }, [fetchProjectData]);
+    if (projectId) {
+      fetchProjectData();
+    }
+  }, [projectId, fetchProjectData]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -136,8 +145,59 @@ const ProjectDetailPage = () => {
         return "default";
     }
   };
+  const canManageTeam =
+    session?.user &&
+    project &&
+    (session.user.id === project.pmId?._id ||
+      session.user.role === "admin" ||
+      session.user.role === "hr");
+  const handleInitiateResourceRequest = (user) => {
+    setUserToRequest(user);
+    setIsRequestModalOpen(true);
+  };
 
-  if (loading) {
+  const handleCloseRequestModal = () => {
+    setIsRequestModalOpen(false);
+    setUserToRequest(null);
+  };
+  const handleSubmitResourceRequest = async (formDataFromForm) => {
+    if (!userToRequest || !project) return;
+    setIsSubmittingRequest(true);
+
+    const payload = {
+      projectId: project._id,
+      requestedUserId: userToRequest._id,
+      requestedRole: formDataFromForm.requestedRole,
+      requestedPercentage: formDataFromForm.requestedPercentage,
+      requestedStartDate: formDataFromForm.requestedStartDate,
+      requestedEndDate: formDataFromForm.requestedEndDate,
+      pmNotes: formDataFromForm.pmNotes,
+    };
+    console.log("Submitting Resource Request:", payload);
+
+    try {
+      const response = await fetch("/api/resourcerequests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to submit request");
+      }
+      // Handle success (e.g., show toast, refresh something if needed will set up toast later)
+      console.log("Request submitted:", result.data);
+      handleCloseRequestModal();
+    } catch (error) {
+      console.error("Error submitting resource request:", error);
+      // Handle error (e.g., show error message in modal or toast)
+      alert(`Error: ${error.message}`);
+    } finally {
+      handleCloseRequestModal();
+    }
+  };
+
+  if (sessionStatus === "loading" || (loading && !project)) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-[rgb(var(--background))] p-10 text-center">
         <LoadingSpinner size={30} />
@@ -361,7 +421,65 @@ const ProjectDetailPage = () => {
             </CardContent>
           </Card>
         </motion.div>
+        {canManageTeam && (
+          <motion.div variants={fadeIn}>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl text-[rgb(var(--foreground))] flex items-center">
+                  <UserPlus
+                    size={20}
+                    className="mr-2 text-[rgb(var(--primary))]"
+                  />
+                  Manage Team / Request Resources
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  Browse users and request them for this project.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-[rgb(var(--muted-foreground))] mb-4">
+                  Search and select users to request for this project. You'll be
+                  able to specify their role and allocation percentage.
+                </p>
+                {/*
+                  UserList will be rendered here.
+                  We need to decide how the "selection" or "request" action will be triggered from UserList.
+                  Option 1: UserList has an "Add to Project" button per user.
+                  Option 2: UserList has checkboxes, and a separate "Request Selected Users" button.
+                  For now, let's assume UserList can take an onSelectUser prop or similar.
+                */}
+                <UserList
+                  onInitiateRequest={handleInitiateResourceRequest}
+                  // We might not need general searchTerm or skillSearchTerm here,
+                  // or we can provide new ones specific to this resource search.
+                  // searchTerm="" // Or new state for this specific search
+                  // skillSearchTerm="" // Or new state
+                  onEditUser={null} // Not for editing user details here
+                  onDeleteUser={null} // Not for deleting users here
+                  // We'll add a new prop later like `onSelectUserForProject`
+                />
+                {/* Placeholder for where selected users might appear or action buttons */}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
       </div>
+      {userToRequest &&
+        project && ( // Ensure both are available before rendering modal
+          <Modal
+            isOpen={isRequestModalOpen}
+            onClose={handleCloseRequestModal}
+            title={`Request ${userToRequest.name} for ${project.name}`}
+          >
+            <RequestResourceForm
+              userToRequest={userToRequest}
+              projectId={project._id}
+              onSubmit={handleSubmitResourceRequest}
+              onCancel={handleCloseRequestModal}
+              isSubmittingRequest={isSubmittingRequest} // Pass submitting state
+            />
+          </Modal>
+        )}
     </motion.div>
   );
 };

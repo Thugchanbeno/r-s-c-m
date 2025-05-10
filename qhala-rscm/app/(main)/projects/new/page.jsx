@@ -32,16 +32,17 @@ export default function NewProjectPage() {
         });
 
         const result = await response.json();
-        if (!response.ok) {
+        if (!response.ok || !result.success) {
           throw new Error(
             result.error || `Error ${response.status}: ${response.statusText}`
           );
         }
-        if (!result.success) {
-          throw new Error(result.error || "API returned success: false");
+        const newProjectId = result.data?._id;
+        if (newProjectId) {
+          router.push(`/projects/${newProjectId}`);
+        } else {
+          router.push("/projects");
         }
-
-        router.push("/projects");
       } catch (err) {
         console.error("Failed to create project:", err);
         setError(

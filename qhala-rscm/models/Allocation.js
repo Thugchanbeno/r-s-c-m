@@ -21,7 +21,7 @@ const AllocationSchema = new Schema(
     role: {
       type: String,
       required: true,
-      enum: ["Developer", "Tester", "Manager", "Admin"],
+      enum: ["Lead developer", "Developer", "Tester", "Manager", "Admin"],
       default: "Developer",
     },
   },
