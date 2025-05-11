@@ -1,9 +1,9 @@
-// components/admin/EditUserForm.jsx
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import Button from "@/components/common/Button";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { AlertCircle, CheckCircle } from "lucide-react";
+import { toast } from "react-toastify";
 
 const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -11,7 +11,7 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
     email: "",
     role: "employee",
     department: "",
-    availabilityStatus: "available", // Add and initialize
+    availabilityStatus: "available",
     authProviderId: "",
   });
 
@@ -44,7 +44,7 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
           email: result.data.email || "",
           role: result.data.role || "employee",
           department: result.data.department || "",
-          availabilityStatus: result.data.availabilityStatus || "available", // Populate from fetched data
+          availabilityStatus: result.data.availabilityStatus || "available",
           authProviderId: result.data.authProviderId || "",
         });
       } else {
@@ -82,7 +82,7 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
         body: JSON.stringify({
           role: formData.role,
           department: formData.department,
-          availabilityStatus: formData.availabilityStatus, // Send new status
+          availabilityStatus: formData.availabilityStatus,
         }),
       });
       const result = await response.json();
@@ -94,7 +94,7 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
       setSuccess(`User "${formData.name}" updated successfully!`);
       toast.success(`User "${formData.name}" updated successfully!`);
       if (onUserUpdated) {
-        onUserUpdated(result.data); // Pass updated data back
+        onUserUpdated(result.data);
       }
     } catch (err) {
       setError(err.message || "Could not update user.");

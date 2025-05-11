@@ -71,8 +71,9 @@ export default function AdminDashboardPage() {
       icon: <Wrench size={22} />,
       href: "/admin/skills",
       stats: "86 skills defined",
-      color: "bg-emerald-50",
-      gradient: "from-emerald-500/10 to-emerald-600/10",
+      color: "bg-[rgb(var(--primary-accent-background))]",
+      gradient:
+        "from-[rgba(var(--primary),0.1)] to-[rgba(var(--primary),0.15)]",
     },
     {
       id: "settings",
@@ -81,8 +82,9 @@ export default function AdminDashboardPage() {
       icon: <Settings size={22} />,
       href: "/admin/settings",
       stats: "Last updated 2 days ago",
-      color: "bg-purple-50",
-      gradient: "from-purple-500/10 to-purple-600/10",
+      color: "bg-[rgb(var(--primary-accent-background))]",
+      gradient:
+        "from-[rgba(var(--primary),0.1)] to-[rgba(var(--primary),0.15)]",
     },
     {
       id: "analytics",
@@ -91,8 +93,9 @@ export default function AdminDashboardPage() {
       icon: <TrendingUp size={22} />,
       href: "/admin/analytics",
       stats: "12 reports available",
-      color: "bg-amber-50",
-      gradient: "from-amber-500/10 to-amber-600/10",
+      color: "bg-[rgb(var(--primary-accent-background))]",
+      gradient:
+        "from-[rgba(var(--primary),0.1)] to-[rgba(var(--primary),0.15)]",
     },
   ];
 

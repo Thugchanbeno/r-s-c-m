@@ -14,6 +14,8 @@ import {
   Activity,
   AlertCircle,
   TrendingUp,
+  Wrench,
+  Star,
 } from "lucide-react";
 import Badge from "@/components/common/Badge";
 import { getAllocationPercentageColor } from "@/components/common/skillcolors";
@@ -23,6 +25,15 @@ const HrAdminDashboardSummary = ({ user }) => {
   const [totalProjectCount, setTotalProjectCount] = useState(0);
   const [overallCapacityUtilization, setOverallCapacityUtilization] =
     useState(0);
+  const [totalUniqueSkills, setTotalUniqueSkills] = useState(0);
+  const [mostCommonSkill, setMostCommonSkill] = useState({
+    name: "N/A",
+    count: 0,
+  });
+  const [mostDesiredSkill, setMostDesiredSkill] = useState({
+    name: "N/A",
+    count: 0,
+  });
   const [loadingSummary, setLoadingSummary] = useState(true);
   const [summaryError, setSummaryError] = useState(null);
 
@@ -33,14 +44,22 @@ const HrAdminDashboardSummary = ({ user }) => {
       let fetchedUserCount = 0;
       let fetchedProjectCount = 0;
       let fetchedCapacityUtilization = 0;
+      let fetchedTotalUniqueSkills = 0;
+      let fetchedMostCommonSkill = { name: "N/A", count: 0 };
+      let fetchedMostDesiredSkill = { name: "N/A", count: 0 };
 
       try {
-        const [usersResponse, projectsResponse, overallAllocationResponse] =
-          await Promise.all([
-            fetch(`/api/users?countOnly=true`),
-            fetch(`/api/projects?countOnly=true`),
-            fetch(`/api/allocations/summary?scope=overall`),
-          ]);
+        const [
+          usersResponse,
+          projectsResponse,
+          overallAllocationResponse,
+          skillDistributionResponse,
+        ] = await Promise.all([
+          fetch(`/api/users?countOnly=true`),
+          fetch(`/api/projects?countOnly=true`),
+          fetch(`/api/allocations/summary?scope=overall`),
+          fetch(`/api/skills/distribution`),
+        ]);
         //process user response
         if (!usersResponse.ok) {
           const errData = await usersResponse.json().catch(() => ({}));
@@ -71,6 +90,7 @@ const HrAdminDashboardSummary = ({ user }) => {
               `Failed to fetch overall allocation summary: ${overallAllocationResponse.statusText} (${overallAllocationResponse.status})`
           );
         }
+        //process overall allocation
         const allocationSummaryResult = await overallAllocationResponse.json();
         if (allocationSummaryResult.success && allocationSummaryResult.data) {
           fetchedCapacityUtilization =
@@ -80,6 +100,44 @@ const HrAdminDashboardSummary = ({ user }) => {
             allocationSummaryResult.error ||
               "Invalid overall allocation summary data."
           );
+        }
+        // Process Skill Distribution Data
+        if (skillDistributionResponse.ok) {
+          const skillDistResult = await skillDistributionResponse.json();
+          if (skillDistResult.success && Array.isArray(skillDistResult.data)) {
+            let uniqueSkills = 0;
+            let commonSkill = { name: "N/A", count: -1 };
+            let desiredSkill = { name: "N/A", count: -1 };
+
+            skillDistResult.data.forEach((category) => {
+              category.skills.forEach((skill) => {
+                uniqueSkills++;
+                if (skill.currentUserCount > commonSkill.count) {
+                  commonSkill = {
+                    name: skill.name,
+                    count: skill.currentUserCount,
+                  };
+                }
+                if (skill.desiredUserCount > desiredSkill.count) {
+                  desiredSkill = {
+                    name: skill.name,
+                    count: skill.desiredUserCount,
+                  };
+                }
+              });
+            });
+            fetchedTotalUniqueSkills = uniqueSkills;
+            fetchedMostCommonSkill =
+              commonSkill.count > -1 ? commonSkill : { name: "N/A", count: 0 };
+            fetchedMostDesiredSkill =
+              desiredSkill.count > -1
+                ? desiredSkill
+                : { name: "N/A", count: 0 };
+          } else {
+            console.warn("Invalid skill distribution data format.");
+          }
+        } else {
+          console.warn("Failed to fetch skill distribution data.");
         }
       } catch (err) {
         console.error("Error fetching HR/Admin summary data:", err);
@@ -92,10 +150,12 @@ const HrAdminDashboardSummary = ({ user }) => {
         setTotalUserCount(fetchedUserCount);
         setTotalProjectCount(fetchedProjectCount);
         setOverallCapacityUtilization(fetchedCapacityUtilization);
+        setTotalUniqueSkills(fetchedTotalUniqueSkills);
+        setMostCommonSkill(fetchedMostCommonSkill);
+        setMostDesiredSkill(fetchedMostDesiredSkill);
         setLoadingSummary(false);
       }
     };
-
     fetchHrSummaryData();
   }, []);
 
@@ -106,7 +166,7 @@ const HrAdminDashboardSummary = ({ user }) => {
       </CardHeader>
       <CardContent>
         {loadingSummary ? (
-          <div className="flex flex-col items-center justify-center p-6 min-h-[150px]">
+          <div className="flex flex-col items-center justify-center p-6 min-h-[200px]">
             <LoadingSpinner size={20} />
             <p className="mt-2 text-sm text-[rgb(var(--muted-foreground))]">
               Loading overview...
@@ -155,6 +215,40 @@ const HrAdminDashboardSummary = ({ user }) => {
                 {overallCapacityUtilization}%
               </Badge>
             </div>
+            <div className="pt-3 border-t border-[rgb(var(--border))] mt-3"></div>{" "}
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center text-[rgb(var(--muted-foreground))]">
+                <Wrench size={16} className="mr-2 text-purple-500" /> Total
+                Unique Skills:
+              </span>
+              <span className="font-semibold text-[rgb(var(--foreground))]">
+                {totalUniqueSkills}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center text-[rgb(var(--muted-foreground))]">
+                <Star size={16} className="mr-2 text-amber-500" /> Most Common
+                Skill:
+              </span>
+              <span
+                className="font-semibold text-[rgb(var(--foreground))] truncate max-w-[150px]"
+                title={mostCommonSkill.name}
+              >
+                {mostCommonSkill.name} ({mostCommonSkill.count})
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center text-[rgb(var(--muted-foreground))]">
+                <Star size={16} className="mr-2 text-sky-500" /> Most Desired
+                Skill:
+              </span>
+              <span
+                className="font-semibold text-[rgb(var(--foreground))] truncate max-w-[150px]"
+                title={mostDesiredSkill.name}
+              >
+                {mostDesiredSkill.name} ({mostDesiredSkill.count})
+              </span>
+            </div>
             <div className="pt-4 border-t border-[rgb(var(--border))] mt-4 flex flex-wrap gap-x-4 gap-y-2">
               <Link
                 href="/admin/users"
@@ -179,6 +273,12 @@ const HrAdminDashboardSummary = ({ user }) => {
                 className="text-sm text-[rgb(var(--primary))] hover:underline font-medium"
               >
                 View All Projects
+              </Link>
+              <Link
+                href="/admin/analytics"
+                className="text-sm text-[rgb(var(--primary))] hover:underline font-medium"
+              >
+                View Skill Analytics
               </Link>
             </div>
           </div>
