@@ -41,7 +41,7 @@ const Navbar = () => {
 
   useEffect(() => {
     fetchNotificationCount();
-    const intervalId = setInterval(fetchNotificationCount, 30000);
+    const intervalId = setInterval(fetchNotificationCount, 120000);
     return () => clearInterval(intervalId);
   }, [fetchNotificationCount]);
 

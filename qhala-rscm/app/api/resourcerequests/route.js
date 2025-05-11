@@ -10,40 +10,93 @@ import mongoose from "mongoose";
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
+
+  // Initial session check
+  if (!session || !session.user || !session.user.id || !session.user.role) {
+    console.log(
+      "API /resourcerequests: Unauthorized - No session or user details."
+    );
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const allowedRoles = ["admin", "hr"];
-  if (!allowedRoles.includes(session.user.role)) {
+  const { searchParams } = new URL(request.url);
+  const statusParam = searchParams.get("status");
+  const requestedByPmIdParam = searchParams.get("requestedByPmId");
+  const countOnly = searchParams.get("countOnly") === "true";
+
+  const loggedInUserId = session.user.id;
+  const loggedInUserRole = session.user.role;
+  //  Authorization Logic
+  let canAccess = false;
+
+  if (requestedByPmIdParam) {
+    //  Fetching requests *for a specific PM*
+    if (!mongoose.Types.ObjectId.isValid(requestedByPmIdParam)) {
+      return NextResponse.json(
+        { success: false, error: "Invalid requestedByPmId format" },
+        { status: 400 }
+      );
+    }
+    // Allow if the logged-in user IS the PM being queried, OR if the logged-in user is Admin/HR
+    if (
+      loggedInUserId === requestedByPmIdParam ||
+      ["admin", "hr"].includes(loggedInUserRole)
+    ) {
+      canAccess = true;
+    } else {
+      console.log(
+        `API /resourcerequests: Forbidden - User ${loggedInUserId} (Role: ${loggedInUserRole}) tried to access requests for PM ${requestedByPmIdParam}.`
+      );
+    }
+  } else {
+    // Fetching a general list of requests (e.g., all pending for Admin/HR view)
+    // Only Admin or HR can access general lists (not filtered by a specific PM they own)
+    if (["admin", "hr"].includes(loggedInUserRole)) {
+      canAccess = true;
+    } else {
+      console.log(
+        `API /resourcerequests: Forbidden - User ${loggedInUserId} (Role: ${loggedInUserRole}) tried to access general request list.`
+      );
+    }
+  }
+
+  if (!canAccess) {
     return NextResponse.json(
-      { success: false, error: "Forbidden: Insufficient permissions" },
+      {
+        success: false,
+        error: "Forbidden: Insufficient permissions to view these requests.",
+      },
       { status: 403 }
     );
   }
-
-  const { searchParams } = new URL(request.url);
-  const status = searchParams.get("status");
-
   try {
     await connectDB();
     let query = {};
 
-    if (status) {
-      query.status = status;
+    if (statusParam) {
+      query.status = statusParam;
+    }
+    if (requestedByPmIdParam) {
+      query.requestedByPmId = requestedByPmIdParam;
     }
 
-    const requests = await ResourceRequest.find(query)
-      .populate("projectId", "name")
-      .populate("requestedUserId", "name email image")
-      .populate("requestedByPmId", "name email")
-      .sort({ createdAt: -1 });
+    if (countOnly) {
+      const count = await ResourceRequest.countDocuments(query);
 
-    return NextResponse.json({
-      success: true,
-      count: requests.length,
-      data: requests,
-    });
+      return NextResponse.json({ success: true, count: count });
+    } else {
+      const requests = await ResourceRequest.find(query)
+        .populate("projectId", "name")
+        .populate("requestedUserId", "name email image")
+        .populate("requestedByPmId", "name email")
+        .sort({ createdAt: -1 });
+
+      return NextResponse.json({
+        success: true,
+        count: requests.length,
+        data: requests,
+      });
+    }
   } catch (error) {
     console.error("API Error fetching resource requests:", error);
     return NextResponse.json(

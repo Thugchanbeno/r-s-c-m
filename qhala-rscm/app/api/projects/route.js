@@ -1,4 +1,3 @@
-// app/api/projects/route.js
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Project from "@/models/Project";
@@ -10,44 +9,63 @@ import mongoose from "mongoose";
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
-  if (!session) {
+  if (!session || !session.user) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  // if (
-  //   session.user.role !== "admin" &&
-  //   session.user.role !== "pm" &&
-  //   session.user.role !== "hr"
-  // ) {
-  //   return NextResponse.json({ message: "Forbidden" }, { status: 403 });
-  // }
   const { searchParams } = new URL(request.url);
   const countOnly = searchParams.get("countOnly") === "true";
   const pmId = searchParams.get("pmId");
-  // const status = searchParams.get('status');
-  // const limit = parseInt(searchParams.get('limit') || '0'); // Example limit
+  const loggedInUserId = session.user.id;
+  const loggedInUserRole = session.user.role;
 
   try {
     await connectDB();
     let query = {};
+
     if (pmId) {
+      // If a specific PM's projects are requested
       if (!mongoose.Types.ObjectId.isValid(pmId)) {
         return NextResponse.json(
           { success: false, error: "Invalid PM ID format" },
           { status: 400 }
         );
       }
+      // Authorization: User must be the PM themselves, or an Admin/HR
+      if (
+        loggedInUserId !== pmId &&
+        !["admin", "hr"].includes(loggedInUserRole)
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "Forbidden: You can only view your own projects or have admin/hr privileges.",
+          },
+          { status: 403 }
+        );
+      }
       query.pmId = pmId;
+    } else {
+      if (!["admin", "hr"].includes(loggedInUserRole)) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Forbidden: Insufficient permissions to view all projects.",
+          },
+          { status: 403 }
+        );
+      }
     }
+
     if (countOnly) {
       const count = await Project.countDocuments(query);
       return NextResponse.json({ success: true, count: count });
     } else {
       const projects = await Project.find(query)
         .populate("pmId", "name email")
-        .populate("requiredSkills.skillId", "name category");
-      // .sort({ createdAt: -1 })
-      // .limit(limit > 0 ? limit : null); // Example limit for pagination maybe? later?
+        .populate("requiredSkills.skillId", "name category")
+        .sort({ name: 1 });
 
       return NextResponse.json({
         success: true,

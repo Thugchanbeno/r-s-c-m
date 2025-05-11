@@ -8,34 +8,40 @@ import {
   CardContent,
 } from "@/components/common/Card";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import { Users, Briefcase, Activity, AlertCircle } from "lucide-react";
+import {
+  Users,
+  Briefcase,
+  Activity,
+  AlertCircle,
+  TrendingUp,
+} from "lucide-react";
+import Badge from "@/components/common/Badge";
+import { getAllocationPercentageColor } from "@/components/common/skillcolors";
 
 const HrAdminDashboardSummary = ({ user }) => {
   const [totalUserCount, setTotalUserCount] = useState(0);
   const [totalProjectCount, setTotalProjectCount] = useState(0);
-  const [overallAllocation, setOverallAllocation] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [overallCapacityUtilization, setOverallCapacityUtilization] =
+    useState(0);
+  const [loadingSummary, setLoadingSummary] = useState(true);
+  const [summaryError, setSummaryError] = useState(null);
 
   useEffect(() => {
     const fetchHrSummaryData = async () => {
-      setLoading(true);
-      setError(null);
+      setLoadingSummary(true);
+      setSummaryError(null);
       let fetchedUserCount = 0;
       let fetchedProjectCount = 0;
-      let fetchedAllocation = 0;
-      let fetchError = null;
+      let fetchedCapacityUtilization = 0;
 
       try {
-        const [usersResponse, projectsResponse /*, allocationResponse */] =
+        const [usersResponse, projectsResponse, overallAllocationResponse] =
           await Promise.all([
             fetch(`/api/users?countOnly=true`),
             fetch(`/api/projects?countOnly=true`),
-            // Placeholder for allocation API - ensure it resolves if commented out
-            // For now, let's assume it's not ready and we'll keep allocation at 0
-            // Promise.resolve({ ok: true, json: async () => ({ data: { overallAverageAllocation: 0 } }) })
+            fetch(`/api/allocations/summary?scope=overall`),
           ]);
-
+        //process user response
         if (!usersResponse.ok) {
           const errData = await usersResponse.json().catch(() => ({}));
           throw new Error(
@@ -45,7 +51,7 @@ const HrAdminDashboardSummary = ({ user }) => {
         }
         const usersResult = await usersResponse.json();
         fetchedUserCount = usersResult.data?.count || usersResult.count || 0;
-
+        //process projects response
         if (!projectsResponse.ok) {
           const errData = await projectsResponse.json().catch(() => ({}));
           throw new Error(
@@ -56,20 +62,37 @@ const HrAdminDashboardSummary = ({ user }) => {
         const projectsResult = await projectsResponse.json();
         fetchedProjectCount =
           projectsResult.data?.count || projectsResult.count || 0;
-
-        // TODO: Process Allocation Response when API is ready
-        // if (allocationResponse && !allocationResponse.ok) { ... }
-        // const allocationResult = await allocationResponse.json();
-        // fetchedAllocation = allocationResult.data?.overallAverageAllocation || 0;
+        if (!overallAllocationResponse.ok) {
+          const errData = await overallAllocationResponse
+            .json()
+            .catch(() => ({}));
+          throw new Error(
+            errData.error ||
+              `Failed to fetch overall allocation summary: ${overallAllocationResponse.statusText} (${overallAllocationResponse.status})`
+          );
+        }
+        const allocationSummaryResult = await overallAllocationResponse.json();
+        if (allocationSummaryResult.success && allocationSummaryResult.data) {
+          fetchedCapacityUtilization =
+            allocationSummaryResult.data.overallAverageCapacityUtilization || 0;
+        } else {
+          throw new Error(
+            allocationSummaryResult.error ||
+              "Invalid overall allocation summary data."
+          );
+        }
       } catch (err) {
         console.error("Error fetching HR/Admin summary data:", err);
-        fetchError = err.message || "Could not load HR/Admin summary data.";
+        setSummaryError(err.message || "Could not load HR/Admin summary data.");
+
+        fetchedUserCount = 0;
+        fetchedProjectCount = 0;
+        fetchedCapacityUtilization = 0;
       } finally {
         setTotalUserCount(fetchedUserCount);
         setTotalProjectCount(fetchedProjectCount);
-        setOverallAllocation(fetchedAllocation);
-        setError(fetchError);
-        setLoading(false);
+        setOverallCapacityUtilization(fetchedCapacityUtilization);
+        setLoadingSummary(false);
       }
     };
 
@@ -82,24 +105,24 @@ const HrAdminDashboardSummary = ({ user }) => {
         <CardTitle className="text-lg">HR / Admin Overview</CardTitle>
       </CardHeader>
       <CardContent>
-        {loading ? (
+        {loadingSummary ? (
           <div className="flex flex-col items-center justify-center p-6 min-h-[150px]">
             <LoadingSpinner size={20} />
             <p className="mt-2 text-sm text-[rgb(var(--muted-foreground))]">
               Loading overview...
             </p>
           </div>
-        ) : error ? (
+        ) : summaryError ? (
           <div className="flex items-center p-3 text-sm rounded-[var(--radius)] bg-red-50 text-red-700 border border-red-200 shadow-sm">
             <AlertCircle size={16} className="mr-2 flex-shrink-0" />
-            <span>{error}</span>
+            <span>{summaryError}</span>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="flex items-center justify-between text-sm">
               <span className="flex items-center text-[rgb(var(--muted-foreground))]">
-                <Users size={16} className="mr-2 text-[rgb(var(--primary))]" />{" "}
-                Total Users:
+                <Users size={16} className="mr-2 text-[rgb(var(--primary))]" />
+                Total Active Users:
               </span>
               <span className="font-semibold text-[rgb(var(--foreground))]">
                 {totalUserCount}
@@ -110,8 +133,8 @@ const HrAdminDashboardSummary = ({ user }) => {
                 <Briefcase
                   size={16}
                   className="mr-2 text-[rgb(var(--primary))]"
-                />{" "}
-                Total Projects:
+                />
+                Total Active Projects:
               </span>
               <span className="font-semibold text-[rgb(var(--foreground))]">
                 {totalProjectCount}
@@ -119,12 +142,18 @@ const HrAdminDashboardSummary = ({ user }) => {
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="flex items-center text-[rgb(var(--muted-foreground))]">
-                <Activity size={16} className="mr-2 text-emerald-500" /> Overall
-                Allocation % (Avg):
+                <TrendingUp size={16} className="mr-2 text-emerald-500" />
+                Overall Capacity Utilization:
               </span>
-              <span className="font-semibold text-[rgb(var(--foreground))]">
-                {overallAllocation}%
-              </span>
+              <Badge
+                size="sm"
+                pill={true}
+                className={getAllocationPercentageColor(
+                  overallCapacityUtilization
+                )}
+              >
+                {overallCapacityUtilization}%
+              </Badge>
             </div>
             <div className="pt-4 border-t border-[rgb(var(--border))] mt-4 flex flex-wrap gap-x-4 gap-y-2">
               <Link
