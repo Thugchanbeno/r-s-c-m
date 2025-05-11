@@ -70,6 +70,14 @@ const Navbar = () => {
     setNotificationCount(0); // Optimistically update count
     fetchNotificationCount(); // Or refetch for certainty
   };
+  const handleDropdownNotificationsUpdate = (newUnreadCount) => {
+    if (typeof newUnreadCount === "number") {
+      setNotificationCount(newUnreadCount);
+    } else {
+      // If specific count isn't passed, just refetch
+      fetchNotificationCount();
+    }
+  };
   const navbarBg = "bg-slate-900";
   const navbarTextPrimary = "text-slate-100";
   const navbarTextSecondary = "text-slate-400";
@@ -124,6 +132,7 @@ const Navbar = () => {
               isOpen={isDropdownOpen}
               onClose={() => setIsDropdownOpen(false)}
               onMarkAllReadSuccess={handleMarkAllReadSuccess}
+              onNotificationRead={handleDropdownNotificationsUpdate}
             />
           </div>
         )}
