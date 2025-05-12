@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import { Trash2, AlertCircle } from "lucide-react";
+import { Trash2, AlertCircle, ChevronDown, ChevronRight } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Button from "@/components/common/Button";
 import { Card, CardHeader, CardContent } from "@/components/common/Card";
+import { motion, AnimatePresence } from "framer-motion";
 
 const SkillTaxonomyList = () => {
   const { data: session } = useSession();
@@ -14,6 +15,7 @@ const SkillTaxonomyList = () => {
   const [deletingSkill, setDeletingSkill] = useState(null);
   const [deleteError, setDeleteError] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [expandedCategories, setExpandedCategories] = useState({});
 
   const isAdmin = session?.user?.role === "admin";
 
@@ -33,21 +35,22 @@ const SkillTaxonomyList = () => {
         throw new Error(errorMsg);
       }
       const result = await response.json();
-      const isSuccess =
-        result && result.hasOwnProperty("success") && result.success === true;
-      const dataIsArray =
-        result && result.hasOwnProperty("data") && Array.isArray(result.data);
+      const isSuccess = result?.success === true;
+      const dataIsArray = Array.isArray(result?.data);
 
       if (isSuccess && dataIsArray) {
         const grouped = result.data.reduce((acc, skill) => {
           const category = skill.category || "Uncategorized";
-          if (!acc[category]) {
-            acc[category] = [];
-          }
+          if (!acc[category]) acc[category] = [];
           acc[category].push(skill);
           return acc;
         }, {});
         setSkills(grouped);
+        const initialExpanded = {};
+        Object.keys(grouped).forEach((cat) => {
+          initialExpanded[cat] = false;
+        });
+        setExpandedCategories(initialExpanded);
       } else {
         let failureReason = "Invalid data format received from API.";
         if (!isSuccess)
@@ -55,7 +58,7 @@ const SkillTaxonomyList = () => {
         if (!dataIsArray)
           failureReason =
             "API response 'data' field is missing or not an array.";
-        if (result && result.error) failureReason = result.error;
+        if (result?.error) failureReason = result.error;
         throw new Error(failureReason);
       }
     } catch (err) {
@@ -84,7 +87,6 @@ const SkillTaxonomyList = () => {
       const response = await fetch(`/api/skills/${skillId}`, {
         method: "DELETE",
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
@@ -101,103 +103,190 @@ const SkillTaxonomyList = () => {
     }
   };
 
+  const toggleCategory = (category) => {
+    setExpandedCategories((prev) => ({ ...prev, [category]: !prev[category] }));
+    setConfirmDelete(null);
+  };
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center p-10 text-center bg-[rgb(var(--background))] min-h-[200px]">
-        <LoadingSpinner size={30} />
-        <span className="ml-3 mt-2 text-[rgb(var(--muted-foreground))]">
-          Loading skill taxonomy...
-        </span>
-      </div>
+      <Card className="min-h-[300px]">
+        <CardContent className="flex flex-col items-center justify-center p-10 text-center h-full">
+          <LoadingSpinner size={30} />
+          <span className="mt-3 text-sm text-[rgb(var(--muted-foreground))]">
+            Loading Skill Taxonomy...
+          </span>
+        </CardContent>
+      </Card>
     );
   }
-
   if (error) {
     return (
-      <div className="p-4 bg-red-50 text-red-700 border border-red-200 rounded-[var(--radius)] shadow-sm">
-        <p className="font-semibold">Error loading skills:</p>
-        <p>{error}</p>
-      </div>
+      <Card>
+        <CardHeader>
+          <h2 className="text-lg font-semibold text-[rgb(var(--card-foreground))]">
+            Skill Taxonomy
+          </h2>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="p-4 bg-red-50 text-red-700 border border-red-200 rounded-[var(--radius)] shadow-sm flex items-start">
+            <AlertCircle size={20} className="mr-3 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold">Error loading skills:</p>
+              <p className="text-sm">{error}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   const categories = Object.keys(skills).sort();
-
   if (categories.length === 0 && !loading) {
     return (
       <Card>
         <CardHeader>
-          <h2 className="text-xl font-semibold text-[rgb(var(--card-foreground))]">
-            Available Skills Taxonomy
+          <h2 className="text-lg font-semibold text-[rgb(var(--card-foreground))]">
+            Skill Taxonomy
           </h2>
         </CardHeader>
         <CardContent>
-          <p className="text-[rgb(var(--muted-foreground))] italic py-4 text-center">
+          <p className="text-[rgb(var(--muted-foreground))] italic py-6 text-center">
             No skills found in the taxonomy.
           </p>
         </CardContent>
       </Card>
     );
   }
-
   return (
     <Card>
       <CardHeader className="border-b border-[rgb(var(--border))]">
-        <h2 className="text-xl font-semibold text-[rgb(var(--card-foreground))]">
-          Available Skills Taxonomy
+        <h2 className="text-lg font-semibold text-[rgb(var(--card-foreground))]">
+          Skill Taxonomy
         </h2>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="pt-4 pb-6 px-4 md:px-6">
         {deleteError && (
-          <div className="p-3 bg-red-50 text-red-700 border border-red-200 rounded-[var(--radius)] flex items-center mb-4 shadow-sm">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-3 bg-red-100 text-red-700 border border-red-300 rounded-[var(--radius)] flex items-center mb-4 shadow-md"
+          >
             <AlertCircle size={18} className="mr-2 flex-shrink-0" />
             <span>{deleteError}</span>
-          </div>
+          </motion.div>
         )}
 
-        <div className="space-y-6">
+        <div className="space-y-1">
           {categories.map((category) => (
-            <div key={category}>
-              <h3 className="text-lg font-medium mb-3 text-[rgb(var(--primary))]">
-                {category}
-              </h3>
-              <ul className="space-y-2 pl-1">
-                {skills[category]
-                  .sort((a, b) => a.name.localeCompare(b.name))
-                  .map((skill) => (
-                    <li
-                      key={skill._id}
-                      className="flex items-center justify-between py-2 px-3 text-sm text-[rgb(var(--foreground))] border border-transparent rounded-[var(--radius)] hover:bg-[rgb(var(--muted))] hover:border-[rgb(var(--border))] transition-colors duration-150"
-                    >
-                      <span className="flex-grow">{skill.name}</span>
-                      {isAdmin && (
-                        <Button
-                          variant={
-                            confirmDelete === skill._id ? "danger" : "ghost"
-                          }
-                          size="xs"
-                          onClick={() => handleDeleteSkill(skill._id)}
-                          disabled={deletingSkill === skill._id}
-                          className="ml-3"
+            <div
+              key={category}
+              className="border border-[rgb(var(--border))] rounded-[var(--radius)] overflow-hidden"
+            >
+              <button
+                onClick={() => toggleCategory(category)}
+                className="flex items-center justify-between w-full p-3 text-left bg-[rgb(var(--muted))] hover:bg-[rgba(var(--muted-rgb),0.7)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))]"
+                aria-expanded={expandedCategories[category]}
+                aria-controls={`category-skills-${category}`}
+              >
+                <h3 className="text-lg font-bold text-[rgb(var(--primary))]">
+                  {category}
+                </h3>
+                {expandedCategories[category] ? (
+                  <ChevronDown
+                    size={20}
+                    className="text-[rgb(var(--muted-foreground))]"
+                  />
+                ) : (
+                  <ChevronRight
+                    size={20}
+                    className="text-[rgb(var(--muted-foreground))]"
+                  />
+                )}
+              </button>
+              <AnimatePresence>
+                {expandedCategories[category] && (
+                  <motion.ul
+                    id={`category-skills-${category}`}
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                    className="divide-y divide-[rgb(var(--border))] bg-[rgb(var(--card))]"
+                  >
+                    {skills[category]
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((skill) => (
+                        <li
+                          key={skill._id}
+                          className="flex items-center justify-between py-2.5 px-4 text-sm text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))] transition-colors duration-100" // Skill text uses default foreground, smaller size
+                          onMouseLeave={() => {
+                            if (
+                              confirmDelete === skill._id &&
+                              deletingSkill !== skill._id
+                            ) {
+                              setConfirmDelete(null);
+                            }
+                          }}
                         >
-                          {deletingSkill === skill._id ? (
-                            <LoadingSpinner
-                              size={14}
-                              className="text-current"
-                            />
-                          ) : (
-                            <>
-                              <Trash2 size={14} className="mr-1" />
-                              {confirmDelete === skill._id
-                                ? "Confirm"
-                                : "Delete"}
-                            </>
+                          <span className="flex-grow pr-2">{skill.name}</span>
+                          {isAdmin && (
+                            <div className="flex-shrink-0">
+                              <Button
+                                variant={
+                                  confirmDelete === skill._id
+                                    ? "danger"
+                                    : "ghost"
+                                }
+                                size="xs"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteSkill(skill._id);
+                                }}
+                                disabled={deletingSkill === skill._id}
+                                className={`transition-all duration-150 ease-in-out ${
+                                  confirmDelete === skill._id
+                                    ? "w-24"
+                                    : "w-auto"
+                                }`}
+                                aria-label={
+                                  confirmDelete === skill._id
+                                    ? `Confirm delete ${skill.name}`
+                                    : `Delete ${skill.name}`
+                                }
+                              >
+                                {deletingSkill === skill._id ? (
+                                  <LoadingSpinner
+                                    size={14}
+                                    className="text-current mx-auto"
+                                  />
+                                ) : (
+                                  <>
+                                    <Trash2
+                                      size={14}
+                                      className={
+                                        confirmDelete === skill._id
+                                          ? ""
+                                          : "mr-1"
+                                      }
+                                    />
+                                    {confirmDelete === skill._id
+                                      ? "Confirm"
+                                      : ""}
+                                  </>
+                                )}
+                              </Button>
+                            </div>
                           )}
-                        </Button>
-                      )}
-                    </li>
-                  ))}
-              </ul>
+                        </li>
+                      ))}
+                    {skills[category].length === 0 && (
+                      <li className="px-4 py-3 text-sm text-center text-[rgb(var(--muted-foreground))] italic">
+                        No skills in this category.
+                      </li>
+                    )}
+                  </motion.ul>
+                )}
+              </AnimatePresence>
             </div>
           ))}
         </div>

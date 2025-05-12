@@ -1,4 +1,3 @@
-// components/common/button
 "use client";
 import { twMerge } from "tailwind-merge";
 import { clsx } from "clsx";
@@ -44,12 +43,13 @@ export default function Button({
   leftIcon,
   rightIcon,
   fullWidth = false,
+  as: Component = "button",
   ...props
 }) {
   const widthStyle = fullWidth ? "w-full" : "";
 
   return (
-    <button
+    <Component
       className={twMerge(
         clsx(
           baseStyles,
@@ -62,25 +62,43 @@ export default function Button({
       disabled={isLoading || disabled}
       {...props}
     >
-      {/* SVG Loader remains the same */}
       {isLoading && (
         <svg
           className="animate-spin h-4 w-4 text-current"
-          // ... (rest of SVG)
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
         >
-          <circle /* ... */ />
-          <path /* ... */ />
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          />
         </svg>
       )}
-      <span className={clsx("inline-flex items-center", { "ml-2": isLoading })}>
+      <span
+        className={clsx("inline-flex items-center justify-center", {
+          "ml-2": isLoading && children,
+          "opacity-0": isLoading && !children,
+        })}
+      >
         {!isLoading && leftIcon && (
           <span className={children ? "mr-2" : ""}>{leftIcon}</span>
         )}
-        {children}
+        {(!isLoading || (isLoading && children)) && children}
         {!isLoading && rightIcon && (
           <span className={children ? "ml-2" : ""}>{rightIcon}</span>
         )}
       </span>
-    </button>
+    </Component>
   );
 }

@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   X,
   LogOut,
+  UserCog,
 } from "lucide-react";
 import Button from "@/components/common/Button.jsx";
 
@@ -61,6 +62,12 @@ const AdminSidebar = () => {
       name: "My Profile",
       icon: <UserCircle size={20} />,
       href: "/profile",
+      roles: ["admin", "hr"],
+    },
+    {
+      name: "Allocations",
+      icon: <UserCog size={20} />,
+      href: "/admin/allocations",
       roles: ["admin", "hr"],
     },
   ];
@@ -175,7 +182,6 @@ const AdminSidebar = () => {
           <nav className="flex-1 px-3 py-4 overflow-y-auto">
             <ul className="space-y-1">
               {filteredNavigation.map((item) => {
-                // BUG FIX: Adjust isActive logic
                 const isActive = item.exactMatch
                   ? pathname === item.href
                   : pathname.startsWith(item.href);
