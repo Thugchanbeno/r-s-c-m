@@ -23,7 +23,6 @@ const UserSkillSchema = new Schema(
       max: 5,
       index: true,
     },
-    //proficiencyLevel: { type: String, required: true, enum: ["Beginner","Novice", "Intermediate", "Advanced","expert"], index: true },
     interestLevel: { type: Number, required: false, min: 1, max: 3 },
     isCurrent: { type: Boolean, required: true, default: false },
     isDesired: { type: Boolean, required: true, default: false },

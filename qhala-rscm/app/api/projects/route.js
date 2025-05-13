@@ -34,7 +34,7 @@ export async function GET(request) {
       // Authorization: User must be the PM themselves, or an Admin/HR
       if (
         loggedInUserId !== pmId &&
-        !["admin", "hr"].includes(loggedInUserRole)
+        !["admin", "hr", "pm"].includes(loggedInUserRole)
       ) {
         return NextResponse.json(
           {
@@ -46,8 +46,10 @@ export async function GET(request) {
         );
       }
       query.pmId = pmId;
+
+      //debug for access previleges.
     } else {
-      if (!["admin", "hr"].includes(loggedInUserRole)) {
+      if (!["admin", "hr", "pm"].includes(loggedInUserRole)) {
         return NextResponse.json(
           {
             success: false,
