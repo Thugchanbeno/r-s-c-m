@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import Skill from "@/models/Skills.js";
 import User from "@/models/User.js";
-
+//implement department when creating a project.
 const ProjectSchema = new Schema(
   {
     name: { type: String, required: true, trim: true },

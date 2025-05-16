@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import User from "./User";
+//include a 4th person when the project creation notification is created.
 
 const NotificationSchema = new Schema(
   {

@@ -1,0 +1,737 @@
+[
+  {
+    "name": "Python",
+    "description": "A versatile, high-level programming language widely used for web development, data analysis, automation, and scientific computing.",
+    "category": "Programming Language",
+    "aliases": ["py", "python3", "python 2"]
+  },
+  {
+    "name": "JavaScript",
+    "description": "A dynamic scripting language primarily used for interactive web development and front-end engineering.",
+    "category": "Programming Language",
+    "aliases": ["js", "ecmascript", "es6", "esnext", "vanilla js"]
+  },
+  {
+    "name": "TypeScript",
+    "description": "A statically typed superset of JavaScript that adds optional types and compiles to plain JavaScript.",
+    "category": "Programming Language",
+    "aliases": ["ts"]
+  },
+  {
+    "name": "Java",
+    "description": "A robust, object-oriented programming language commonly used for enterprise applications, Android development, and backend systems.",
+    "category": "Programming Language",
+    "aliases": ["j2ee", "jee", "java se", "java ee"]
+  },
+  {
+    "name": "C#",
+    "description": "A modern, object-oriented programming language developed by Microsoft, widely used for .NET applications and game development.",
+    "category": "Programming Language",
+    "aliases": ["c sharp", "csharp", ".net", "dotnet"]
+  },
+  {
+    "name": "C++",
+    "description": "A high-performance programming language used for system/software development, game engines, and performance-critical applications.",
+    "category": "Programming Language",
+    "aliases": ["cpp", "c plus plus"]
+  },
+  {
+    "name": "Go",
+    "description": "A statically typed, compiled language designed for simplicity and high performance, often used in cloud and server-side applications.",
+    "category": "Programming Language",
+    "aliases": ["golang"]
+  },
+  {
+    "name": "Ruby",
+    "description": "A dynamic, open-source programming language with a focus on simplicity and productivity, popular for web development with Rails.",
+    "category": "Programming Language",
+    "aliases": []
+  },
+  {
+    "name": "PHP",
+    "description": "A widely-used open-source scripting language especially suited for web development and server-side scripting.",
+    "category": "Programming Language",
+    "aliases": []
+  },
+  {
+    "name": "Swift",
+    "description": "A powerful and intuitive programming language for macOS, iOS, watchOS, and tvOS app development.",
+    "category": "Programming Language",
+    "aliases": ["ios swift"]
+  },
+  {
+    "name": "Kotlin",
+    "description": "A modern programming language targeting the JVM and Android, known for its concise syntax and interoperability with Java.",
+    "category": "Programming Language",
+    "aliases": ["android kotlin"]
+  },
+  {
+    "name": "HTML",
+    "description": "The standard markup language for creating web pages and web applications.",
+    "category": "Web Development",
+    "aliases": ["html5"]
+  },
+  {
+    "name": "CSS",
+    "description": "A style sheet language used for describing the look and formatting of a document written in HTML.",
+    "category": "Web Development",
+    "aliases": ["css3", "cascading style sheets"]
+  },
+  {
+    "name": "Sass",
+    "description": "A preprocessor scripting language that is interpreted or compiled into CSS, used to make writing CSS easier and more efficient.",
+    "category": "Web Development",
+    "aliases": ["scss"]
+  },
+  {
+    "name": "React",
+    "description": "A popular JavaScript library for building user interfaces, especially single-page applications. Used for creating reusable UI components and managing application state efficiently.",
+    "category": "Web Development",
+    "aliases": ["react.js", "reactjs"]
+  },
+  {
+    "name": "Angular",
+    "description": "A TypeScript-based open-source web application framework led by the Angular Team at Google for building dynamic web apps.",
+    "category": "Web Development",
+    "aliases": ["angular.js", "angularjs", "angular 2+"]
+  },
+  {
+    "name": "Vue.js",
+    "description": "A progressive JavaScript framework for building user interfaces and single-page applications.",
+    "category": "Web Development",
+    "aliases": ["vue", "vuejs"]
+  },
+  {
+    "name": "Next.js",
+    "description": "A React framework for server-side rendering, static site generation, and building scalable web applications.",
+    "category": "Web Development",
+    "aliases": ["nextjs"]
+  },
+  {
+    "name": "Node.js",
+    "description": "A JavaScript runtime built on Chrome's V8 engine, enabling server-side scripting and building scalable network applications.",
+    "category": "Backend Development",
+    "aliases": ["node", "nodejs"]
+  },
+  {
+    "name": "Express.js",
+    "description": "A minimal and flexible Node.js web application framework that provides a robust set of features for web and mobile applications.",
+    "category": "Backend Development",
+    "aliases": ["express", "expressjs"]
+  },
+  {
+    "name": "Django",
+    "description": "A high-level Python web framework that encourages rapid development and clean, pragmatic design.",
+    "category": "Backend Development",
+    "aliases": ["python django"]
+  },
+  {
+    "name": "Flask",
+    "description": "A lightweight Python web framework for building simple to complex web applications quickly.",
+    "category": "Backend Development",
+    "aliases": ["python flask"]
+  },
+  {
+    "name": "Spring Boot",
+    "description": "A Java-based framework used to create stand-alone, production-grade Spring-based applications.",
+    "category": "Backend Development",
+    "aliases": ["spring"]
+  },
+  {
+    "name": "Ruby on Rails",
+    "description": "A server-side web application framework written in Ruby, following the MVC pattern.",
+    "category": "Backend Development",
+    "aliases": ["rails", "ror"]
+  },
+  {
+    "name": "REST API",
+    "description": "A set of architectural principles for designing networked applications using stateless, client-server communication.",
+    "category": "API Development",
+    "aliases": ["restful api", "rest", "restful services"]
+  },
+  {
+    "name": "GraphQL",
+    "description": "A query language for APIs and a runtime for executing those queries by using a type system you define for your data.",
+    "category": "API Development",
+    "aliases": []
+  },
+  {
+    "name": "PostgreSQL",
+    "description": "A powerful, open-source object-relational database system with a strong reputation for reliability and performance.",
+    "category": "Database",
+    "aliases": ["postgres", "pgsql"]
+  },
+  {
+    "name": "MySQL",
+    "description": "An open-source relational database management system based on SQL, widely used in web applications.",
+    "category": "Database",
+    "aliases": []
+  },
+  {
+    "name": "MongoDB",
+    "description": "A popular NoSQL, document-oriented database designed for scalability and flexibility.",
+    "category": "Database",
+    "aliases": ["mongo"]
+  },
+  {
+    "name": "Redis",
+    "description": "An open-source, in-memory key-value data store, used as a database, cache, and message broker.",
+    "category": "Database",
+    "aliases": []
+  },
+  {
+    "name": "Elasticsearch",
+    "description": "A distributed, RESTful search and analytics engine capable of solving a growing number of use cases.",
+    "category": "Database",
+    "aliases": ["elastic search"]
+  },
+  {
+    "name": "Docker",
+    "description": "A platform for developing, shipping, and running applications in containers.",
+    "category": "DevOps",
+    "aliases": []
+  },
+  {
+    "name": "Kubernetes",
+    "description": "An open-source system for automating deployment, scaling, and management of containerized applications.",
+    "category": "DevOps",
+    "aliases": ["k8s"]
+  },
+  {
+    "name": "AWS",
+    "description": "Amazon Web Services, a comprehensive cloud computing platform offering infrastructure, storage, and application services.",
+    "category": "Cloud",
+    "aliases": ["amazon web services"]
+  },
+  {
+    "name": "Azure",
+    "description": "Microsoft's cloud computing platform, offering a wide range of services including computing, analytics, storage, and networking.",
+    "category": "Cloud",
+    "aliases": ["microsoft azure"]
+  },
+  {
+    "name": "Google Cloud Platform",
+    "description": "A suite of cloud computing services that runs on the same infrastructure that Google uses internally.",
+    "category": "Cloud",
+    "aliases": ["gcp", "google cloud"]
+  },
+  {
+    "name": "CI/CD",
+    "description": "Continuous Integration and Continuous Deployment practices for automating software build, test, and deployment pipelines.",
+    "category": "DevOps",
+    "aliases": [
+      "cicd",
+      "continuous integration",
+      "continuous deployment",
+      "continuous delivery"
+    ]
+  },
+  {
+    "name": "Terraform",
+    "description": "An open-source infrastructure as code software tool for building, changing, and versioning infrastructure safely and efficiently.",
+    "category": "DevOps",
+    "aliases": ["iac"]
+  },
+  {
+    "name": "Ansible",
+    "description": "An open-source automation tool for configuration management, application deployment, and task automation.",
+    "category": "DevOps",
+    "aliases": []
+  },
+  {
+    "name": "Linux",
+    "description": "An open-source operating system kernel used in a wide variety of computing systems, from servers to embedded devices.",
+    "category": "Operating System",
+    "aliases": ["unix-like"]
+  },
+  {
+    "name": "Windows Server",
+    "description": "A group of server operating systems released by Microsoft, designed for enterprise-level management, data storage, and applications.",
+    "category": "Operating System",
+    "aliases": ["win server"]
+  },
+  {
+    "name": "macOS",
+    "description": "Apple's operating system for Mac computers, known for its stability and user-friendly interface.",
+    "category": "Operating System",
+    "aliases": ["mac os", "osx"]
+  },
+  {
+    "name": "Machine Learning",
+    "description": "The study and application of algorithms that improve automatically through experience and data.",
+    "category": "AI/ML",
+    "aliases": ["ml", "ai/ml"]
+  },
+  {
+    "name": "Deep Learning",
+    "description": "A subset of machine learning involving neural networks with many layers, used for complex pattern recognition.",
+    "category": "AI/ML",
+    "aliases": ["dl", "neural networks"]
+  },
+  {
+    "name": "Natural Language Processing",
+    "description": "A field of AI focused on the interaction between computers and humans through natural language.",
+    "category": "AI/ML",
+    "aliases": ["nlp"]
+  },
+  {
+    "name": "Computer Vision",
+    "description": "A field of AI that trains computers to interpret and process visual information from the world.",
+    "category": "AI/ML",
+    "aliases": ["cv"]
+  },
+  {
+    "name": "PyTorch",
+    "description": "An open-source machine learning library based on the Torch library, used for applications such as computer vision and NLP.",
+    "category": "AI/ML",
+    "aliases": ["torch"]
+  },
+  {
+    "name": "TensorFlow",
+    "description": "An end-to-end open-source platform for machine learning developed by Google.",
+    "category": "AI/ML",
+    "aliases": ["tf", "keras"]
+  },
+  {
+    "name": "scikit-learn",
+    "description": "A Python library for machine learning, providing simple and efficient tools for data mining and analysis.",
+    "category": "AI/ML",
+    "aliases": ["sklearn"]
+  },
+  {
+    "name": "Pandas",
+    "description": "A Python library providing high-performance, easy-to-use data structures and data analysis tools.",
+    "category": "Data Analysis",
+    "aliases": ["python pandas"]
+  },
+  {
+    "name": "NumPy",
+    "description": "A fundamental package for scientific computing with Python, supporting large, multi-dimensional arrays and matrices.",
+    "category": "Data Analysis",
+    "aliases": ["python numpy"]
+  },
+  {
+    "name": "Matplotlib",
+    "description": "A Python 2D plotting library which produces publication-quality figures in a variety of formats.",
+    "category": "Data Visualization",
+    "aliases": ["python matplotlib"]
+  },
+  {
+    "name": "Tableau",
+    "description": "A powerful data visualization tool used for converting raw data into an understandable format.",
+    "category": "Data Visualization",
+    "aliases": []
+  },
+  {
+    "name": "Power BI",
+    "description": "A business analytics service by Microsoft providing interactive visualizations and business intelligence capabilities.",
+    "category": "Data Visualization",
+    "aliases": ["powerbi"]
+  },
+  {
+    "name": "Jira",
+    "description": "A proprietary issue tracking product developed by Atlassian that allows bug tracking and agile project management.",
+    "category": "Project Management",
+    "aliases": []
+  },
+  {
+    "name": "Confluence",
+    "description": "A collaboration wiki tool used to help teams collaborate and share knowledge efficiently.",
+    "category": "Project Management",
+    "aliases": []
+  },
+  {
+    "name": "Agile Methodology",
+    "description": "A set of principles for software development under which requirements and solutions evolve through collaboration.",
+    "category": "Project Management",
+    "aliases": ["agile"]
+  },
+  {
+    "name": "Scrum",
+    "description": "An agile process framework for managing complex knowledge work, with an initial emphasis on software development.",
+    "category": "Project Management",
+    "aliases": []
+  },
+  {
+    "name": "Kanban",
+    "description": "A lean method to manage and improve work across human systems, balancing demands with available capacity.",
+    "category": "Project Management",
+    "aliases": []
+  },
+  {
+    "name": "UI Design",
+    "description": "The process of designing user interfaces for software with a focus on looks or style.",
+    "category": "Design",
+    "aliases": ["user interface design"]
+  },
+  {
+    "name": "UX Design",
+    "description": "The process of creating products that provide meaningful and relevant experiences to users.",
+    "category": "Design",
+    "aliases": ["user experience design"]
+  },
+  {
+    "name": "Figma",
+    "description": "A collaborative interface design tool used for UI/UX design and prototyping.",
+    "category": "Design",
+    "aliases": []
+  },
+  {
+    "name": "Adobe XD",
+    "description": "A vector-based user experience design tool for web apps and mobile apps, developed by Adobe.",
+    "category": "Design",
+    "aliases": ["xd"]
+  },
+  {
+    "name": "Quality Assurance",
+    "description": "A way of preventing mistakes and defects in manufactured products and avoiding problems when delivering solutions.",
+    "category": "Testing",
+    "aliases": ["qa", "software testing"]
+  },
+  {
+    "name": "Unit Testing",
+    "description": "A software testing method by which individual units of source code are tested to determine whether they are fit for use.",
+    "category": "Testing",
+    "aliases": []
+  },
+  {
+    "name": "Integration Testing",
+    "description": "A level of software testing where individual units are combined and tested as a group.",
+    "category": "Testing",
+    "aliases": []
+  },
+  {
+    "name": "Selenium",
+    "description": "A portable framework for testing web applications, providing a playback tool for authoring tests without learning a test scripting language.",
+    "category": "Testing",
+    "aliases": ["selenium webdriver"]
+  },
+  {
+    "name": "Jest",
+    "description": "A delightful JavaScript testing framework with a focus on simplicity.",
+    "category": "Testing",
+    "aliases": []
+  },
+  {
+    "name": "Cypress",
+    "description": "A next generation front end testing tool built for the modern web.",
+    "category": "Testing",
+    "aliases": ["cypress.io"]
+  },
+  {
+    "name": "Mobile Development",
+    "description": "The process of creating software applications that run on a mobile device.",
+    "category": "Mobile Development",
+    "aliases": ["mobile app development"]
+  },
+  {
+    "name": "Android Development",
+    "description": "The process of creating applications for devices running the Android operating system.",
+    "category": "Mobile Development",
+    "aliases": ["android"]
+  },
+  {
+    "name": "iOS Development",
+    "description": "The process of creating applications for Apple's iOS operating system.",
+    "category": "Mobile Development",
+    "aliases": ["ios"]
+  },
+  {
+    "name": "React Native",
+    "description": "A framework for building native apps using React.",
+    "category": "Mobile Development",
+    "aliases": ["rn"]
+  },
+  {
+    "name": "Flutter",
+    "description": "An open-source UI software development kit created by Google for building natively compiled applications for mobile, web, and desktop from a single codebase.",
+    "category": "Mobile Development",
+    "aliases": []
+  },
+  {
+    "name": "Security",
+    "description": "Practices and tools for protecting systems, networks, and programs from digital attacks.",
+    "category": "Security",
+    "aliases": ["cybersecurity", "infosec"]
+  },
+  {
+    "name": "Penetration Testing",
+    "description": "A simulated cyber attack against your computer system to check for exploitable vulnerabilities.",
+    "category": "Security",
+    "aliases": ["pen testing", "ethical hacking"]
+  },
+  {
+    "name": "OAuth",
+    "description": "An open standard for access delegation commonly used as a way to grant websites or applications access to information on other websites.",
+    "category": "Security",
+    "aliases": ["oauth2"]
+  },
+  {
+    "name": "SAML",
+    "description": "A single sign-on (SSO) protocol that allows users to authenticate once and gain access to different applications.",
+    "category": "Security",
+    "aliases": []
+  },
+  {
+    "name": "Business Analysis",
+    "description": "The practice of enabling change in an organizational context, by defining needs and recommending solutions that deliver value.",
+    "category": "Business",
+    "aliases": ["ba"]
+  },
+  {
+    "name": "Product Management",
+    "description": "The practice of strategically driving the development, market launch, and continual support and improvement of a company’s products.",
+    "category": "Business",
+    "aliases": ["pm"]
+  },
+  {
+    "name": "Salesforce",
+    "description": "A cloud-based software company providing customer relationship management service and a suite of enterprise applications.",
+    "category": "Business",
+    "aliases": ["sfdc"]
+  },
+  {
+    "name": "SAP",
+    "description": "A multinational software corporation that makes enterprise software to manage business operations and customer relations.",
+    "category": "Business",
+    "aliases": []
+  },
+  {
+    "name": "SQL",
+    "description": "Structured Query Language, a standard language for managing and manipulating relational databases.",
+    "category": "Database",
+    "aliases": ["structured query language"]
+  },
+  {
+    "name": "Git",
+    "description": "A distributed version control system for tracking changes in source code during software development.",
+    "category": "DevOps",
+    "aliases": ["version control"]
+  },
+  {
+    "name": "Communication",
+    "description": "The ability to convey or share ideas and feelings effectively, both verbally and in writing.",
+    "category": "Soft Skill",
+    "aliases": [
+      "interpersonal skills",
+      "verbal communication",
+      "written communication"
+    ]
+  },
+  {
+    "name": "Problem Solving",
+    "description": "The process of finding solutions to difficult or complex issues.",
+    "category": "Soft Skill",
+    "aliases": ["analytical skills", "critical thinking"]
+  },
+  {
+    "name": "Teamwork",
+    "description": "The collaborative effort of a group to achieve a common goal or to complete a task in the most effective and efficient way.",
+    "category": "Soft Skill",
+    "aliases": ["collaboration"]
+  },
+  {
+    "name": "Leadership",
+    "description": "The ability to guide, inspire, and manage a team or project towards a specific goal.",
+    "category": "Soft Skill",
+    "aliases": ["management"]
+  },
+  {
+    "name": "Time Management",
+    "description": "The ability to use one's time effectively or productively, especially at work.",
+    "category": "Soft Skill",
+    "aliases": ["organization skills"]
+  },
+  {
+    "name": "Data Structures and Algorithms",
+    "description": "Fundamental concepts in computer science for organizing, managing, and processing data efficiently.",
+    "category": "Computer Science",
+    "aliases": ["dsa", "algorithms", "data structures"]
+  },
+  {
+    "name": "System Design",
+    "description": "The process of defining the architecture, components, modules, interfaces, and data for a system to satisfy specified requirements.",
+    "category": "Software Architecture",
+    "aliases": ["software architecture"]
+  },
+  {
+    "name": "Microservices",
+    "description": "An architectural style that structures an application as a collection of loosely coupled, independently deployable services.",
+    "category": "Software Architecture",
+    "aliases": ["microservice architecture"]
+  },
+  {
+    "name": "Serverless",
+    "description": "A cloud computing execution model in which the cloud provider runs the server and dynamically manages the allocation of machine resources.",
+    "category": "Cloud",
+    "aliases": ["serverless architecture", "faas", "functions as a service"]
+  },
+  {
+    "name": "Blockchain",
+    "description": "A distributed, immutable ledger technology used for recording transactions and tracking assets.",
+    "category": "Emerging Tech",
+    "aliases": []
+  },
+  {
+    "name": "Internet of Things",
+    "description": "A network of physical devices, vehicles, home appliances, and other items embedded with electronics, software, sensors, actuators, and connectivity which enables these objects to connect and exchange data.",
+    "category": "Emerging Tech",
+    "aliases": ["iot"]
+  },
+  {
+    "name": "Cybersecurity",
+    "description": "The practice of protecting systems, networks, and programs from digital attacks, damage, or unauthorized access.",
+    "category": "Security",
+    "aliases": ["information security", "network security"]
+  },
+  {
+    "name": "Data Engineering",
+    "description": "The aspect of data science that focuses on practical applications of data collection and analysis, including building data pipelines.",
+    "category": "Data",
+    "aliases": []
+  },
+  {
+    "name": "Data Warehousing",
+    "description": "The process of constructing and using a data warehouse, a large store of data accumulated from a wide range of sources within a company and used to guide management decisions.",
+    "category": "Data",
+    "aliases": ["dwh"]
+  },
+  {
+    "name": "ETL",
+    "description": "Extract, Transform, Load is a data integration process that combines data from multiple data sources into a single, consistent data store that is loaded into a data warehouse or other target system.",
+    "category": "Data",
+    "aliases": ["extract transform load"]
+  },
+  {
+    "name": "API Integration",
+    "description": "The process of connecting different software applications at the API level to enable them to exchange data and functionality.",
+    "category": "API Development",
+    "aliases": ["system integration", "third-party api integration"]
+  },
+  {
+    "name": "Web Scraping",
+    "description": "The process of extracting data from websites using automated scripts or tools.",
+    "category": "Data Collection",
+    "aliases": ["data scraping", "web crawling"]
+  },
+  {
+    "name": "Shell Scripting",
+    "description": "Writing scripts for a shell, or command line interpreter, to automate tasks.",
+    "category": "Operating System",
+    "aliases": ["bash", "sh", "zsh"]
+  },
+  {
+    "name": "PowerShell",
+    "description": "A task automation and configuration management framework from Microsoft, consisting of a command-line shell and associated scripting language.",
+    "category": "Operating System",
+    "aliases": []
+  },
+  {
+    "name": "Technical Writing",
+    "description": "A type of writing where the author is writing about a particular subject that requires direction, instruction, or explanation.",
+    "category": "Communication",
+    "aliases": ["documentation"]
+  },
+  {
+    "name": "User Research",
+    "description": "The systematic study of target users and their requirements, to add realistic contexts and insights to design processes.",
+    "category": "Design",
+    "aliases": ["ux research"]
+  },
+  {
+    "name": "A/B Testing",
+    "description": "A method of comparing two versions of a webpage or app against each other to determine which one performs better.",
+    "category": "Product Management",
+    "aliases": ["split testing"]
+  },
+  {
+    "name": "SEO",
+    "description": "Search Engine Optimization is the process of improving the quality and quantity of website traffic to a website or a web page from search engines.",
+    "category": "Marketing",
+    "aliases": ["search engine optimization"]
+  },
+  {
+    "name": "Digital Marketing",
+    "description": "The component of marketing that uses the Internet and online based digital technologies to promote products and services.",
+    "category": "Marketing",
+    "aliases": []
+  },
+  {
+    "name": "Content Creation",
+    "description": "The process of generating topic ideas that appeal to your buyer persona, creating written or visual content around those ideas, and making that information accessible to your audience as a blog, video, infographic, or other format.",
+    "category": "Marketing",
+    "aliases": []
+  },
+  {
+    "name": "Statistical Analysis",
+    "description": "The science of collecting, exploring, and presenting large amounts of data to discover underlying patterns and trends.",
+    "category": "Data Analysis",
+    "aliases": ["statistics"]
+  },
+  {
+    "name": "R",
+    "description": "A programming language and free software environment for statistical computing and graphics.",
+    "category": "Data Analysis",
+    "aliases": ["r language"]
+  },
+  {
+    "name": "MATLAB",
+    "description": "A proprietary multi-paradigm programming language and numeric computing environment developed by MathWorks.",
+    "category": "Data Analysis",
+    "aliases": []
+  },
+  {
+    "name": "Excel",
+    "description": "A spreadsheet program developed by Microsoft, widely used for data analysis, calculation, and visualization.",
+    "category": "Data Analysis",
+    "aliases": ["microsoft excel", "ms excel"]
+  },
+  {
+    "name": "Google Analytics",
+    "description": "A web analytics service offered by Google that tracks and reports website traffic.",
+    "category": "Marketing",
+    "aliases": ["ga"]
+  },
+  {
+    "name": "Adobe Photoshop",
+    "description": "A raster graphics editor developed and published by Adobe Inc. for Windows and macOS.",
+    "category": "Design",
+    "aliases": ["photoshop", "ps"]
+  },
+  {
+    "name": "Adobe Illustrator",
+    "description": "A vector graphics editor and design program developed and marketed by Adobe Inc.",
+    "category": "Design",
+    "aliases": ["illustrator", "ai"]
+  },
+  {
+    "name": "Adobe Premiere Pro",
+    "description": "A timeline-based video editing software application developed by Adobe Inc.",
+    "category": "Media",
+    "aliases": ["premiere pro"]
+  },
+  {
+    "name": "Final Cut Pro",
+    "description": "A professional non-linear video editing application developed by Apple Inc.",
+    "category": "Media",
+    "aliases": ["fcp"]
+  },
+  {
+    "name": "Blender",
+    "description": "A free and open-source 3D computer graphics software toolset used for creating animated films, visual effects, art, 3D-printed models, motion graphics, interactive 3D applications, and virtual reality.",
+    "category": "Design",
+    "aliases": ["3d modeling"]
+  },
+  {
+    "name": "Unity",
+    "description": "A cross-platform game engine developed by Unity Technologies, used to develop video games for PC, consoles, mobile devices and websites.",
+    "category": "Game Development",
+    "aliases": ["unity3d"]
+  },
+  {
+    "name": "Unreal Engine",
+    "description": "A game engine developed by Epic Games, used for developing high-fidelity games and simulations.",
+    "category": "Game Development",
+    "aliases": ["ue4", "ue5"]
+  }
+]

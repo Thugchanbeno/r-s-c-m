@@ -8,6 +8,7 @@ const AddSkillForm = ({ onSkillAdded, onCancel }) => {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
+  const [aliases, setAliases] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -18,23 +19,37 @@ const AddSkillForm = ({ onSkillAdded, onCancel }) => {
     setError(null);
     setSuccess(null);
 
+    const aliasesArray = aliases
+      .split(",")
+      .map((alias) => alias.trim())
+      .filter((alias) => alias !== "");
+
     try {
       const response = await fetch("/api/skills", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, category, description }),
+        body: JSON.stringify({
+          name,
+          category,
+          description,
+          aliases: aliasesArray,
+        }),
       });
 
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.error || `Error: ${response.status}`);
+        const errorMessage = Array.isArray(result.error)
+          ? result.error.join(", ")
+          : result.error;
+        throw new Error(errorMessage || `Error: ${response.status}`);
       }
 
       setSuccess(`Skill "${result.data.name}" added successfully!`);
       setName("");
       setCategory("");
       setDescription("");
+      setAliases("");
       if (onSkillAdded) onSkillAdded();
       toast.success(`Skill "${result.data.name}" added successfully!`);
     } catch (err) {
@@ -81,6 +96,23 @@ const AddSkillForm = ({ onSkillAdded, onCancel }) => {
       </div>
       <div>
         <label
+          htmlFor="skill-aliases"
+          className="block text-sm font-medium text-[rgb(var(--foreground))]"
+        >
+          Aliases (Optional, comma-separated)
+        </label>
+        <input
+          type="text"
+          id="skill-aliases"
+          value={aliases}
+          onChange={(e) => setAliases(e.target.value)}
+          className={`${inputBaseClasses.replace("p-2", "")} px-4 py-2 `}
+          placeholder="e.g., JS, Node, ReactJS"
+        />
+      </div>
+
+      <div>
+        <label
           htmlFor="skill-category"
           className="block text-sm font-medium text-[rgb(var(--foreground))]"
         >
@@ -112,9 +144,7 @@ const AddSkillForm = ({ onSkillAdded, onCancel }) => {
         />
       </div>
       <div className="flex justify-end space-x-3 pt-2">
-        {" "}
-        {/* Added space-x-3 */}
-        {onCancel && ( // Conditionally render Cancel button
+        {onCancel && (
           <Button
             type="button"
             variant="outline"

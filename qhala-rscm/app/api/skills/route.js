@@ -47,28 +47,32 @@ export async function POST(request) {
     await connectDB();
     const body = await request.json();
 
-    if (!body.name) {
+    const { name, category, description, aliases } = body;
+
+    if (!name) {
       return NextResponse.json(
         { success: false, error: "Skill name is required" },
         { status: 400 }
       );
     }
-
     const existingSkill = await Skills.findOne({
-      name: { $regex: `^${body.name}$`, $options: "i" },
+      name: { $regex: `^${name}$`, $options: "i" },
     });
     if (existingSkill) {
       return NextResponse.json(
-        { success: false, error: `Skill '${body.name}' already exists` },
+        { success: false, error: `Skill '${name}' already exists` },
         { status: 400 }
       );
     }
 
-    const newSkill = await Skills.create({
-      name: body.name,
-      category: body.category,
-      description: body.description,
-    });
+    const skillData = {
+      name: name,
+      category: category,
+      description: description,
+      aliases: aliases || [],
+    };
+
+    const newSkill = await Skills.create(skillData);
 
     return NextResponse.json(
       { success: true, data: newSkill },
@@ -80,6 +84,15 @@ export async function POST(request) {
       const messages = Object.values(error.errors).map((val) => val.message);
       return NextResponse.json(
         { success: false, error: messages },
+        { status: 400 }
+      );
+    }
+    if (error.code === 11000 && error.keyPattern && error.keyPattern.name) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Skill '${error.keyValue.name}' already exists (duplicate key).`,
+        },
         { status: 400 }
       );
     }

@@ -255,10 +255,12 @@ export const CurrentSkillsEditor = ({
             >
               <Badge
                 variant={isSelected ? "primary" : "outline"}
-                className="cursor-pointer px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105" // Adjusted badge
+                className="cursor-pointer px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105"
+                onClick={() => handleToggleCurrentSkill(skill._id)}
               >
                 {skill.name}
               </Badge>
+
               {isSelected && (
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-[rgb(var(--foreground))]">
