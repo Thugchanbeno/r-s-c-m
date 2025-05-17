@@ -22,7 +22,11 @@ const ProfileData = () => {
     currentSkills,
     desiredSkills,
     projects,
-    allSkillsTaxonomy,
+    groupedSkillsTaxonomy,
+    expandedCurrentSkillCategories,
+    toggleCurrentSkillCategory,
+    expandedDesiredSkillCategories,
+    toggleDesiredSkillCategory,
     isEditingCurrentSkills,
     setIsEditingCurrentSkills,
     isEditingDesiredSkills,
@@ -99,9 +103,7 @@ const ProfileData = () => {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        {/* Main content card - uses themed Card component */}
         <Card className="lg:col-span-2">
-          {/* UserInfo is already styled as a card-like item, so CardHeader can be minimal */}
           <CardHeader>
             <UserInfo
               className="p-2"
@@ -111,12 +113,12 @@ const ProfileData = () => {
               allocationSummaryError={allocationSummaryError}
             />
           </CardHeader>
-          {/* CardContent will have the default card background (e.g., white) */}
           <CardContent>
             <div className="space-y-8">
-              {saveError && <ErrorMessage message={saveError} />}
-
-              {/* Current Skills Section */}
+              {saveError &&
+                (isEditingCurrentSkills || isEditingDesiredSkills) && (
+                  <ErrorMessage message={saveError} />
+                )}
               <div className="space-y-3 p-1">
                 <SectionHeader
                   title="Current Skills"
@@ -127,20 +129,22 @@ const ProfileData = () => {
                   }}
                   onSaveClick={() => handleSaveSkills("current")}
                   onCancelClick={handleCancelEditCurrent}
-                  isSaving={isSaving}
+                  isSaving={isSaving && isEditingCurrentSkills}
                 />
 
-                {loadingSkills ? (
+                {loadingSkills && !isEditingCurrentSkills ? (
                   <div className="flex justify-center py-4">
                     <LoadingSpinner size={20} />
                   </div>
-                ) : skillsError ? (
+                ) : skillsError && !isEditingCurrentSkills ? (
                   <p className="text-red-500 text-sm p-2 bg-red-50 rounded-[var(--radius)]">
                     {skillsError}
                   </p>
                 ) : isEditingCurrentSkills ? (
                   <CurrentSkillsEditor
-                    allSkillsTaxonomy={allSkillsTaxonomy}
+                    groupedSkillsTaxonomy={groupedSkillsTaxonomy}
+                    expandedCategories={expandedCurrentSkillCategories}
+                    toggleCategory={toggleCurrentSkillCategory}
                     selectedCurrentSkillsMap={selectedCurrentSkillsMap}
                     handleToggleCurrentSkill={handleToggleCurrentSkill}
                     handleSetProficiency={handleSetProficiency}
@@ -153,8 +157,6 @@ const ProfileData = () => {
                   </div>
                 )}
               </div>
-
-              {/* Desired Skills Section */}
               <div className="space-y-3 p-1">
                 <SectionHeader
                   title="Desired Skills"
@@ -165,10 +167,10 @@ const ProfileData = () => {
                   }}
                   onSaveClick={() => handleSaveSkills("desired")}
                   onCancelClick={handleCancelEditDesired}
-                  isSaving={isSaving}
+                  isSaving={isSaving && isEditingDesiredSkills}
                 />
 
-                {loadingSkills ? (
+                {loadingSkills && !isEditingDesiredSkills ? (
                   <div className="flex justify-center py-4">
                     <LoadingSpinner size={20} />
                   </div>
@@ -178,7 +180,9 @@ const ProfileData = () => {
                   </p>
                 ) : isEditingDesiredSkills ? (
                   <DesiredSkillsEditor
-                    allSkillsTaxonomy={allSkillsTaxonomy}
+                    groupedSkillsTaxonomy={groupedSkillsTaxonomy}
+                    expandedCategories={expandedDesiredSkillCategories}
+                    toggleCategory={toggleDesiredSkillCategory}
                     selectedDesiredSkillIds={selectedDesiredSkillIds}
                     handleToggleDesiredSkill={handleToggleDesiredSkill}
                     loadingTaxonomy={loadingTaxonomy}
@@ -193,12 +197,9 @@ const ProfileData = () => {
           </CardContent>
         </Card>
 
-        {/* Sidebar */}
         <div className="space-y-6">
-          {/* Projects card - uses themed Card component */}
           <Card>
             <CardHeader>
-              {/* ProjectsList already renders its own CardTitle, so this is a simple h3 */}
               <h3 className="text-lg font-medium text-[rgb(var(--card-foreground))]">
                 Allocated Projects
               </h3>

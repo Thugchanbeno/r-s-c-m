@@ -1,5 +1,5 @@
 // lib/hooks/useProfileData.js
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSession } from "next-auth/react";
 
 const DEFAULT_PROFICIENCY = 3;
@@ -9,9 +9,13 @@ export const useProfileData = () => {
 
   const [currentSkills, setCurrentSkills] = useState([]);
   const [desiredSkills, setDesiredSkills] = useState([]);
-  const [projects, setProjects] = useState([]); // Allocations for ProjectsList
+  const [projects, setProjects] = useState([]);
   const [allSkillsTaxonomy, setAllSkillsTaxonomy] = useState([]);
 
+  const [expandedCurrentSkillCategories, setExpandedCurrentSkillCategories] =
+    useState({});
+  const [expandedDesiredSkillCategories, setExpandedDesiredSkillCategories] =
+    useState({});
   const [isEditingCurrentSkills, setIsEditingCurrentSkills] = useState(false);
   const [isEditingDesiredSkills, setIsEditingDesiredSkills] = useState(false);
   const [selectedCurrentSkillsMap, setSelectedCurrentSkillsMap] = useState(
@@ -39,6 +43,46 @@ export const useProfileData = () => {
   const [loadingAllocationSummary, setLoadingAllocationSummary] =
     useState(true);
   const [allocationSummaryError, setAllocationSummaryError] = useState(null);
+
+  const groupedSkillsTaxonomy = useMemo(() => {
+    if (
+      loadingTaxonomy ||
+      !allSkillsTaxonomy ||
+      allSkillsTaxonomy.length === 0
+    ) {
+      return {};
+    }
+    const grouped = allSkillsTaxonomy.reduce((acc, skill) => {
+      const category = skill.category || "Uncategorized";
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(skill);
+      return acc;
+    }, {});
+    // Sort skills within each category
+    for (const category in grouped) {
+      grouped[category].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    return grouped;
+  }, [allSkillsTaxonomy, loadingTaxonomy]);
+
+  useEffect(() => {
+    if (Object.keys(groupedSkillsTaxonomy).length > 0) {
+      const initialExpandedState = Object.keys(groupedSkillsTaxonomy).reduce(
+        (acc, category) => {
+          acc[category] = false; // Start all collapsed
+          return acc;
+        },
+        {}
+      );
+      setExpandedCurrentSkillCategories(initialExpandedState);
+      setExpandedDesiredSkillCategories(initialExpandedState);
+    } else {
+      setExpandedCurrentSkillCategories({});
+      setExpandedDesiredSkillCategories({});
+    }
+  }, [groupedSkillsTaxonomy]);
 
   useEffect(() => {
     const fetchTaxonomy = async () => {
@@ -338,6 +382,20 @@ export const useProfileData = () => {
     setSaveError(null);
   }, [desiredSkills]);
 
+  const toggleCurrentSkillCategory = useCallback((category) => {
+    setExpandedCurrentSkillCategories((prev) => ({
+      ...prev,
+      [category]: !prev[category],
+    }));
+  }, []);
+
+  const toggleDesiredSkillCategory = useCallback((category) => {
+    setExpandedDesiredSkillCategories((prev) => ({
+      ...prev,
+      [category]: !prev[category],
+    }));
+  }, []);
+
   return {
     session,
     status,
@@ -345,6 +403,11 @@ export const useProfileData = () => {
     desiredSkills,
     projects,
     allSkillsTaxonomy,
+    groupedSkillsTaxonomy,
+    expandedCurrentSkillCategories,
+    expandedDesiredSkillCategories,
+    toggleCurrentSkillCategory,
+    toggleDesiredSkillCategory,
     isEditingCurrentSkills,
     setIsEditingCurrentSkills,
     isEditingDesiredSkills,
