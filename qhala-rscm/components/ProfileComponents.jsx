@@ -28,7 +28,7 @@ import {
   getAllocationPercentageColor,
 } from "@/components/common/skillcolors";
 import { fadeIn, staggerChildren } from "@/lib/animations";
-import { formatDateRange } from "@/lib/utils";
+import { formatDateRange } from "@/lib/dateUtils";
 
 // Profile Header Component
 export const ProfileHeader = ({ title, description }) => (
