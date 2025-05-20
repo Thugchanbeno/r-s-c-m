@@ -10,7 +10,6 @@ const UserSchema = new Schema(
       trim: true,
       index: true,
     },
-    //Store unique ID from the auth provider-google auth.
     authProviderId: { type: String, required: true, unique: true, index: true },
     department: { type: String, required: false, index: true },
     role: {

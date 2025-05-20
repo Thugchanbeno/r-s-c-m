@@ -1,0 +1,190 @@
+[
+  {
+    "_id": {
+      "$oid": "682231712d70c897ac12e862"
+    },
+    "name": "Stahili",
+    "description": "A data project to study sentiment analysis of the Kenyan market. This initiative requires Data Science & Analysis, Business Intelligence & Visualization capabilities, Machine Learning (ML) techniques, and programming proficiency in both the Python programming language and R Language to help businesses understand their customers better.",
+    "nlpExtractedSkills": [],
+    "pmId": {
+      "$oid": "68132e3f0aef5e2a6b41311e"
+    },
+    "startDate": {
+      "$date": "2025-01-01T00:00:00.000Z"
+    },
+    "endDate": {
+      "$date": "2025-08-30T00:00:00.000Z"
+    },
+    "status": "Active",
+    "createdAt": {
+      "$date": "2025-05-12T17:35:45.116Z"
+    },
+    "updatedAt": {
+      "$date": "2025-05-12T17:35:45.116Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "682231a72d70c897ac12e872"
+    },
+    "name": "Kenya Orient",
+    "description": "A data project to analyze sentiment from questionnaires for Kenya Orient insurance. This requires strong Data Science & Analysis, Business Intelligence & Visualization skills, application of Machine Learning (ML) models, and expertise in Python and R Language.",
+    "nlpExtractedSkills": [],
+    "pmId": {
+      "$oid": "68132e3f0aef5e2a6b41311e"
+    },
+    "startDate": {
+      "$date": "2025-05-01T00:00:00.000Z"
+    },
+    "endDate": null,
+    "status": "Planning",
+    "createdAt": {
+      "$date": "2025-05-12T17:36:39.795Z"
+    },
+    "updatedAt": {
+      "$date": "2025-05-12T17:36:39.795Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "682231ce2d70c897ac12e881"
+    },
+    "name": "Legal LLM",
+    "description": "An AI powered legal assistant that helps users draft and review legal documents, interpret legal texts, contracts, and agreements. This project utilizes Natural Language Processing (NLP), Machine Learning (ML), and general Software Architecture skills. Key technologies include API Integration and Data Engineering. Domain expertise in Legal Knowledge is beneficial.",
+    "nlpExtractedSkills": [],
+    "pmId": {
+      "$oid": "68132e3f0aef5e2a6b41311e"
+    },
+    "startDate": null,
+    "endDate": null,
+    "status": "Active",
+    "createdAt": {
+      "$date": "2025-05-12T17:37:18.859Z"
+    },
+    "updatedAt": {
+      "$date": "2025-05-12T17:37:18.859Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "682232072d70c897ac12e891"
+    },
+    "name": "NISR",
+    "description": "A project for the National Institute of Statistics of Rwanda to build a data collection and analysis tool. This requires skills in Data Engineering for data pipelines, Data Science & Analysis for insights, Machine Learning (ML) for predictive tasks, general Software Architecture, and API Integration for system connectivity. Expertise in Data Collection methodologies is also needed.",
+    "nlpExtractedSkills": [],
+    "pmId": {
+      "$oid": "68132e3f0aef5e2a6b41311e"
+    },
+    "startDate": {
+      "$date": "2025-02-01T00:00:00.000Z"
+    },
+    "endDate": null,
+    "status": "Active",
+    "createdAt": {
+      "$date": "2025-05-12T17:38:15.991Z"
+    },
+    "updatedAt": {
+      "$date": "2025-05-12T17:38:15.991Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6822322c2d70c897ac12e8a0"
+    },
+    "name": "No Code Builder",
+    "description": "A platform for non-technical users to build applications without coding. This project leverages Deep Learning (DL) and Machine Learning (ML) for its core intelligence, general Software Architecture for the platform build, UI (User Interface) Design and UX (User Experience) Design for usability, API Integration for extensibility, Cloud Computing (e.g. AWS (Amazon Web Services) or Google Cloud Platform (GCP)) for hosting, and User Research to guide development.",
+    "nlpExtractedSkills": [],
+    "pmId": {
+      "$oid": "68132e3f0aef5e2a6b41311e"
+    },
+    "startDate": {
+      "$date": "2025-02-01T00:00:00.000Z"
+    },
+    "endDate": null,
+    "status": "Active",
+    "createdAt": {
+      "$date": "2025-05-12T17:38:52.216Z"
+    },
+    "updatedAt": {
+      "$date": "2025-05-12T17:38:52.216Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6822325e2d70c897ac12e8af"
+    },
+    "name": "ASR Model Finetuning",
+    "description": "An advanced speech recognition system customization service. This project involves finetuning baseline Automatic Speech Recognition (ASR) models, which requires expertise in Natural Language Processing (NLP) and Deep Learning (DL), to adapt to specific accents, dialects, industry terminologies, and acoustic environments, significantly improving transcription accuracy for specialized applications using Python and potentially PyTorch or TensorFlow.",
+    "nlpExtractedSkills": [],
+    "pmId": {
+      "$oid": "68132e3f0aef5e2a6b41311e"
+    },
+    "startDate": {
+      "$date": "2025-06-10T00:00:00.000Z"
+    },
+    "endDate": {
+      "$date": "2025-07-30T00:00:00.000Z"
+    },
+    "status": "Planning",
+    "createdAt": {
+      "$date": "2025-05-12T17:39:42.873Z"
+    },
+    "updatedAt": {
+      "$date": "2025-05-12T17:39:42.873Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "682232922d70c897ac12e8bf"
+    },
+    "name": "Tunga (AfyaHub)",
+    "description": "A digital health platform connecting patients in underserved African communities. This platform is built with Web Development (Frontend) skills (such as React or Vue.js) and Web Development (Backend) skills (like Node.js or Python with Django/Flask). It requires Data Science & Analysis for understanding user data and general Software Architecture principles. Domain Knowledge in healthcare is crucial.",
+    "nlpExtractedSkills": [],
+    "pmId": {
+      "$oid": "68132e3f0aef5e2a6b41311e"
+    },
+    "startDate": {
+      "$date": "2025-04-01T00:00:00.000Z"
+    },
+    "endDate": null,
+    "status": "Active",
+    "createdAt": {
+      "$date": "2025-05-12T17:40:34.380Z"
+    },
+    "updatedAt": {
+      "$date": "2025-05-12T17:40:34.380Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6823168696e10a5d29626817"
+    },
+    "name": "Salesforce Integration",
+    "description": "Integrate Salesforce CRM with our existing systems to streamline customer data management. This requires expertise in Salesforce CRM (including Salesforce Administration), API Integration, Data Engineering for Data Migration tasks, Business Analysis for Business Process Mapping, and Communication Skills for User Training. Data Science & Analysis skills will be used for post-integration reporting.",
+    "nlpExtractedSkills": [],
+    "pmId": {
+      "$oid": "68132e3f0aef5e2a6b41311e"
+    },
+    "startDate": {
+      "$date": "2025-05-14T00:00:00.000Z"
+    },
+    "endDate": {
+      "$date": "2025-05-15T00:00:00.000Z"
+    },
+    "status": "Planning",
+    "createdAt": {
+      "$date": "2025-05-13T09:53:10.520Z"
+    },
+    "updatedAt": {
+      "$date": "2025-05-13T09:53:10.520Z"
+    },
+    "__v": 0
+  }
+]

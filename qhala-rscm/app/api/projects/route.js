@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
-import Project from "@/models/Project";
-import User from "@/models/User";
-import Skills from "@/models/Skills";
+import Project, { departmentEnum } from "@/models/Project";
+import "@/models/Skills";
+import "@/models/User";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import mongoose from "mongoose";
@@ -24,14 +24,12 @@ export async function GET(request) {
     let query = {};
 
     if (pmId) {
-      // If a specific PM's projects are requested
       if (!mongoose.Types.ObjectId.isValid(pmId)) {
         return NextResponse.json(
           { success: false, error: "Invalid PM ID format" },
           { status: 400 }
         );
       }
-      // Authorization: User must be the PM themselves, or an Admin/HR
       if (
         loggedInUserId !== pmId &&
         !["admin", "hr", "pm"].includes(loggedInUserRole)
@@ -46,8 +44,6 @@ export async function GET(request) {
         );
       }
       query.pmId = pmId;
-
-      //debug for access previleges.
     } else {
       if (!["admin", "hr", "pm"].includes(loggedInUserRole)) {
         return NextResponse.json(
@@ -66,7 +62,6 @@ export async function GET(request) {
     } else {
       const projects = await Project.find(query)
         .populate("pmId", "name email")
-        .populate("requiredSkills.skillId", "name category")
         .sort({ name: 1 });
 
       return NextResponse.json({
@@ -101,23 +96,70 @@ export async function POST(request) {
     await connectDB();
     const body = await request.json();
 
-    if (!body.name || !body.description) {
+    if (!body.name || !body.description || !body.department) {
       return NextResponse.json(
-        { success: false, error: "Project name and description are required" },
+        {
+          success: false,
+          error: "Project name, description, and department are required",
+        },
         { status: 400 }
       );
     }
 
-    // TODO: Validate requiredSkills structure if provided
+    if (!departmentEnum.includes(body.department)) {
+      return NextResponse.json(
+        { success: false, error: "Invalid department value provided." },
+        { status: 400 }
+      );
+    }
+
+    if (body.requiredSkills && !Array.isArray(body.requiredSkills)) {
+      return NextResponse.json(
+        { success: false, error: "requiredSkills must be an array" },
+        { status: 400 }
+      );
+    }
+    if (body.requiredSkills) {
+      for (const skill of body.requiredSkills) {
+        if (
+          !skill.skillId ||
+          !skill.skillName ||
+          typeof skill.proficiencyLevel !== "number" ||
+          typeof skill.isRequired !== "boolean"
+        ) {
+          return NextResponse.json(
+            {
+              success: false,
+              error:
+                "Invalid structure in requiredSkills. Each skill must have skillId, skillName, proficiencyLevel (number), and isRequired (boolean).",
+            },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
     const newProjectData = {
-      ...body,
+      name: body.name,
+      description: body.description,
+      department: body.department,
+      status: body.status || "Planning",
+      startDate: body.startDate || null,
+      endDate: body.endDate || null,
       pmId: session.user.id,
+      requiredSkills: body.requiredSkills || [],
+      nlpExtractedSkills: body.nlpExtractedSkills || [],
     };
 
     const newProject = await Project.create(newProjectData);
 
+    const populatedProject = await Project.findById(newProject._id).populate(
+      "pmId",
+      "name email"
+    );
+
     return NextResponse.json(
-      { success: true, data: newProject },
+      { success: true, data: populatedProject || newProject },
       { status: 201 }
     );
   } catch (error) {

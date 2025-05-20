@@ -28,7 +28,10 @@ import {
   UserPlus,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { getAllocationPercentageColor } from "@/components/common/skillcolors";
+import {
+  getAllocationPercentageColor,
+  getSkillLevelColor,
+} from "@/components/common/skillcolors";
 import { toast } from "react-toastify";
 
 // Animation variants
@@ -354,14 +357,16 @@ const ProjectDetailPage = () => {
                     Required Skills
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {project.requiredSkills.map((skill, index) => (
+                    {project.requiredSkills.map((reqSkill) => (
                       <Badge
-                        key={index}
-                        variant="outline"
+                        key={reqSkill.skillId}
                         pill={true}
                         size="sm"
+                        className={getSkillLevelColor(
+                          reqSkill.proficiencyLevel
+                        )}
                       >
-                        {skill}
+                        {reqSkill.skillName || "Unnamed Skill"}{" "}
                       </Badge>
                     ))}
                   </div>
