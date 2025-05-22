@@ -1,5 +1,4 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Badge from "@/components/common/Badge";
 import { getSkillLevelColor } from "@/components/common/skillcolors";
@@ -11,8 +10,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSkillSelector } from "@/lib/hooks/useSkillSelector";
 
-// Animation variants (can be shared or defined locally)
 const fadeIn = {
   hidden: { opacity: 0, y: -10 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
@@ -23,105 +22,20 @@ const SkillSelector = ({
   nlpSuggestedSkills = [],
   onChange,
 }) => {
-  const [allSkills, setAllSkills] = useState([]);
-  const [loadingSkills, setLoadingSkills] = useState(true);
-  const [errorSkills, setErrorSkills] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSkillsMap, setSelectedSkillsMap] = useState(new Map());
-  const [expandedCategories, setExpandedCategories] = useState({});
-
-  const fetchAllSkillsFromAPI = useCallback(async () => {
-    setLoadingSkills(true);
-    setErrorSkills(null);
-    try {
-      const response = await fetch("/api/skills");
-      if (!response.ok) throw new Error("Failed to fetch skills taxonomy");
-      const result = await response.json();
-      if (result.success && Array.isArray(result.data)) {
-        setAllSkills(result.data);
-        // Initialize categories to be closed by default
-        const grouped = result.data.reduce((acc, skill) => {
-          const category = skill.category || "Uncategorized";
-          if (!acc[category]) acc[category] = false; // false means collapsed
-          return acc;
-        }, {});
-        setExpandedCategories(grouped);
-      } else {
-        throw new Error(result.error || "Invalid skills data format");
-      }
-    } catch (err) {
-      setErrorSkills(err.message);
-    } finally {
-      setLoadingSkills(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchAllSkillsFromAPI();
-  }, [fetchAllSkillsFromAPI]);
-
-  useEffect(() => {
-    const initialMap = new Map();
-    initialSelectedSkills.forEach((skill) => {
-      initialMap.set(skill.skillId, { ...skill });
-    });
-    setSelectedSkillsMap(initialMap);
-  }, [initialSelectedSkills]);
-
-  const handleToggleSkill = (skillFromApi) => {
-    const newMap = new Map(selectedSkillsMap);
-    if (newMap.has(skillFromApi._id)) {
-      newMap.delete(skillFromApi._id);
-    } else {
-      newMap.set(skillFromApi._id, {
-        skillId: skillFromApi._id,
-        skillName: skillFromApi.name,
-        category: skillFromApi.category,
-        proficiencyLevel: 3,
-        isRequired: true,
-      });
-    }
-    setSelectedSkillsMap(newMap);
-    onChange(Array.from(newMap.values()));
-  };
-
-  const handleProficiencyChange = (skillId, newProficiency) => {
-    const newMap = new Map(selectedSkillsMap);
-    if (newMap.has(skillId)) {
-      newMap.get(skillId).proficiencyLevel = parseInt(newProficiency, 10);
-      setSelectedSkillsMap(newMap);
-      onChange(Array.from(newMap.values()));
-    }
-  };
-
-  const handleIsRequiredChange = (skillId, newIsRequired) => {
-    const newMap = new Map(selectedSkillsMap);
-    if (newMap.has(skillId)) {
-      newMap.get(skillId).isRequired = newIsRequired;
-      setSelectedSkillsMap(newMap);
-      onChange(Array.from(newMap.values()));
-    }
-  };
-
-  const toggleCategory = (category) => {
-    setExpandedCategories((prev) => ({ ...prev, [category]: !prev[category] }));
-  };
-
-  const filteredSkills = allSkills.filter(
-    (skill) =>
-      skill.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (skill.category &&
-        skill.category.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
-  const skillsByCategory = filteredSkills.reduce((acc, skill) => {
-    const category = skill.category || "Uncategorized";
-    if (!acc[category]) acc[category] = [];
-    acc[category].push(skill);
-    return acc;
-  }, {});
-
-  const sortedCategories = Object.keys(skillsByCategory).sort();
+  const {
+    loadingSkills,
+    errorSkills,
+    searchTerm,
+    setSearchTerm,
+    selectedSkillsMap,
+    expandedCategories,
+    handleToggleSkill,
+    handleProficiencyChange,
+    handleIsRequiredChange,
+    toggleCategory,
+    skillsByCategory,
+    sortedCategories,
+  } = useSkillSelector(initialSelectedSkills, nlpSuggestedSkills, onChange);
 
   if (loadingSkills)
     return (
@@ -172,6 +86,7 @@ const SkillSelector = ({
                       handleToggleSkill({
                         _id: sSkill.skillId,
                         name: sSkill.skillName,
+                        category: sSkill.category,
                       })
                     }
                     className="text-current hover:opacity-70"
@@ -194,10 +109,11 @@ const SkillSelector = ({
         {sortedCategories.map((category) => (
           <motion.div
             key={category}
-            variants={fadeIn} // Using a simple fadeIn for category block
+            variants={fadeIn}
             className="border border-[rgb(var(--border))] rounded-[var(--radius)] overflow-hidden bg-[rgb(var(--background))]"
           >
             <button
+              type="button"
               onClick={() => toggleCategory(category)}
               className="flex items-center justify-between w-full p-3 text-left bg-[rgb(var(--muted))] hover:bg-[rgba(var(--muted-rgb),0.8)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))]"
               aria-expanded={expandedCategories[category]}
@@ -226,7 +142,7 @@ const SkillSelector = ({
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.2, ease: "easeInOut" }}
-                  className="p-3 space-y-2" // Reduced space-y for denser list
+                  className="p-3 space-y-2"
                 >
                   {skillsByCategory[category]
                     .sort((a, b) => a.name.localeCompare(b.name))
@@ -240,7 +156,7 @@ const SkillSelector = ({
                       return (
                         <motion.div
                           key={skill._id}
-                          variants={fadeIn} // Simple fadeIn for each skill item
+                          variants={fadeIn}
                           className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-2.5 rounded-[var(--radius)] transition-all duration-150 ease-in-out border
                             ${
                               isSelected

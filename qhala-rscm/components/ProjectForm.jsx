@@ -1,5 +1,4 @@
 "use client";
-import { useState, useEffect } from "react";
 import Button from "@/components/common/Button.jsx";
 import {
   Card,
@@ -19,155 +18,41 @@ import {
   CalendarDays,
   ChevronDown,
 } from "lucide-react";
-import { getSkillLevelColor } from "@/components/common/skillcolors";
 import SkillSelector from "@/components/projects/SkillSelector";
 import { departmentEnum, projectStatusEnum } from "@/lib/projectconstants";
-
-const initialProjectState = {
-  name: "",
-  description: "",
-  startDate: "",
-  endDate: "",
-  status: projectStatusEnum[0],
-  department: departmentEnum.includes("Unassigned")
-    ? "Unassigned"
-    : departmentEnum[0],
-  requiredSkills: [],
-};
+import { useProjectFormData } from "@/lib/hooks/useProjectFormData";
+import {
+  getStatusBadgeVariant,
+  getSkillLevelColor,
+} from "@/components/common/skillcolors";
 
 const ProjectForm = ({
-  initialData = initialProjectState,
+  initialData,
   onSubmit,
   isSubmitting = false,
   submitError = null,
   onCancel,
   isEditMode = false,
 }) => {
-  const [projectData, setProjectData] = useState({
-    ...initialProjectState,
-    ...initialData,
-    department: initialData.department || initialProjectState.department,
-    startDate: initialData.startDate ? initialData.startDate.split("T")[0] : "",
-    endDate: initialData.endDate ? initialData.endDate.split("T")[0] : "",
-  });
-
-  const [nlpSuggestedSkills, setNlpSuggestedSkills] = useState([]);
-  const [isProcessingDescription, setIsProcessingDescription] = useState(false);
-  const [nlpError, setNlpError] = useState(null);
-  const [descriptionProcessed, setDescriptionProcessed] = useState(false);
-
-  useEffect(() => {
-    const effectiveInitialData = {
-      ...initialProjectState,
-      ...initialData,
-      department: initialData.department || initialProjectState.department,
-      startDate: initialData.startDate
-        ? initialData.startDate.split("T")[0]
-        : "",
-      endDate: initialData.endDate ? initialData.endDate.split("T")[0] : "",
-    };
-    setProjectData(effectiveInitialData);
-
-    setNlpSuggestedSkills(
-      isEditMode && initialData.requiredSkills
-        ? initialData.requiredSkills.map((s) => ({
-            id: s.skillId,
-            name: s.skillName,
-            category: s.category || "N/A",
-          }))
-        : []
-    );
-    setDescriptionProcessed(
-      !!(initialData.requiredSkills && initialData.requiredSkills.length > 0)
-    );
-  }, [initialData, isEditMode]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setProjectData((prev) => ({ ...prev, [name]: value }));
-    if (name === "description") {
-      setDescriptionProcessed(false);
-      setNlpSuggestedSkills([]);
-      setNlpError(null);
-    }
-  };
-
-  const handleProcessDescription = async () => {
-    if (!projectData.description.trim()) {
-      setNlpError("Please enter a project description first.");
-      return;
-    }
-    setIsProcessingDescription(true);
-    setNlpError(null);
-    setNlpSuggestedSkills([]);
-    try {
-      const response = await fetch("/api/nlp/extract-from-text", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: projectData.description }),
-      });
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(
-          result.error || "Failed to extract skills from description."
-        );
-      }
-      setNlpSuggestedSkills(result.data || []);
-      setDescriptionProcessed(true);
-    } catch (err) {
-      setNlpError(err.message);
-      setDescriptionProcessed(false);
-    } finally {
-      setIsProcessingDescription(false);
-    }
-  };
-
-  const handleRequiredSkillsChange = (updatedRequiredSkills) => {
-    setProjectData((prev) => ({
-      ...prev,
-      requiredSkills: updatedRequiredSkills,
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!isEditMode && projectData.requiredSkills.length === 0 && !nlpError) {
-      setNlpError(
-        "Please process the description for skills or add required skills manually."
-      );
-      return;
-    }
-    const dataToSubmit = {
-      ...projectData,
-      startDate: projectData.startDate || null,
-      endDate: projectData.endDate || null,
-    };
-    if (onSubmit) {
-      onSubmit(dataToSubmit);
-    }
-  };
-
-  const getStatusBadgeVariant = (status) => {
-    switch (status) {
-      case "Planning":
-        return "primary";
-      case "Active":
-        return "success";
-      case "On Hold":
-        return "warning";
-      case "Completed":
-        return "secondary";
-      case "Cancelled":
-        return "error";
-      default:
-        return "default";
-    }
-  };
+  const {
+    projectData,
+    nlpSuggestedSkills,
+    isProcessingDescription,
+    nlpError,
+    descriptionProcessed,
+    localSubmitError,
+    handleChange,
+    handleProcessDescription,
+    handleRequiredSkillsChange,
+    handleSubmitLogic,
+  } = useProjectFormData(initialData, isEditMode, onSubmit);
 
   const inputBaseClasses =
     "block w-full rounded-[var(--radius)] border-[rgb(var(--border))] bg-[rgb(var(--background))] text-[rgb(var(--foreground))] shadow-sm focus:border-[rgb(var(--primary))] focus:ring-1 focus:ring-[rgb(var(--primary))] sm:text-sm transition-all duration-200 placeholder:text-[rgb(var(--muted-foreground))] disabled:opacity-50 disabled:cursor-not-allowed";
   const labelBaseClasses =
     "block text-sm font-medium text-[rgb(var(--foreground))] mb-1.5";
+
+  const displayError = submitError || localSubmitError;
 
   return (
     <Card className="animate-fade-in overflow-hidden shadow-xl">
@@ -184,19 +69,20 @@ const ProjectForm = ({
       </CardHeader>
 
       <CardContent className="p-6 md:p-8">
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {submitError && (
+        <form onSubmit={handleSubmitLogic} className="space-y-8">
+          {displayError && (
             <div className="flex items-center p-4 text-sm rounded-[var(--radius)] bg-red-50 text-red-700 border-l-4 border-red-500 shadow">
               <AlertCircle size={20} className="mr-3 flex-shrink-0" />
-              <span>Error: {submitError}</span>
+              <span>Error: {displayError}</span>
             </div>
           )}
-
+          {/* Project Overview Section */}
           <section className="space-y-6">
             <h3 className="text-lg font-semibold text-[rgb(var(--foreground))] border-b border-[rgb(var(--border))] pb-2 mb-4">
               Project Overview
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+              {/* Name */}
               <div className="space-y-1">
                 <label htmlFor="name" className={labelBaseClasses}>
                   Project Name*
@@ -212,6 +98,7 @@ const ProjectForm = ({
                   className={`${inputBaseClasses} px-3 py-2.5`}
                 />
               </div>
+              {/* Department */}
               <div className="space-y-1">
                 <label
                   htmlFor="department"
@@ -240,6 +127,7 @@ const ProjectForm = ({
                   </div>
                 </div>
               </div>
+              {/* Status */}
               <div className="space-y-1">
                 <label htmlFor="status" className={labelBaseClasses}>
                   Status*
@@ -277,6 +165,7 @@ const ProjectForm = ({
                 {" "}
                 {/* Placeholder for alignment */}{" "}
               </div>
+              {/* Start Date */}
               <div className="space-y-1">
                 <label
                   htmlFor="startDate"
@@ -300,6 +189,7 @@ const ProjectForm = ({
                   <CalendarDays className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--muted-foreground))] pointer-events-none" />
                 </div>
               </div>
+              {/* End Date */}
               <div className="space-y-1">
                 <label
                   htmlFor="endDate"
@@ -326,6 +216,7 @@ const ProjectForm = ({
             </div>
           </section>
 
+          {/* Project Details & AI Skill Analysis Section */}
           <section className="space-y-4">
             <h3 className="text-lg font-semibold text-[rgb(var(--foreground))] border-b border-[rgb(var(--border))] pb-2 mb-4">
               Project Details & AI Skill Analysis
@@ -370,6 +261,7 @@ const ProjectForm = ({
             )}
           </section>
 
+          {/* AI Skill Suggestions Display Section */}
           {(descriptionProcessed ||
             nlpSuggestedSkills.length > 0 ||
             (isEditMode && projectData.requiredSkills.length > 0)) &&
@@ -404,12 +296,13 @@ const ProjectForm = ({
               </section>
             )}
 
+          {/* Define Required Skills Section */}
           <section className="space-y-3">
             <h3 className="text-lg font-semibold text-[rgb(var(--foreground))] border-b border-[rgb(var(--border))] pb-2 mb-4 flex items-center">
               <ListChecks
                 size={20}
                 className="mr-2 text-[rgb(var(--primary))]"
-              />
+              />{" "}
               Define Required Skills*
             </h3>
             <div className="p-3 rounded-[var(--radius)] border border-[rgb(var(--border))] bg-[rgb(var(--background))] shadow-inner">
@@ -429,6 +322,7 @@ const ProjectForm = ({
               )}
           </section>
 
+          {/* Action Buttons Section */}
           <div className="flex justify-end items-center space-x-4 pt-6 border-t border-[rgb(var(--border))] mt-8">
             {onCancel && (
               <Button
@@ -447,7 +341,9 @@ const ProjectForm = ({
               disabled={
                 isSubmitting ||
                 isProcessingDescription ||
-                (!isEditMode && projectData.requiredSkills.length === 0)
+                (!isEditMode &&
+                  projectData.requiredSkills.length === 0 &&
+                  descriptionProcessed)
               }
               isLoading={isSubmitting}
               className="px-8 py-2.5 text-base"

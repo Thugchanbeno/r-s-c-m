@@ -96,7 +96,6 @@ export async function POST(request) {
   try {
     await connectDB();
     const body = await request.json();
-
     if (!body.name || !body.description || !body.department) {
       return NextResponse.json(
         {

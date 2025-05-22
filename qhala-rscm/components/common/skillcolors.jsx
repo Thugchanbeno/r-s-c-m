@@ -136,3 +136,19 @@ export const getScoreRatingText = (score) => {
   if (percentage >= 25) return "Considerable";
   return "Needs Review";
 };
+const getStatusBadgeVariant = (status) => {
+  switch (status) {
+    case "Planning":
+      return "primary";
+    case "Active":
+      return "success";
+    case "On Hold":
+      return "warning";
+    case "Completed":
+      return "secondary";
+    case "Cancelled":
+      return "error";
+    default:
+      return "default";
+  }
+};
