@@ -1,6 +1,5 @@
-// models/Project.js
 import mongoose, { Schema } from "mongoose";
-import { departmentEnum, projectStatusEnum } from "@/lib/projectconstants"; // Import from new location
+import { departmentEnum, projectStatusEnum } from "@/lib/projectconstants";
 
 const ProjectSchema = new Schema(
   {
@@ -9,7 +8,7 @@ const ProjectSchema = new Schema(
     department: {
       type: String,
       required: true,
-      enum: departmentEnum, // Use imported enum
+      enum: departmentEnum,
       default: "Unassigned",
     },
     requiredSkills: [
@@ -33,9 +32,8 @@ const ProjectSchema = new Schema(
     status: {
       type: String,
       required: true,
-      enum: projectStatusEnum, // Use imported enum
+      enum: projectStatusEnum,
       default: "Planning",
-      index: true,
     },
   },
   { timestamps: true }

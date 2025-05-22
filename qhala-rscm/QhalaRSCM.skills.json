@@ -284,7 +284,7 @@
     "name": "Machine Learning (ML)",
     "description": "A branch of Artificial Intelligence (AI) focused on building systems that can learn from data, identify patterns, and make decisions with minimal human intervention. Includes supervised, unsupervised, and reinforcement learning.",
     "category": "AI & Machine Learning",
-    "aliases": ["ml modeling", "predictive analytics"]
+    "aliases": ["ml modeling", "predictive analytics", "machine learning"]
   },
   {
     "name": "Deep Learning (DL)",

@@ -99,3 +99,40 @@ export const getAvailabilityStyles = (status) => {
       return "border-transparent shadow-none";
   }
 };
+
+export const getMatchScoreColorClasses = (score, type = "text") => {
+  const percentage = Math.max(0, Math.min(1, score)) * 100;
+
+  if (type === "text") {
+    if (percentage >= 75) return "text-green-600 dark:text-green-400";
+    if (percentage >= 50) return "text-yellow-600 dark:text-yellow-400";
+    if (percentage >= 25) return "text-orange-600 dark:text-orange-400";
+    return "text-red-600 dark:text-red-400";
+  }
+  if (type === "bg") {
+    if (percentage >= 75) return "bg-green-500";
+    if (percentage >= 50) return "bg-yellow-500";
+    if (percentage >= 25) return "bg-orange-500";
+    return "bg-red-500";
+  }
+  if (type === "border") {
+    if (percentage >= 75) return "border-green-500";
+    if (percentage >= 50) return "border-yellow-500";
+    if (percentage >= 25) return "border-orange-500";
+    return "border-red-500";
+  }
+
+  if (percentage >= 75) return "text-green-600 dark:text-green-400";
+  if (percentage >= 50) return "text-yellow-600 dark:text-yellow-400";
+  return "text-red-600 dark:text-red-400";
+};
+
+export const getScoreRatingText = (score) => {
+  const percentage = Math.max(0, Math.min(1, score)) * 100;
+  if (percentage >= 85) return "Excellent";
+  if (percentage >= 70) return "Great";
+  if (percentage >= 55) return "Good";
+  if (percentage >= 40) return "Fair";
+  if (percentage >= 25) return "Considerable";
+  return "Needs Review";
+};

@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
-import Project, { departmentEnum } from "@/models/Project";
+import Project from "@/models/Project";
 import "@/models/Skills";
 import "@/models/User";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import mongoose from "mongoose";
+import { departmentEnum } from "@/lib/projectconstants";
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);

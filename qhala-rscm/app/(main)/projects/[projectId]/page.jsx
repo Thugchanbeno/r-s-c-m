@@ -1,5 +1,4 @@
 "use client";
-import UserList from "@/components/admin/UserList";
 import RequestResourceForm from "@/components/RequestResourceForm";
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -11,7 +10,6 @@ import {
   CardTitle,
   CardContent,
   CardDescription,
-  CardFooter,
 } from "@/components/common/Card";
 import Button from "@/components/common/Button";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
@@ -21,11 +19,12 @@ import {
   ArrowLeft,
   Users,
   CalendarDays,
-  Layers,
   UserCog,
   AlertCircle,
   Wrench,
   UserPlus,
+  SearchCheck,
+  Info,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import {
@@ -33,8 +32,8 @@ import {
   getSkillLevelColor,
 } from "@/components/common/skillcolors";
 import { toast } from "react-toastify";
+import RecommendedUserList from "@/components/recommendations/RecommendedUserList";
 
-// Animation variants
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
   visible: {
@@ -64,6 +63,11 @@ const ProjectDetailPage = () => {
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
   const [userToRequest, setUserToRequest] = useState(null);
+
+  const [recommendedUsers, setRecommendedUsers] = useState([]);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+  const [recommendationError, setRecommendationError] = useState(null);
+  const [showRecommendations, setShowRecommendations] = useState(false);
 
   const fetchProjectData = useCallback(async () => {
     if (!projectId) {
@@ -124,6 +128,31 @@ const ProjectDetailPage = () => {
     }
   }, [projectId, fetchProjectData]);
 
+  const handleFetchRecommendations = async () => {
+    if (!projectId) return;
+    setLoadingRecommendations(true);
+    setRecommendationError(null);
+    setRecommendedUsers([]);
+    setShowRecommendations(true);
+
+    try {
+      const response = await fetch(
+        `/api/recommendations/users?projectId=${projectId}`
+      );
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to fetch recommendations.");
+      }
+      setRecommendedUsers(result.data || []);
+    } catch (err) {
+      console.error("Error fetching recommendations:", err);
+      setRecommendationError(err.message);
+      setRecommendedUsers([]);
+    } finally {
+      setLoadingRecommendations(false);
+    }
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString(undefined, {
@@ -149,12 +178,14 @@ const ProjectDetailPage = () => {
         return "default";
     }
   };
+
   const canManageTeam =
     session?.user &&
     project &&
     (session.user.id === project.pmId?._id ||
       session.user.role === "admin" ||
       session.user.role === "hr");
+
   const handleInitiateResourceRequest = (user) => {
     setUserToRequest(user);
     setIsRequestModalOpen(true);
@@ -163,7 +194,9 @@ const ProjectDetailPage = () => {
   const handleCloseRequestModal = () => {
     setIsRequestModalOpen(false);
     setUserToRequest(null);
+    setIsSubmittingRequest(false);
   };
+
   const handleSubmitResourceRequest = async (formDataFromForm) => {
     if (!userToRequest || !project) return;
     setIsSubmittingRequest(true);
@@ -177,7 +210,6 @@ const ProjectDetailPage = () => {
       requestedEndDate: formDataFromForm.requestedEndDate,
       pmNotes: formDataFromForm.pmNotes,
     };
-    console.log("Submitting Resource Request:", payload);
 
     try {
       const response = await fetch("/api/resourcerequests", {
@@ -193,13 +225,10 @@ const ProjectDetailPage = () => {
         `Request for ${userToRequest.name} submitted successfully!`
       );
       handleCloseRequestModal();
-      handleCloseRequestModal();
     } catch (error) {
       console.error("Error submitting resource request:", error);
       toast.error(`Error: ${error.message || "Could not submit request."}`);
-      alert(`Error: ${error.message}`);
-    } finally {
-      handleCloseRequestModal();
+      setIsSubmittingRequest(false);
     }
   };
 
@@ -279,10 +308,10 @@ const ProjectDetailPage = () => {
             onClick={() => router.push("/projects")}
             className="text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))]"
           >
-            <ArrowLeft size={18} className="mr-2" />
-            Back to All Projects
+            <ArrowLeft size={18} className="mr-2" /> Back to All Projects
           </Button>
         </div>
+
         <motion.div variants={fadeIn}>
           <Card>
             <CardHeader className="border-b border-[rgb(var(--border))]">
@@ -360,13 +389,16 @@ const ProjectDetailPage = () => {
                     {project.requiredSkills.map((reqSkill) => (
                       <Badge
                         key={reqSkill.skillId}
-                        pill={true}
-                        size="sm"
                         className={getSkillLevelColor(
                           reqSkill.proficiencyLevel
                         )}
+                        pill={true}
+                        size="sm"
                       >
-                        {reqSkill.skillName || "Unnamed Skill"}{" "}
+                        {reqSkill.skillName || "Unnamed Skill"}
+                        {reqSkill.proficiencyLevel &&
+                          ` (L${reqSkill.proficiencyLevel})`}
+                        {reqSkill.isRequired ? "*" : ""}
                       </Badge>
                     ))}
                   </div>
@@ -375,6 +407,7 @@ const ProjectDetailPage = () => {
             </CardContent>
           </Card>
         </motion.div>
+
         <motion.div variants={fadeIn}>
           <Card>
             <CardHeader>
@@ -429,6 +462,7 @@ const ProjectDetailPage = () => {
             </CardContent>
           </Card>
         </motion.div>
+
         {canManageTeam && (
           <motion.div variants={fadeIn}>
             <Card>
@@ -441,53 +475,88 @@ const ProjectDetailPage = () => {
                   Manage Team / Request Resources
                 </CardTitle>
                 <CardDescription className="mt-1">
-                  Browse users and request them for this project.
+                  Find AI-powered user recommendations for this project.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-[rgb(var(--muted-foreground))] mb-4">
-                  Search and select users to request for this project. You'll be
-                  able to specify their role and allocation percentage.
-                </p>
-                {/*
-                  UserList will be rendered here.
-                  We need to decide how the "selection" or "request" action will be triggered from UserList.
-                  Option 1: UserList has an "Add to Project" button per user.
-                  Option 2: UserList has checkboxes, and a separate "Request Selected Users" button.
-                  For now, let's assume UserList can take an onSelectUser prop or similar.
-                */}
-                <UserList
-                  onInitiateRequest={handleInitiateResourceRequest}
-                  // We might not need general searchTerm or skillSearchTerm here,
-                  // or we can provide new ones specific to this resource search.
-                  // searchTerm="" // Or new state for this specific search
-                  // skillSearchTerm="" // Or new state
-                  onEditUser={null} // Not for editing user details here
-                  onDeleteUser={null} // Not for deleting users here
-                  // We'll add a new prop later like `onSelectUserForProject`
-                />
-                {/* Placeholder for where selected users might appear or action buttons */}
+                <div className="mb-6">
+                  <Button
+                    onClick={handleFetchRecommendations}
+                    disabled={loadingRecommendations}
+                    isLoading={loadingRecommendations}
+                    variant="primary_outline"
+                    className="group w-full sm:w-auto"
+                  >
+                    <SearchCheck
+                      size={18}
+                      className="mr-2 transition-transform duration-300 group-hover:scale-110"
+                    />
+                    {loadingRecommendations
+                      ? "Finding Matches..."
+                      : "Find Matching Users (AI)"}
+                  </Button>
+                  {recommendationError && (
+                    <p className="text-sm text-red-600 mt-3 p-3 bg-red-50 border border-red-200 rounded-[var(--radius)] shadow">
+                      Error finding recommendations: {recommendationError}
+                    </p>
+                  )}
+                </div>
+
+                {loadingRecommendations && (
+                  <div className="text-center py-10">
+                    <LoadingSpinner size={28} />
+                    <p className="text-sm text-[rgb(var(--muted-foreground))] mt-3">
+                      Analyzing user profiles to find the best matches...
+                    </p>
+                  </div>
+                )}
+
+                {!loadingRecommendations && showRecommendations && (
+                  <RecommendedUserList
+                    recommendedUsers={recommendedUsers}
+                    onInitiateRequest={handleInitiateResourceRequest}
+                  />
+                )}
+
+                {!loadingRecommendations &&
+                  showRecommendations &&
+                  recommendedUsers.length === 0 &&
+                  !recommendationError && (
+                    <div className="text-center py-8 px-4 rounded-lg bg-[rgb(var(--background))] border border-[rgb(var(--border))]">
+                      <Info
+                        size={32}
+                        className="mx-auto mb-3 text-[rgb(var(--primary))]"
+                      />
+                      <h4 className="font-semibold text-md text-[rgb(var(--foreground))] mb-1">
+                        No Specific Recommendations Found
+                      </h4>
+                      <p className="text-sm text-[rgb(var(--muted-foreground))]">
+                        The AI couldn't pinpoint specific user recommendations
+                        based on the current project criteria. You can still
+                        manually browse and request resources if needed.
+                      </p>
+                    </div>
+                  )}
               </CardContent>
             </Card>
           </motion.div>
         )}
       </div>
-      {userToRequest &&
-        project && ( // Ensure both are available before rendering modal
-          <Modal
-            isOpen={isRequestModalOpen}
-            onClose={handleCloseRequestModal}
-            title={`Request ${userToRequest.name} for ${project.name}`}
-          >
-            <RequestResourceForm
-              userToRequest={userToRequest}
-              projectId={project._id}
-              onSubmit={handleSubmitResourceRequest}
-              onCancel={handleCloseRequestModal}
-              isSubmittingRequest={isSubmittingRequest} // Pass submitting state
-            />
-          </Modal>
-        )}
+      {userToRequest && project && (
+        <Modal
+          isOpen={isRequestModalOpen}
+          onClose={handleCloseRequestModal}
+          title={`Request ${userToRequest.name} for ${project.name}`}
+        >
+          <RequestResourceForm
+            userToRequest={userToRequest}
+            projectId={project._id}
+            onSubmit={handleSubmitResourceRequest}
+            onCancel={handleCloseRequestModal}
+            isSubmittingRequest={isSubmittingRequest}
+          />
+        </Modal>
+      )}
     </motion.div>
   );
 };
