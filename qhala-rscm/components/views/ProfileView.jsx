@@ -13,7 +13,7 @@ import {
   DesiredSkillsEditor,
   DesiredSkillsDisplay,
   ProjectsList,
-} from "@/components/ProfileComponents";
+} from "@/components/user/ProfileComponents";
 
 const ProfileData = () => {
   const {

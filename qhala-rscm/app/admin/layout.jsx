@@ -4,9 +4,9 @@ import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { redirect, usePathname } from "next/navigation";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import AdminNavigation from "@/components/AdminNavigation";
+import Navbar from "@/components/navigation/Navbar";
+import Footer from "@/components/navigation/Footer";
+import AdminNavigation from "@/components/navigation/AdminNavigation";
 
 export default function AdminLayout({ children }) {
   const { data: session, status } = useSession();

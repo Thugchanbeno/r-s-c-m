@@ -26,7 +26,7 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 import {
   getSkillLevelColor,
   getAllocationPercentageColor,
-} from "@/components/common/skillcolors";
+} from "@/components/common/CustomColors";
 import { fadeIn, staggerChildren } from "@/lib/animations";
 import { formatDateRange } from "@/lib/dateUtils";
 

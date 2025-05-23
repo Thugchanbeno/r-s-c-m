@@ -1,4 +1,3 @@
-// lib/hooks/useProfileData.js
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSession } from "next-auth/react";
 
@@ -60,7 +59,6 @@ export const useProfileData = () => {
       acc[category].push(skill);
       return acc;
     }, {});
-    // Sort skills within each category
     for (const category in grouped) {
       grouped[category].sort((a, b) => a.name.localeCompare(b.name));
     }
@@ -71,7 +69,7 @@ export const useProfileData = () => {
     if (Object.keys(groupedSkillsTaxonomy).length > 0) {
       const initialExpandedState = Object.keys(groupedSkillsTaxonomy).reduce(
         (acc, category) => {
-          acc[category] = false; // Start all collapsed
+          acc[category] = false;
           return acc;
         },
         {}
@@ -99,7 +97,6 @@ export const useProfileData = () => {
         }
       } catch (error) {
         console.error("Error fetching skill taxonomy:", error);
-        // Optionally set a specific taxonomy error state
       } finally {
         setLoadingTaxonomy(false);
       }
@@ -129,12 +126,11 @@ export const useProfileData = () => {
         allocationsForProfileResponse,
         totalAllocationResponse,
       ] = await Promise.all([
-        fetch(`/api/userskills`), // Assumes API gets user from session
+        fetch(`/api/userskills`),
         fetch(`/api/allocations?userId=${userId}`),
         fetch(`/api/users/${userId}/allocation-summary`),
       ]);
 
-      // Process Skills
       if (!skillsResponse.ok) {
         const skillsErrData = await skillsResponse.json().catch(() => ({}));
         throw new Error(
@@ -161,7 +157,6 @@ export const useProfileData = () => {
         setSkillsError(skillsResult.error || "Invalid skills data format");
       }
 
-      // Process Projects/Allocations for Profile List
       if (!allocationsForProfileResponse.ok) {
         const allocErrData = await allocationsForProfileResponse
           .json()
@@ -180,7 +175,6 @@ export const useProfileData = () => {
         );
       }
 
-      // Process Total Allocation Summary
       if (!totalAllocationResponse.ok) {
         const summaryErrData = await totalAllocationResponse
           .json()
@@ -193,16 +187,11 @@ export const useProfileData = () => {
       const summaryResult = await totalAllocationResponse.json();
       if (summaryResult.success && summaryResult.data) {
         const newSummary = {
-          // Create a new object to ensure state update
           percentage: summaryResult.data.totalCurrentCapacityPercentage,
           hours: summaryResult.data.totalAllocatedHours,
           count: summaryResult.data.activeAllocationCount,
           standardHours: summaryResult.data.standardWorkWeekHours,
         };
-        console.log(
-          "useProfileData - Setting totalAllocationSummary to:",
-          newSummary
-        );
         setTotalAllocationSummary(newSummary);
       } else {
         setAllocationSummaryError(
@@ -210,12 +199,10 @@ export const useProfileData = () => {
         );
       }
     } catch (error) {
-      // This catch block will handle errors from Promise.all or any subsequent processing
       console.error(
         "Error fetching user data (skills, projects, or summary):",
         error
       );
-      // Set a general error or specific ones if not already set
       if (!skillsError) setSkillsError(error.message);
       if (!projectsError) setProjectsError(error.message);
       if (!allocationSummaryError) setAllocationSummaryError(error.message);
@@ -234,7 +221,6 @@ export const useProfileData = () => {
       setCurrentSkills([]);
       setDesiredSkills([]);
       setProjects([]);
-      // setAllSkillsTaxonomy([]); // Taxonomy might not need reset if not user-specific
       setSelectedCurrentSkillsMap(new Map());
       setSelectedDesiredSkillIds(new Set());
       setSkillsError(null);
@@ -251,7 +237,6 @@ export const useProfileData = () => {
       });
       setLoadingSkills(true);
       setLoadingProjects(true);
-      // setLoadingTaxonomy(true); // Taxonomy loading is independent
       setLoadingAllocationSummary(true);
     }
   }, [status, fetchAllUserData]);
@@ -361,7 +346,7 @@ export const useProfileData = () => {
       selectedDesiredSkillIds,
       currentSkills,
       desiredSkills,
-    ] // Added currentSkills & desiredSkills
+    ]
   );
 
   const handleCancelEditCurrent = useCallback(() => {

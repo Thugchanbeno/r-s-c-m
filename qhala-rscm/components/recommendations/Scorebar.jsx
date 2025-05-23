@@ -1,7 +1,7 @@
 import {
   getMatchScoreColorClasses,
   getScoreRatingText,
-} from "@/components/common/skillcolors";
+} from "@/components/common/CustomColors";
 
 const EnhancedScoreBar = ({ score, label = "Overall Match" }) => {
   const percentage = Math.max(0, Math.min(1, score)) * 100;

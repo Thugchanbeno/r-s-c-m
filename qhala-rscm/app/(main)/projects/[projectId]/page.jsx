@@ -1,5 +1,5 @@
 "use client";
-import RequestResourceForm from "@/components/RequestResourceForm";
+import RequestResourceForm from "@/components/user/RequestResourceForm";
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -30,7 +30,7 @@ import { motion } from "framer-motion";
 import {
   getAllocationPercentageColor,
   getSkillLevelColor,
-} from "@/components/common/skillcolors";
+} from "@/components/common/CustomColors";
 import { toast } from "react-toastify";
 import RecommendedUserList from "@/components/recommendations/RecommendedUserList";
 

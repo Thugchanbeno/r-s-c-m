@@ -15,7 +15,7 @@ import {
   AlertCircle,
   Activity as CapacityIcon,
 } from "lucide-react";
-import { getAllocationPercentageColor } from "@/components/common/skillcolors";
+import { getAllocationPercentageColor } from "@/components/common/CustomColors";
 
 const EmployeeDashboardSummary = ({ user }) => {
   // State for this component's specific data

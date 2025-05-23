@@ -3,7 +3,7 @@ import { useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import ProjectForm from "@/components/ProjectForm";
+import ProjectForm from "@/components/projects/ProjectForm";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/common/Card";

@@ -23,7 +23,7 @@ import { motion } from "framer-motion";
 import {
   getMatchScoreColorClasses,
   getScoreRatingText,
-} from "@/components/common/skillcolors";
+} from "@/components/common/CustomColors";
 
 // EnhancedScoreBar (can be here or imported if in separate file)
 const EnhancedScoreBar = ({ score, label = "Overall Match" }) => {

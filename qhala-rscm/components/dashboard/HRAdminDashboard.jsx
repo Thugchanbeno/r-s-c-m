@@ -18,7 +18,7 @@ import {
   Star,
 } from "lucide-react";
 import Badge from "@/components/common/Badge";
-import { getAllocationPercentageColor } from "@/components/common/skillcolors";
+import { getAllocationPercentageColor } from "@/components/common/CustomColors";
 
 const HrAdminDashboardSummary = ({ user }) => {
   const [totalUserCount, setTotalUserCount] = useState(0);

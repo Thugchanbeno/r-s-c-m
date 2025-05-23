@@ -1,7 +1,7 @@
 "use client";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Badge from "@/components/common/Badge";
-import { getSkillLevelColor } from "@/components/common/skillcolors";
+import { getSkillLevelColor } from "@/components/common/CustomColors";
 import {
   Check,
   PlusCircle,

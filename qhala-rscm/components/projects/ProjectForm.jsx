@@ -24,7 +24,7 @@ import { useProjectFormData } from "@/lib/hooks/useProjectFormData";
 import {
   getStatusBadgeVariant,
   getSkillLevelColor,
-} from "@/components/common/skillcolors";
+} from "@/components/common/CustomColors";
 
 const ProjectForm = ({
   initialData,

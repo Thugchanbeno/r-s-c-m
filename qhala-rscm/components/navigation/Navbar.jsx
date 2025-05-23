@@ -7,7 +7,7 @@ import { useTheme } from "next-themes";
 import { Sun, Moon, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
-import NotificationDropdown from "@/components/views/NotificationDropdown";
+import NotificationDropdown from "@/components/user/NotificationDropdown";
 import { toast } from "react-toastify";
 
 const Navbar = () => {

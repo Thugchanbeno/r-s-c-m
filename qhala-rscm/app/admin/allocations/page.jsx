@@ -27,7 +27,7 @@ import {
 import {
   getAllocationPercentageColor,
   getAvailabilityStyles,
-} from "@/components/common/skillcolors";
+} from "@/components/common/CustomColors";
 import { formatDate } from "@/lib/dateUtils";
 import { useAllocations } from "@/lib/hooks/useAllocations";
 

@@ -15,7 +15,7 @@ import {
   Search,
   UserPlus,
 } from "lucide-react";
-import { getAvailabilityStyles } from "@/components/common/skillcolors";
+import { getAvailabilityStyles } from "@/components/common/CustomColors";
 
 // Animation variants
 const containerVariants = {

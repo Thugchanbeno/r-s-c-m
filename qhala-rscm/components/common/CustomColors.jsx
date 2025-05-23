@@ -1,5 +1,3 @@
-// Enhanced skill level colors with a more refined palette
-// Added hover and focus states for interactive elements
 export const getSkillLevelColor = (level, { isInteractive = false } = {}) => {
   const baseClasses = getBaseColorClasses(level);
 
@@ -12,7 +10,6 @@ export const getSkillLevelColor = (level, { isInteractive = false } = {}) => {
   return baseClasses;
 };
 
-// Base colors with improved contrast ratios and matching the design system
 const getBaseColorClasses = (level) => {
   switch (level) {
     case 1: // Beginner / Novice
@@ -67,7 +64,6 @@ export const getSkillLevelName = (level) => {
 };
 export const getAllocationPercentageColor = (percentage) => {
   if (percentage == null || percentage < 0) {
-    // Allow > 100
     return "bg-slate-50 text-slate-700 ring-1 ring-inset ring-slate-200";
   }
 
@@ -83,10 +79,10 @@ export const getAllocationPercentageColor = (percentage) => {
     return "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200";
   } else {
     // Over 100% - distinct "overallocated" style
-    return "bg-rose-100 text-rose-700 ring-1 ring-inset ring-rose-300 border-2 border-rose-500"; // Example: Rose color, stronger border
+    return "bg-rose-100 text-rose-700 ring-1 ring-inset ring-rose-300 border-2 border-rose-500";
   }
 };
-// New function for User Availability Status Border and Shadow Styles
+// function for User Availability Status Border and Shadow Styles
 export const getAvailabilityStyles = (status) => {
   switch (status) {
     case "available":
@@ -136,7 +132,7 @@ export const getScoreRatingText = (score) => {
   if (percentage >= 25) return "Considerable";
   return "Needs Review";
 };
-const getStatusBadgeVariant = (status) => {
+export const getStatusBadgeVariant = (status) => {
   switch (status) {
     case "Planning":
       return "primary";

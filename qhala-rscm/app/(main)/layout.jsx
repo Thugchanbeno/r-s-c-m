@@ -1,9 +1,9 @@
 "use client";
-import Sidebar from "@/components/Sidebar.jsx";
+import Sidebar from "@/components/navigation/Sidebar.jsx";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/navigation/Navbar";
 
 export default function MainAppLayout({ children }) {
   const { status } = useSession({
