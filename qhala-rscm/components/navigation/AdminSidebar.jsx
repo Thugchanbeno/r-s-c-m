@@ -1,32 +1,36 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import Image from "next/image";
 import qlogo from "@/assets/qlogo.png";
+import Image from "next/image";
 import {
   Users,
   LayoutDashboard,
-  Briefcase,
-  UserCircle,
   Settings,
-  LogOut,
-  ChevronLeft,
+  UserCircle,
+  FileText,
   Menu,
+  ChevronLeft,
   X,
+  LogOut,
+  UserCog,
+  Home,
+  Briefcase,
+  Shield,
 } from "lucide-react";
 import Button from "@/components/common/Button.jsx";
 import { cn } from "@/lib/utils";
 
-const Sidebar = () => {
+const AdminSidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { data: session } = useSession();
   const pathname = usePathname();
 
-  const userRole = session?.user?.role || "employee";
-  const userName = session?.user?.name || session?.user?.email || "User";
+  const userRole = session?.user?.role || "admin";
+  const userName = session?.user?.name || session?.user?.email || "Admin User";
   const userAvatar = session?.user?.image || "/images/default-avatar.png";
 
   const toggleSidebar = () => setIsExpanded(!isExpanded);
@@ -36,52 +40,67 @@ const Sidebar = () => {
     bg: "bg-slate-900",
     textPrimary: "text-slate-100",
     textSecondary: "text-slate-400",
+    titleText: "text-[rgb(var(--accent))]",
     hoverBg: "bg-slate-800",
     inactiveLinkHoverText: "hover:text-[rgb(var(--accent))]",
     activeColor: "text-[rgb(var(--accent))]",
-    mainActionButtonBg: "bg-[rgb(var(--accent))]",
-    mainActionButtonText: "text-[rgb(var(--accent-foreground))]",
-    mainActionButtonHoverBg: "hover:bg-[rgb(var(--qhala-soft-peach-darker))]",
-    titleText: "text-[rgb(var(--accent))]",
+    adminPanelButtonBg: "bg-[rgb(var(--accent))]",
+    adminPanelButtonText: "text-[rgb(var(--accent-foreground))]",
+    adminPanelButtonHoverBg: "hover:bg-[rgb(var(--qhala-soft-peach-darker))]",
   };
 
-  const navigation = [
+  const adminNavigation = [
     {
-      name: "Dashboard",
+      name: "Admin Dashboard",
       icon: LayoutDashboard,
-      href: "/dashboard",
-      roles: ["admin", "hr", "pm", "employee"],
+      href: "/admin",
+      roles: ["admin", "hr"],
       exactMatch: true,
     },
     {
-      name: "My Profile",
-      icon: UserCircle,
-      href: "/profile",
-      roles: ["admin", "hr", "pm", "employee"],
+      name: "User Management",
+      icon: Users,
+      href: "/admin/users",
+      roles: ["admin", "hr"],
+    },
+    {
+      name: "Allocations",
+      icon: UserCog,
+      href: "/admin/allocations",
+      roles: ["admin", "hr"],
     },
     {
       name: "Projects",
       icon: Briefcase,
       href: "/projects",
-      roles: ["admin", "hr", "pm", "employee"],
-    },
-    {
-      name: "Resources",
-      icon: Users,
-      href: "/resources",
       roles: ["admin", "hr", "pm"],
     },
     {
-      name: "Admin",
-      icon: Settings,
-      href: "/admin",
+      name: "Reports",
+      icon: FileText,
+      href: "/admin/reports",
       roles: ["admin", "hr"],
+    },
+    {
+      name: "Site Settings",
+      icon: Settings,
+      href: "/admin/settings",
+      roles: ["admin"],
     },
   ];
 
-  const filteredNavigation = navigation.filter((item) =>
-    item.roles.includes(userRole)
-  );
+  const backToMainAppItem = {
+    name: "Home",
+    icon: Home,
+    href: "/dashboard",
+    roles: ["admin", "hr", "pm", "employee"],
+    exactMatch: true,
+  };
+
+  const filteredNavigation = [
+    backToMainAppItem,
+    ...adminNavigation.filter((item) => item.roles.includes(userRole)),
+  ];
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/" });
@@ -98,6 +117,9 @@ const Sidebar = () => {
       return pathname === item.href;
     }
     if (pathname.startsWith(item.href)) {
+      if (item.href === "/admin" && pathname !== "/admin") return false;
+      // The dashboard check was specific to AdminSidebar, keep if needed
+      // if (item.href === "/dashboard" && pathname !== "/dashboard") return false;
       return true;
     }
     return false;
@@ -126,7 +148,7 @@ const Sidebar = () => {
           size="icon"
           onClick={toggleMobileSidebar}
           className="p-2 rounded-md shadow-lg bg-[rgb(var(--card))] text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))]"
-          aria-label="Open sidebar"
+          aria-label="Open admin sidebar"
         >
           <Menu size={20} />
         </Button>
@@ -149,7 +171,7 @@ const Sidebar = () => {
           sidebarWidthClass,
           mobileTransformClass
         )}
-        aria-label="Main Sidebar"
+        aria-label="Admin Sidebar"
       >
         <div className="flex h-full flex-col">
           <div
@@ -201,77 +223,74 @@ const Sidebar = () => {
                 "hover:bg-slate-700",
                 `hover:${sidebarTheme.textPrimary}`
               )}
-              aria-label="Close sidebar"
+              aria-label="Close admin sidebar"
             >
               <X size={20} />
             </Button>
           </div>
 
-          {isExpanded &&
-            filteredNavigation.find((item) => item.name === "Dashboard") && (
-              <div className="px-3 pt-2 pb-4">
-                <Link
-                  href="/dashboard"
-                  onClick={handleNavLinkClick}
-                  className={cn(
-                    "flex items-center justify-center w-full text-sm font-medium",
-                    "px-2.5 py-2.5",
-                    sidebarTheme.mainActionButtonBg,
-                    sidebarTheme.mainActionButtonText,
-                    sidebarTheme.mainActionButtonHoverBg,
-                    "rounded-lg",
-                    "transition-colors duration-150 ease-in-out shadow-sm"
-                  )}
-                >
-                  <LayoutDashboard size={16} className="mr-2" />
-                  Dashboard
-                </Link>
-              </div>
-            )}
+          {isExpanded && (
+            <div className="px-3 pt-2 pb-4">
+              <Link
+                href="/admin"
+                onClick={handleNavLinkClick}
+                className={cn(
+                  "flex items-center justify-center w-full text-sm font-medium",
+                  "px-2.5 py-2.5",
+                  sidebarTheme.adminPanelButtonBg,
+                  sidebarTheme.adminPanelButtonText,
+                  sidebarTheme.adminPanelButtonHoverBg,
+                  "rounded-lg",
+                  "transition-colors duration-150 ease-in-out shadow-sm"
+                )}
+              >
+                <Shield size={16} className="mr-2" />
+                Admin Panel
+              </Link>
+            </div>
+          )}
 
           <nav className="flex-1 px-2 py-2 overflow-y-auto space-y-1">
-            {filteredNavigation
-              .filter((item) => item.name !== "Dashboard" || !isExpanded)
-              .map((item) => {
-                const isLinkActive = isActiveLink(item);
-                const IconComponent = item.icon;
+            {filteredNavigation.map((item) => {
+              const isLinkActive = isActiveLink(item);
+              const IconComponent = item.icon;
 
-                return (
-                  <div key={item.name}>
-                    <Link
-                      href={item.href}
-                      onClick={handleNavLinkClick}
-                      title={isExpanded ? "" : item.name}
+              return (
+                <div key={item.name}>
+                  <Link
+                    href={item.href}
+                    onClick={handleNavLinkClick}
+                    title={isExpanded ? "" : item.name}
+                    className={cn(
+                      `flex items-center p-2.5 rounded-[var(--radius)] text-sm group transition-colors duration-150 ease-in-out`,
+                      isLinkActive
+                        ? `${sidebarTheme.hoverBg} ${sidebarTheme.activeColor} font-medium shadow-sm`
+                        : `${sidebarTheme.textPrimary} hover:${sidebarTheme.hoverBg} ${sidebarTheme.inactiveLinkHoverText} font-normal`
+                    )}
+                  >
+                    <IconComponent
+                      size={18}
+                      strokeWidth={isLinkActive ? 2 : 1.5}
                       className={cn(
-                        `flex items-center p-2.5 rounded-[var(--radius)] text-sm group transition-colors duration-150 ease-in-out`,
                         isLinkActive
-                          ? `${sidebarTheme.hoverBg} ${sidebarTheme.activeColor} font-medium shadow-sm`
-                          : `${sidebarTheme.textPrimary} hover:${sidebarTheme.hoverBg} ${sidebarTheme.inactiveLinkHoverText} font-normal`
+                          ? sidebarTheme.activeColor
+                          : sidebarTheme.textSecondary,
+                        !isLinkActive &&
+                          `group-hover:${sidebarTheme.activeColor}`
                       )}
-                    >
-                      <IconComponent
-                        size={18}
-                        strokeWidth={isLinkActive ? 2 : 1.5}
-                        className={cn(
-                          isLinkActive
-                            ? sidebarTheme.activeColor
-                            : sidebarTheme.textSecondary,
-                          !isLinkActive &&
-                            `group-hover:${sidebarTheme.activeColor}`
-                        )}
-                      />
-                      {isExpanded && (
-                        <span className={cn("ml-3 whitespace-nowrap")}>
-                          {item.name}
-                        </span>
-                      )}
-                    </Link>
-                  </div>
-                );
-              })}
+                    />
+                    {isExpanded && (
+                      <span className={cn("ml-3 whitespace-nowrap")}>
+                        {item.name}
+                      </span>
+                    )}
+                  </Link>
+                </div>
+              );
+            })}
           </nav>
 
-          <div className={cn("shrink-0 p-3 border-t border-slate-700")}>
+          <div className={cn("shrink-0 p-3")}>
             <div
               className={cn(
                 "flex items-center",
@@ -330,4 +349,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default AdminSidebar;

@@ -6,8 +6,7 @@ const baseStyles =
   "inline-flex items-center justify-center rounded-[var(--radius)] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-[rgb(var(--background))] focus-visible:ring-[rgb(var(--ring))]";
 
 const variantStyles = {
-  primary:
-    "bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))] hover:bg-blue-700",
+  primary: "bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))]",
 
   secondary:
     "bg-[rgb(var(--secondary))] text-[rgb(var(--secondary-foreground))] hover:opacity-80",

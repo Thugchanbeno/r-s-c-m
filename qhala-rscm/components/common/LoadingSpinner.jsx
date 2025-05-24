@@ -1,13 +1,10 @@
 "use client";
-
-import { ScaleLoader } from "react-spinners";
-//might review for other spinner types, fadeloader?pacmanloader?
-//can gradient color scheme be implemented in the loader component? use the qhala color scheme instead of a single color.
+import { PulseLoader } from "react-spinners";
 const LoadingSpinner = ({
   loading = true,
-  color = "#3b82f6",
+  color = "#333333",
   size = 15,
-  speedMultiplier = 1,
+  speedMultiplier = 0.75,
   className = "",
   ...props
 }) => {
@@ -21,7 +18,7 @@ const LoadingSpinner = ({
 
   return (
     <div className={`flex items-center justify-center ${className}`}>
-      <ScaleLoader
+      <PulseLoader
         color={color}
         loading={loading}
         height={loaderHeight}

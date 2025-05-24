@@ -76,11 +76,11 @@ export async function POST(request) {
       );
     }
 
-    if (nlpResult && typeof nlpResult.skills !== "undefined") {
-      if (!Array.isArray(nlpResult.skills)) {
+    if (nlpResult && typeof nlpResult.extracted_skills !== "undefined") {
+      if (!Array.isArray(nlpResult.extracted_skills)) {
         console.error(
-          "FastAPI /extract-skills 'skills' field was not an array:",
-          nlpResult.skills
+          "FastAPI /extract-skills 'extracted_skills' field was not an array:",
+          nlpResult.extracted_skills
         );
         return NextResponse.json(
           {
@@ -90,10 +90,13 @@ export async function POST(request) {
           { status: 500 }
         );
       }
-      return NextResponse.json({ success: true, data: nlpResult.skills });
+      return NextResponse.json({
+        success: true,
+        data: nlpResult.extracted_skills,
+      });
     } else {
       console.error(
-        "FastAPI /extract-skills response did not contain 'skills' key or was invalid:",
+        "FastAPI /extract-skills response did not contain 'extracted_skills' key or was invalid:",
         nlpResult
       );
       return NextResponse.json(

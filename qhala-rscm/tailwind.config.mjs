@@ -13,11 +13,6 @@ export default {
 
   theme: {
     extend: {
-      // Define custom colors using CSS variables for theming
-      // Ensure these variables are defined in your global CSS (e.g., globals.css or app.css)
-      // Example definition in CSS:
-      // :root { --background: 255 255 255; --foreground: 0 0 0; /* ... other light vars */ }
-      // .dark { --background: 0 0 0; --foreground: 255 255 255; /* ... other dark vars */ }
       colors: {
         border: "rgb(var(--border) / <alpha-value>)",
         input: "rgb(var(--input) / <alpha-value>)",
@@ -27,6 +22,8 @@ export default {
         primary: {
           DEFAULT: "rgb(var(--primary) / <alpha-value>)",
           foreground: "rgb(var(--primary-foreground) / <alpha-value>)",
+          "accent-background":
+            "rgb(var(--primary-accent-background) / <alpha-value>)",
         },
         secondary: {
           DEFAULT: "rgb(var(--secondary) / <alpha-value>)",
@@ -37,12 +34,10 @@ export default {
           foreground: "rgb(var(--destructive-foreground) / <alpha-value>)",
         },
         success: {
-          // Added success theme colors
           DEFAULT: "rgb(var(--success) / <alpha-value>)",
           foreground: "rgb(var(--success-foreground) / <alpha-value>)",
         },
         warning: {
-          // Added warning theme colors
           DEFAULT: "rgb(var(--warning) / <alpha-value>)",
           foreground: "rgb(var(--warning-foreground) / <alpha-value>)",
         },
@@ -62,6 +57,14 @@ export default {
           DEFAULT: "rgb(var(--card) / <alpha-value>)",
           foreground: "rgb(var(--card-foreground) / <alpha-value>)",
         },
+        // Adding your specific Qhala brand colors for direct use
+        "qhala-deep-red": "rgb(var(--qhala-deep-red) / <alpha-value>)",
+        "qhala-rich-gold": "rgb(var(--qhala-rich-gold) / <alpha-value>)",
+        "qhala-dark-navy": "rgb(var(--qhala-dark-navy) / <alpha-value>)",
+        "qhala-charcoal-grey":
+          "rgb(var(--qhala-charcoal-grey) / <alpha-value>)",
+        "qhala-sky-blue": "rgb(var(--qhala-sky-blue) / <alpha-value>)",
+        "qhala-soft-peach": "rgb(var(--qhala-soft-peach) / <alpha-value>)",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -70,24 +73,14 @@ export default {
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "serif"],
         mono: ["var(--font-mono)", "monospace"],
-        // Keep 'code' if you specifically use font-code class, otherwise mono is standard
-        // code: ["var(--font-code)", "monospace"],
       },
-      // Add other theme extensions like keyframes, animations, etc. here
-      // keyframes: {
-      //   "accordion-down": { /* ... */ },
-      //   "accordion-up": { /* ... */ },
-      // },
-      // animation: {
-      //   "accordion-down": "accordion-down 0.2s ease-out",
-      //   "accordion-up": "accordion-up 0.2s ease-out",
-      // },
     },
   },
   plugins: [
-    // require('@tailwindcss/forms'), // Example: Adds better default form styles
-    // require('@tailwindcss/typography'), // Example: Adds 'prose' class for styling markdown
-    // require('tailwindcss-animate'), // Example: For animations often used with shadcn/ui
+    // require('@tailwindcss/forms'),
+    // require('@tailwindcss/typography'),
+    // require('tailwindcss-animate'),
   ],
 };
