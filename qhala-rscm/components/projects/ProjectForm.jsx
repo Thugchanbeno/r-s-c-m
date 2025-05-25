@@ -21,10 +21,12 @@ import {
 import SkillSelector from "@/components/projects/SkillSelector";
 import { departmentEnum, projectStatusEnum } from "@/lib/projectconstants";
 import { useProjectFormData } from "@/lib/hooks/useProjectFormData";
-import {
-  getStatusBadgeVariant,
-  getSkillLevelColor,
-} from "@/components/common/CustomColors";
+import { getStatusBadgeVariant } from "@/components/common/CustomColors";
+import { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { formatDatePickerDate, parseDatePickerDate } from "@/lib/dateUtils";
+import { cn } from "@/lib/utils";
 
 const ProjectForm = ({
   initialData,
@@ -48,42 +50,52 @@ const ProjectForm = ({
   } = useProjectFormData(initialData, isEditMode, onSubmit);
 
   const inputBaseClasses =
-    "block w-full rounded-[var(--radius)] border-[rgb(var(--border))] bg-[rgb(var(--background))] text-[rgb(var(--foreground))] shadow-sm focus:border-[rgb(var(--primary))] focus:ring-1 focus:ring-[rgb(var(--primary))] sm:text-sm transition-all duration-200 placeholder:text-[rgb(var(--muted-foreground))] disabled:opacity-50 disabled:cursor-not-allowed";
-  const labelBaseClasses =
-    "block text-sm font-medium text-[rgb(var(--foreground))] mb-1.5";
+    "block w-full rounded-md bg-background text-foreground shadow-sm sm:text-sm transition-all duration-200 placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed";
+  const inputPadding = "px-3 py-2";
 
+  const labelBaseClasses = "mb-1 block text-sm font-medium text-foreground";
+  const sectionHeaderClasses = "mb-3 text-lg font-semibold text-foreground";
   const displayError = submitError || localSubmitError;
+
+  const handleStartDateChange = (date) => {
+    handleChange({
+      target: { name: "startDate", value: formatDatePickerDate(date) },
+    });
+  };
+
+  const handleEndDateChange = (date) => {
+    handleChange({
+      target: { name: "endDate", value: formatDatePickerDate(date) },
+    });
+  };
 
   return (
     <Card className="animate-fade-in overflow-hidden shadow-xl">
-      <CardHeader className="bg-gradient-to-br from-[rgb(var(--primary-accent-background))] via-blue-50 to-purple-50 border-b border-[rgb(var(--border))] p-6">
-        <CardTitle className="text-xl font-semibold text-[rgb(var(--primary))] flex items-center gap-2.5">
-          <Briefcase size={24} />
+      <CardHeader className="shadow-sm bg-gradient-to-br from-primary-accent-background via-blue-50 to-purple-50 p-4">
+        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-primary md:text-xl">
+          <Briefcase size={22} />
           {isEditMode ? "Edit Project Details" : "Create Project"}
         </CardTitle>
-        <CardDescription className="text-[rgb(var(--muted-foreground))] mt-1">
+        <CardDescription className="mt-1 text-sm text-muted-foreground">
           {isEditMode
             ? "Refine the project specifics and team requirements."
             : "Define your project, and let AI assist with skill identification."}
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="p-6 md:p-8">
-        <form onSubmit={handleSubmitLogic} className="space-y-8">
+      <CardContent className="p-5 md:p-6">
+        <form onSubmit={handleSubmitLogic} className="space-y-6">
           {displayError && (
-            <div className="flex items-center p-4 text-sm rounded-[var(--radius)] bg-red-50 text-red-700 border-l-4 border-red-500 shadow">
-              <AlertCircle size={20} className="mr-3 flex-shrink-0" />
+            <div className="flex items-center rounded-md border-l-4 border-destructive bg-destructive/15 p-3 text-sm text-destructive shadow-sm">
+              <AlertCircle size={18} className="mr-2.5 flex-shrink-0" />
               <span>Error: {displayError}</span>
             </div>
           )}
-          {/* Project Overview Section */}
-          <section className="space-y-6">
-            <h3 className="text-lg font-semibold text-[rgb(var(--foreground))] border-b border-[rgb(var(--border))] pb-2 mb-4">
-              Project Overview
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-              {/* Name */}
-              <div className="space-y-1">
+
+          <section className="space-y-4">
+            <h3 className={sectionHeaderClasses}>Project Overview</h3>
+            <div className="grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
+              <div className="space-y-0.5">
                 <label htmlFor="name" className={labelBaseClasses}>
                   Project Name*
                 </label>
@@ -95,17 +107,15 @@ const ProjectForm = ({
                   onChange={handleChange}
                   required
                   placeholder="E.g., Q4 Marketing Campaign"
-                  className={`${inputBaseClasses} px-3 py-2.5`}
+                  className={cn(inputBaseClasses, inputPadding)}
                 />
               </div>
-              {/* Department */}
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <label
                   htmlFor="department"
-                  className={`${labelBaseClasses} flex items-center gap-2`}
+                  className={cn(labelBaseClasses, "flex items-center gap-1.5")}
                 >
-                  <Building2 size={16} className="text-[rgb(var(--primary))]" />{" "}
-                  Department*
+                  <Building2 size={15} className="text-primary" /> Department*
                 </label>
                 <div className="relative">
                   <select
@@ -114,7 +124,11 @@ const ProjectForm = ({
                     value={projectData.department}
                     onChange={handleChange}
                     required
-                    className={`${inputBaseClasses} appearance-none pl-3 pr-10 py-2.5`}
+                    className={cn(
+                      inputBaseClasses,
+                      "appearance-none pl-3 pr-8",
+                      inputPadding
+                    )}
                   >
                     {departmentEnum.map((dept) => (
                       <option key={dept} value={dept}>
@@ -122,13 +136,12 @@ const ProjectForm = ({
                       </option>
                     ))}
                   </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <ChevronDown className="h-4 w-4 text-[rgb(var(--muted-foreground))]" />
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </div>
               </div>
-              {/* Status */}
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <label htmlFor="status" className={labelBaseClasses}>
                   Status*
                 </label>
@@ -139,7 +152,11 @@ const ProjectForm = ({
                     value={projectData.status}
                     onChange={handleChange}
                     required
-                    className={`${inputBaseClasses} appearance-none pl-3 pr-10 py-2.5`}
+                    className={cn(
+                      inputBaseClasses,
+                      "appearance-none pl-3 pr-8",
+                      inputPadding
+                    )}
                   >
                     {projectStatusEnum.map((s) => (
                       <option key={s} value={s}>
@@ -147,11 +164,11 @@ const ProjectForm = ({
                       </option>
                     ))}
                   </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <ChevronDown className="h-4 w-4 text-[rgb(var(--muted-foreground))]" />
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </div>
-                <div className="mt-2">
+                <div className="mt-1.5">
                   <Badge
                     variant={getStatusBadgeVariant(projectData.status)}
                     pill={true}
@@ -161,67 +178,57 @@ const ProjectForm = ({
                   </Badge>
                 </div>
               </div>
-              <div className="space-y-1">
-                {" "}
-                {/* Placeholder for alignment */}{" "}
-              </div>
-              {/* Start Date */}
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <label
                   htmlFor="startDate"
-                  className={`${labelBaseClasses} flex items-center gap-2`}
+                  className={cn(labelBaseClasses, "flex items-center gap-1.5")}
                 >
-                  <CalendarDays
-                    size={16}
-                    className="text-[rgb(var(--primary))]"
-                  />{" "}
-                  Start Date
+                  <CalendarDays size={15} className="text-primary" /> Start Date
                 </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    id="startDate"
-                    name="startDate"
-                    value={projectData.startDate}
-                    onChange={handleChange}
-                    className={`${inputBaseClasses} px-3 py-2.5 pr-8`}
+                <div className="relative w-full">
+                  <DatePicker
+                    selected={parseDatePickerDate(projectData.startDate)}
+                    onChange={handleStartDateChange}
+                    dateFormat="yyyy-MM-dd"
+                    placeholderText="YYYY-MM-DD"
+                    className={cn(inputBaseClasses, inputPadding, "w-full")}
+                    wrapperClassName="w-full"
+                    showPopperArrow={false}
+                    isClearable
+                    autoComplete="off"
                   />
-                  <CalendarDays className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--muted-foreground))] pointer-events-none" />
                 </div>
               </div>
-              {/* End Date */}
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <label
                   htmlFor="endDate"
-                  className={`${labelBaseClasses} flex items-center gap-2`}
+                  className={cn(labelBaseClasses, "flex items-center gap-1.5")}
                 >
-                  <CalendarDays
-                    size={16}
-                    className="text-[rgb(var(--primary))]"
-                  />{" "}
-                  End Date
+                  <CalendarDays size={15} className="text-primary" /> End Date
                 </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    id="endDate"
-                    name="endDate"
-                    value={projectData.endDate}
-                    onChange={handleChange}
-                    className={`${inputBaseClasses} px-3 py-2.5 pr-8`}
+                <div className="relative w-full">
+                  <DatePicker
+                    selected={parseDatePickerDate(projectData.endDate)}
+                    onChange={handleEndDateChange}
+                    dateFormat="yyyy-MM-dd"
+                    placeholderText="YYYY-MM-DD"
+                    className={cn(inputBaseClasses, inputPadding, "w-full")}
+                    wrapperClassName="w-full"
+                    showPopperArrow={false}
+                    isClearable
+                    minDate={parseDatePickerDate(projectData.startDate)}
+                    autoComplete="off"
                   />
-                  <CalendarDays className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--muted-foreground))] pointer-events-none" />
                 </div>
               </div>
             </div>
           </section>
 
-          {/* Project Details & AI Skill Analysis Section */}
-          <section className="space-y-4">
-            <h3 className="text-lg font-semibold text-[rgb(var(--foreground))] border-b border-[rgb(var(--border))] pb-2 mb-4">
+          <section className="space-y-3">
+            <h3 className={sectionHeaderClasses}>
               Project Details & AI Skill Analysis
             </h3>
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <label htmlFor="description" className={labelBaseClasses}>
                 Description*
               </label>
@@ -232,9 +239,9 @@ const ProjectForm = ({
                 onChange={handleChange}
                 required
                 placeholder="Provide a detailed project scope, objectives, and deliverables..."
-                rows={5}
-                className={`${inputBaseClasses} px-3 py-2`}
-              />
+                rows={4}
+                className={cn(inputBaseClasses, "px-3 py-2")}
+              />{" "}
             </div>
             <Button
               type="button"
@@ -244,42 +251,46 @@ const ProjectForm = ({
                 isProcessingDescription || !projectData.description.trim()
               }
               isLoading={isProcessingDescription}
-              className="mt-2 text-sm border-[rgb(var(--primary))] text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-accent-background))] hover:text-[rgb(var(--primary))] group"
+              className="group mt-1.5 text-primary shadow-md hover:bg-primary-accent-background hover:text-primary text-sm px-4 py-2"
             >
               <Sparkles
-                size={18}
-                className="mr-2 transition-transform duration-300 ease-in-out group-hover:scale-125 group-hover:animate-pulse"
+                size={16}
+                className="mr-1.5 transition-transform duration-300 ease-in-out group-hover:scale-125 group-hover:animate-pulse"
               />
               {descriptionProcessed && nlpSuggestedSkills.length > 0
-                ? "Re-analyze with AI"
-                : "Analyze with AI for Skill Suggestions"}
+                ? "Re-analyze"
+                : "Analyze with AI"}
             </Button>
             {nlpError && (
-              <p className="text-sm text-red-600 mt-2 p-2 bg-red-50 border border-red-200 rounded-[var(--radius)]">
+              <p className="mt-1.5 rounded-md bg-destructive/15 p-2 text-xs text-destructive shadow-sm">
                 {nlpError}
               </p>
             )}
           </section>
 
-          {/* AI Skill Suggestions Display Section */}
           {(descriptionProcessed ||
             nlpSuggestedSkills.length > 0 ||
             (isEditMode && projectData.requiredSkills.length > 0)) &&
             !isProcessingDescription && (
-              <section className="space-y-3 p-4 border border-dashed border-blue-300 rounded-[var(--radius)] bg-blue-50/50 shadow-sm">
-                <h3 className="text-md font-semibold text-blue-700 flex items-center">
-                  <CheckCircle size={18} className="mr-2" /> AI Skill
+              <section
+                className={cn(
+                  "space-y-2 p-3 rounded-md shadow-sm",
+                  "bg-primary-accent-background/40"
+                )}
+              >
+                <h3 className="flex items-center text-sm font-semibold text-primary">
+                  <CheckCircle size={16} className="mr-1.5" /> AI Skill
                   Suggestions
                 </h3>
                 {nlpSuggestedSkills.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5">
                     {nlpSuggestedSkills.map((skill) => (
                       <Badge
                         key={skill.id}
-                        variant="info_outline"
+                        variant="primary"
                         pill
-                        size="sm"
-                        className="border-blue-400 text-blue-700"
+                        size="xs"
+                        className="bg-primary/15 text-primary text-sm p-2"
                       >
                         {skill.name}{" "}
                         {skill.category ? `(${skill.category})` : ""}
@@ -287,25 +298,25 @@ const ProjectForm = ({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-500 italic">
+                  <p className="text-xs italic text-muted-foreground">
                     {descriptionProcessed
-                      ? "No specific skills identified by AI. Please add skills manually below."
-                      : "Analyze description to see AI suggestions."}
+                      ? "No specific skills identified. Add manually."
+                      : "Analyze description for suggestions."}
                   </p>
                 )}
               </section>
             )}
-
-          {/* Define Required Skills Section */}
-          <section className="space-y-3">
-            <h3 className="text-lg font-semibold text-[rgb(var(--foreground))] border-b border-[rgb(var(--border))] pb-2 mb-4 flex items-center">
-              <ListChecks
-                size={20}
-                className="mr-2 text-[rgb(var(--primary))]"
-              />{" "}
-              Define Required Skills*
+          <section className="space-y-2">
+            <h3
+              className={cn(
+                sectionHeaderClasses,
+                "flex items-center text-base"
+              )}
+            >
+              <ListChecks size={18} className="mr-1.5 text-primary" /> Define
+              Required Skills*
             </h3>
-            <div className="p-3 rounded-[var(--radius)] border border-[rgb(var(--border))] bg-[rgb(var(--background))] shadow-inner">
+            <div className="rounded-md bg-background p-2 shadow-sm">
               <SkillSelector
                 initialSelectedSkills={projectData.requiredSkills}
                 nlpSuggestedSkills={nlpSuggestedSkills}
@@ -316,25 +327,24 @@ const ProjectForm = ({
               projectData.requiredSkills.length === 0 &&
               !isEditMode &&
               descriptionProcessed && (
-                <p className="text-xs text-red-500 mt-1 p-2 bg-red-50 border border-red-200 rounded-[var(--radius)]">
-                  Please select at least one required skill for the project.
+                <p className="mt-1 rounded-md bg-destructive/15 p-1.5 text-xs text-destructive shadow-sm">
+                  Please select at least one required skill.
                 </p>
               )}
           </section>
 
-          {/* Action Buttons Section */}
-          <div className="flex justify-end items-center space-x-4 pt-6 border-t border-[rgb(var(--border))] mt-8">
+          <div className="mt-6 flex items-center justify-end space-x-3 p-1">
             {onCancel && (
               <Button
                 type="button"
                 variant="outline"
                 onClick={onCancel}
                 disabled={isSubmitting || isProcessingDescription}
-                className="px-6 py-2.5"
+                className="px-5 py-2 text-sm"
               >
                 Cancel
               </Button>
-            )}
+            )}{" "}
             <Button
               type="submit"
               variant="primary"
@@ -346,9 +356,9 @@ const ProjectForm = ({
                   descriptionProcessed)
               }
               isLoading={isSubmitting}
-              className="px-8 py-2.5 text-base"
+              className="px-6 p-2 text-sm"
             >
-              {isEditMode ? "Save Changes" : "Finalize & Create Project"}
+              {isEditMode ? "Save Changes" : "Create Project"}
             </Button>
           </div>
         </form>

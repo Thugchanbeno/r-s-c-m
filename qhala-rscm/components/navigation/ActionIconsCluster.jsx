@@ -67,13 +67,13 @@ const ActionIconsCluster = () => {
   const outerSeamlessBg = "bg-slate-900";
   const innerElevatedBg = "bg-slate-900";
   const iconColor = "text-[rgb(var(--accent))]";
-  const iconHoverBg = "hover:bg-slate-00";
+  const iconHoverBg = "hover:bg-slate-800";
   const ringOffsetColor = "focus-visible:ring-offset-slate-800";
 
   return (
     <div
       className={cn(
-        "pt-[6px] pb-[6px] pl-3 pr-[7px]",
+        "pt-[2px] pb-[2px] pl-3 pr-[7px]",
         "rounded-l-full",
         outerSeamlessBg
       )}

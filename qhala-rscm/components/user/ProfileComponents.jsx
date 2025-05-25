@@ -8,6 +8,7 @@ import {
   Briefcase,
   AlertCircle,
   Percent,
+  UserCheck,
   UserCog,
   CalendarDays,
   Activity,
@@ -25,10 +26,16 @@ import Badge from "@/components/common/Badge";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import {
   getSkillLevelColor,
+  getSkillLevelName,
   getAllocationPercentageColor,
+  darkItemStyles,
+  darkItemSelectedStyles,
+  proficiencySelectedStyles,
+  selectedItemRingStyles,
 } from "@/components/common/CustomColors";
 import { fadeIn, staggerChildren } from "@/lib/animations";
 import { formatDateRange } from "@/lib/dateUtils";
+import { cn } from "@/lib/utils";
 
 // Profile Header Component
 export const ProfileHeader = ({ title, description }) => (
@@ -36,15 +43,10 @@ export const ProfileHeader = ({ title, description }) => (
     initial="hidden"
     animate="visible"
     variants={fadeIn}
-    className="mb-8 relative"
+    className="mb-8"
   >
-    <div className="absolute inset-0 rounded-[var(--radius)] -z-10" />
-    <h1 className="text-2xl font-bold text-[rgb(var(--foreground))]">
-      {title}
-    </h1>
-    <p className="text-[rgb(var(--muted-foreground))] mt-1 text-base">
-      {description}
-    </p>
+    <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+    <p className="mt-1 text-base text-muted-foreground">{description}</p>
   </motion.div>
 );
 
@@ -53,16 +55,21 @@ export const UserInfo = ({
   user,
   totalAllocation,
   loadingAllocationSummary,
+  //allocationSummaryError
 }) => (
   <motion.div
     initial="hidden"
     animate="visible"
     variants={fadeIn}
-    className="flex flex-col sm:flex-row items-start sm:items-center bg-gradient-to-r from-[rgb(var(--primary-accent-background))] to-purple-50 rounded-[var(--radius)] p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
+    className={cn(
+      "flex flex-col sm:flex-row items-start sm:items-center",
+      "rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-300",
+      "bg-gradient-to-r from-primary-accent-background to-[rgb(var(--card))]/50"
+    )}
   >
     <div className="relative">
       <Image
-        src={user.image || "/images/default-avatar.png"}
+        src={user.image || UserCheck}
         alt={user.name || "User"}
         width={80}
         height={80}
@@ -79,45 +86,49 @@ export const UserInfo = ({
       <div className="flex items-center flex-wrap gap-2">
         <Badge
           variant="primary"
-          className="capitalize px-3 py-2 text-xs font-medium"
+          className="px-3 py-1 text-xs font-medium capitalize"
         >
           {user.role || "N/A"}
         </Badge>
         {user.department && (
           <Badge
             variant="secondary"
-            className="capitalize px-3 py-2 text-xs font-medium"
+            className="px-3 py-1 text-xs font-medium capitalize"
           >
             {user.department}
           </Badge>
         )}
       </div>
-      {loadingAllocationSummary ? (
-        <div className="flex items-center text-xs text-[rgb(var(--muted-foreground))]">
-          <LoadingSpinner size={12} className="mr-2" /> Loading allocation...
-        </div>
-      ) : totalAllocation && totalAllocation.percentage !== undefined ? (
-        <div className="flex items-center text-sm">
-          <Activity size={16} className="mr-2 text-[rgb(var(--primary))]" />
-          <span className="text-[rgb(var(--muted-foreground))] mr-1 py-1">
-            Current Capacity:
-          </span>
-          <Badge
-            size="sm"
-            pill={true}
-            className={getAllocationPercentageColor(totalAllocation.percentage)}
-          >
-            {totalAllocation.percentage}%
-          </Badge>
-          <span className="text-xs text-[rgb(var(--muted-foreground))] ml-2">
-            ({totalAllocation.hours}h / {totalAllocation.standardHours}h week)
-          </span>
-        </div>
-      ) : (
-        <div className="text-xs text-[rgb(var(--muted-foreground))]">
-          Allocation data not available.
-        </div>
-      )}
+      <div className="mt-3">
+        {loadingAllocationSummary ? (
+          <div className="flex items-center text-xs text-muted-foreground">
+            <LoadingSpinner size={12} className="mr-2" /> Loading allocation...
+          </div>
+        ) : totalAllocation && totalAllocation.percentage !== undefined ? (
+          <div className="flex flex-wrap items-center text-sm">
+            <Activity size={16} className="mr-2 text-primary" />
+            <span className="text-muted-foreground mr-1 py-1">
+              Current Capacity:
+            </span>
+            <Badge
+              size="sm"
+              pill={true}
+              className={getAllocationPercentageColor(
+                totalAllocation.percentage
+              )}
+            >
+              {totalAllocation.percentage}%
+            </Badge>
+            <span className="text-xs text-muted-forground ml-2">
+              ({totalAllocation.hours}h / {totalAllocation.standardHours}h week)
+            </span>
+          </div>
+        ) : (
+          <div className="text-xs text-muted-foreground">
+            Allocation data not available.
+          </div>
+        )}
+      </div>
     </div>
   </motion.div>
 );
@@ -126,7 +137,12 @@ export const ErrorMessage = ({ message }) => (
   <motion.div
     initial={{ opacity: 0, scale: 0.95 }}
     animate={{ opacity: 1, scale: 1 }}
-    className="p-4 bg-red-50 border border-red-200 rounded-[var(--radius)] text-sm text-red-700 flex items-center shadow-sm"
+    className={cn(
+      "flex items-center p-4 rounded-lg text-sm shadow-sm",
+      "bg-[rgb(var(--destructive))]/15",
+      "text-[rgb(var(--destructive))]",
+      "border border-[rgb(var(--destructive))]/40"
+    )}
   >
     <AlertCircle size={20} className="mr-3 flex-shrink-0" />
     <span className="font-medium">{message}</span>
@@ -146,11 +162,9 @@ export const SectionHeader = ({
     initial="hidden"
     animate="visible"
     variants={fadeIn}
-    className="flex items-center justify-between mb-4 pb-3 border-b border-[rgb(var(--border))]"
+    className="flex items-center justify-between mb-4 pb-3"
   >
-    <h3 className="font-semibold text-lg text-[rgb(var(--foreground))]">
-      {title}
-    </h3>
+    <h3 className="font-semibold text-lg text-foreground">{title}</h3>
     {!isEditing ? (
       <Button
         variant="ghost"
@@ -177,7 +191,7 @@ export const SectionHeader = ({
           size="sm"
           onClick={onCancelClick}
           disabled={isSaving}
-          className="text-red-600 hover:bg-red-50 transition-colors duration-200"
+          className="text-destructive hover:bg-destructive/10 duration-200"
         >
           <X size={16} className="mr-2" /> Cancel
         </Button>
@@ -186,7 +200,7 @@ export const SectionHeader = ({
   </motion.div>
 );
 
-// Current Skills Editor Component
+// current skills editor
 export const CurrentSkillsEditor = ({
   groupedSkillsTaxonomy,
   expandedCategories,
@@ -200,11 +214,13 @@ export const CurrentSkillsEditor = ({
   const categories = Object.keys(groupedSkillsTaxonomy).sort();
 
   return (
-    <motion.div className="space-y-3 p-4 md:p-6 border border-[rgb(var(--border))] rounded-[var(--radius)] bg-slate-200 shadow-sm">
+    <motion.div
+      className={cn("space-y-3 p-3 md:p-4 rounded-lg", "bg-card shadow-sm ")}
+    >
       {loadingTaxonomy ? (
         <LoadingSpinner size={20} className="mx-auto my-4" />
       ) : categories.length === 0 ? (
-        <p className="text-sm text-[rgb(var(--muted-foreground))] text-center py-4">
+        <p className="py-4 text-center text-sm text-muted-foreground">
           No skills available to select.
         </p>
       ) : (
@@ -212,26 +228,37 @@ export const CurrentSkillsEditor = ({
           <motion.div
             key={category}
             variants={fadeIn}
-            className="border border-[rgb(var(--border))] rounded-[var(--radius)] overflow-hidden bg-[rgb(var(--background))]"
+            className="rounded-md bg-background group"
           >
             <button
               onClick={() => toggleCategory(category)}
-              className="flex items-center justify-between w-full p-3 text-left bg-[rgb(var(--muted))] hover:bg-[rgba(var(--muted-rgb),0.8)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))]"
+              className={cn(
+                "flex w-full items-center justify-between p-3 text-left transition-colors duration-150 focus:outline-none rounded-md",
+                expandedCategories[category]
+                  ? "bg-muted/60 text-primary"
+                  : "bg-transparent text-primary",
+                "hover:bg-[rgb(var(--accent))] hover:text-[rgb(var(--accent-foreground))]",
+                "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
+              )}
               aria-expanded={expandedCategories[category]}
               aria-controls={`category-skills-current-${category}`}
             >
-              <h4 className="font-semibold text-md text-[rgb(var(--primary))]">
-                {category}
-              </h4>
+              <h4 className="text-md font-semibold">{category}</h4>
               {expandedCategories[category] ? (
                 <ChevronDown
                   size={20}
-                  className="text-[rgb(var(--muted-foreground))]"
+                  className={cn(
+                    "text-muted-foreground",
+                    "group-hover:text-[rgb(var(--accent-foreground))]"
+                  )}
                 />
               ) : (
                 <ChevronRight
                   size={20}
-                  className="text-[rgb(var(--muted-foreground))]"
+                  className={cn(
+                    "text-muted-foreground",
+                    "group-hover:text-[rgb(var(--accent-foreground))]"
+                  )}
                 />
               )}
             </button>
@@ -242,8 +269,8 @@ export const CurrentSkillsEditor = ({
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2, ease: "easeInOut" }}
-                  className="p-3 space-y-3"
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="space-y-2 p-3 "
                 >
                   {groupedSkillsTaxonomy[category].map((skill) => {
                     const isSelected = selectedCurrentSkillsMap.has(skill._id);
@@ -253,22 +280,30 @@ export const CurrentSkillsEditor = ({
                     return (
                       <motion.div
                         key={skill._id}
-                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-2 rounded-[var(--radius)] bg-transparent hover:bg-slate-100 transition-colors duration-200"
+                        className={cn(
+                          "flex flex-col items-start justify-between gap-2 rounded-md p-2 transition-all duration-200 sm:flex-row sm:items-center"
+                        )}
                       >
                         <Badge
-                          variant={isSelected ? "primary" : "outline"}
-                          className="cursor-pointer px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105"
+                          className={cn(
+                            "cursor-pointer px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 rounded-md border",
+                            isSelected
+                              ? `${darkItemSelectedStyles.base} ${selectedItemRingStyles}`
+                              : `${darkItemStyles.base} ${darkItemStyles.hover}`
+                          )}
                           onClick={() => handleToggleCurrentSkill(skill._id)}
+                          pill={false}
+                          size="md"
                         >
                           {skill.name}
                         </Badge>
 
                         {isSelected && (
-                          <div className="flex items-center gap-2 mt-2 sm:mt-0">
-                            <span className="text-xs text-[rgb(var(--foreground))]">
+                          <div className="mt-1 flex items-center gap-2 sm:mt-0">
+                            <span className="text-xs text-foreground">
                               Proficiency:
                             </span>
-                            <div className="flex gap-1">
+                            <div className="flex gap-1.5">
                               {[1, 2, 3, 4, 5].map((level) => (
                                 <button
                                   key={level}
@@ -277,11 +312,12 @@ export const CurrentSkillsEditor = ({
                                     handleSetProficiency(skill._id, level)
                                   }
                                   disabled={isSaving}
-                                  className={`w-6 h-6 rounded-[var(--radius)] text-xs font-medium flex items-center justify-center border-2 transition-all duration-200 ${
+                                  className={cn(
+                                    "flex h-[26px] w-[26px] items-center justify-center rounded-md border text-xs font-medium transition-all duration-150",
                                     currentProficiency === level
-                                      ? "bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))] border-[rgb(var(--primary))] scale-105"
-                                      : "bg-[rgb(var(--background))] hover:bg-slate-200 border-[rgb(var(--border))]"
-                                  }`}
+                                      ? `${proficiencySelectedStyles.base} ${selectedItemRingStyles}`
+                                      : `${darkItemStyles.base} ${darkItemStyles.hover}`
+                                  )}
                                 >
                                   {level}
                                 </button>
@@ -293,7 +329,7 @@ export const CurrentSkillsEditor = ({
                     );
                   })}
                   {groupedSkillsTaxonomy[category].length === 0 && (
-                    <p className="text-xs text-[rgb(var(--muted-foreground))] text-center py-2">
+                    <p className="py-2 text-center text-xs text-muted-foreground">
                       No skills in this category.
                     </p>
                   )}
@@ -312,27 +348,37 @@ export const CurrentSkillsDisplay = ({ currentSkills }) => (
     initial="hidden"
     animate="visible"
     variants={staggerChildren}
-    className="flex flex-wrap gap-2 p-4"
+    className="flex flex-wrap gap-2"
   >
     {currentSkills.length > 0 ? (
-      currentSkills.map((userSkill) => (
-        <motion.div key={userSkill._id} variants={fadeIn}>
-          <Badge
-            className={`px-3 py-1.5 text-xs font-medium ${getSkillLevelColor(
-              userSkill.proficiency
-            )}`}
+      currentSkills.map((userSkill) => {
+        const proficiencyName =
+          userSkill.proficiency != null
+            ? getSkillLevelName(userSkill.proficiency)
+            : "";
+
+        return (
+          <motion.div
+            key={userSkill.skillId?._id || userSkill._id}
+            variants={fadeIn}
           >
-            {userSkill.skillId?.name || "Unknown"}
-            {userSkill.proficiency != null && (
-              <span className="ml-2 px-1.5 py-0.5 bg-white/20 rounded-full text-[10px]">
-                Level {userSkill.proficiency}
-              </span>
-            )}
-          </Badge>
-        </motion.div>
-      ))
+            <Badge
+              className={cn(
+                "px-3 py-1.5 text-xs font-medium rounded-md",
+                getSkillLevelColor(userSkill.proficiency)
+              )}
+              size="md"
+            >
+              {userSkill.skillId?.name || "Unknown Skill"}
+              {proficiencyName && (
+                <span className="ml-1.5 opacity-80">({proficiencyName})</span>
+              )}
+            </Badge>
+          </motion.div>
+        );
+      })
     ) : (
-      <p className="text-[rgb(var(--muted-foreground))] italic text-sm">
+      <p className="italic text-sm text-muted-foreground">
         No current skills added yet.
       </p>
     )}
@@ -347,15 +393,18 @@ export const DesiredSkillsEditor = ({
   selectedDesiredSkillIds,
   handleToggleDesiredSkill,
   loadingTaxonomy,
+  isSaving,
 }) => {
   const categories = Object.keys(groupedSkillsTaxonomy).sort();
 
   return (
-    <motion.div className="space-y-3 p-4 md:p-6 border border-[rgb(var(--border))] rounded-[var(--radius)] bg-slate-200 shadow-sm">
+    <motion.div
+      className={cn("space-y-3 p-3 md:p-4 rounded-lg", "bg-card shadow-sm ")}
+    >
       {loadingTaxonomy ? (
         <LoadingSpinner size={20} className="mx-auto my-4" />
       ) : categories.length === 0 ? (
-        <p className="text-sm text-[rgb(var(--muted-foreground))] text-center py-4">
+        <p className="py-4 text-center text-sm text-muted-foreground">
           No skills available to select.
         </p>
       ) : (
@@ -363,26 +412,37 @@ export const DesiredSkillsEditor = ({
           <motion.div
             key={category}
             variants={fadeIn}
-            className="border border-[rgb(var(--border))] rounded-[var(--radius)] overflow-hidden bg-[rgb(var(--background))]"
+            className="rounded-md bg-background group"
           >
             <button
               onClick={() => toggleCategory(category)}
-              className="flex items-center justify-between w-full p-3 text-left bg-[rgb(var(--muted))] hover:bg-[rgba(var(--muted-rgb),0.8)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))]"
+              className={cn(
+                "flex w-full items-center justify-between p-3 text-left transition-colors duration-150 focus:outline-none rounded-md",
+                expandedCategories[category]
+                  ? "bg-muted/60 text-primary"
+                  : "bg-transparent text-primary",
+                "hover:bg-[rgb(var(--accent))] hover:text-[rgb(var(--accent-foreground))]",
+                "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
+              )}
               aria-expanded={expandedCategories[category]}
               aria-controls={`category-skills-desired-${category}`}
             >
-              <h4 className="font-semibold text-md text-[rgb(var(--primary))]">
-                {category}
-              </h4>
+              <h4 className="text-md font-semibold">{category}</h4>
               {expandedCategories[category] ? (
                 <ChevronDown
                   size={20}
-                  className="text-[rgb(var(--muted-foreground))]"
+                  className={cn(
+                    "text-muted-foreground",
+                    "group-hover:text-[rgb(var(--accent-foreground))]"
+                  )}
                 />
               ) : (
                 <ChevronRight
                   size={20}
-                  className="text-[rgb(var(--muted-foreground))]"
+                  className={cn(
+                    "text-muted-foreground",
+                    "group-hover:text-[rgb(var(--accent-foreground))]"
+                  )}
                 />
               )}
             </button>
@@ -393,26 +453,36 @@ export const DesiredSkillsEditor = ({
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2, ease: "easeInOut" }}
-                  className="p-3 flex flex-wrap gap-3"
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="space-y-2 p-3 "
                 >
-                  {groupedSkillsTaxonomy[category].map((skill) => (
-                    <motion.div key={skill._id}>
-                      <Badge
-                        variant={
-                          selectedDesiredSkillIds.has(skill._id)
-                            ? "secondary"
-                            : "outline"
-                        }
-                        className="cursor-pointer px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105"
-                        onClick={() => handleToggleDesiredSkill(skill._id)}
+                  {groupedSkillsTaxonomy[category].map((skill) => {
+                    const isSelected = selectedDesiredSkillIds.has(skill._id);
+                    return (
+                      <motion.div
+                        key={skill._id}
+                        className={cn(
+                          "flex items-center rounded-md p-0.5 transition-all duration-200"
+                        )}
                       >
-                        {skill.name}
-                      </Badge>
-                    </motion.div>
-                  ))}
+                        <Badge
+                          className={cn(
+                            "w-full cursor-pointer px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 rounded-md border",
+                            isSelected
+                              ? `${darkItemSelectedStyles.base} ${selectedItemRingStyles}`
+                              : `${darkItemStyles.base} ${darkItemStyles.hover}`
+                          )}
+                          onClick={() => handleToggleDesiredSkill(skill._id)}
+                          pill={false}
+                          size="md"
+                        >
+                          {skill.name}
+                        </Badge>
+                      </motion.div>
+                    );
+                  })}
                   {groupedSkillsTaxonomy[category].length === 0 && (
-                    <p className="text-xs text-[rgb(var(--muted-foreground))] text-center py-2 w-full">
+                    <p className="py-2 text-center text-xs text-muted-foreground">
                       No skills in this category.
                     </p>
                   )}
@@ -426,40 +496,46 @@ export const DesiredSkillsEditor = ({
   );
 };
 
-// Desired Skills Display Component
+//Desired skills display
 export const DesiredSkillsDisplay = ({ desiredSkills }) => (
   <motion.div
     initial="hidden"
     animate="visible"
     variants={staggerChildren}
-    className="flex flex-wrap gap-3 p-4"
+    className="flex flex-wrap gap-2"
   >
     {desiredSkills.length > 0 ? (
       desiredSkills.map((userSkill) => (
-        <motion.div key={userSkill._id} variants={fadeIn}>
+        <motion.div
+          key={userSkill.skillId?._id || userSkill._id}
+          variants={fadeIn}
+        >
           <Badge
             variant="secondary"
-            className="px-3 py-1.5 text-xs font-medium"
+            className="px-3 py-1.5 text-xs font-medium rounded-md"
+            pill={false}
+            size="md"
           >
-            {userSkill.skillId?.name || "Unknown"}
+            {userSkill.skillId?.name || "Unknown Skill"}
           </Badge>
         </motion.div>
       ))
     ) : (
-      <p className="text-[rgb(var(--muted-foreground))] italic text-sm">
+      <p className="italic text-sm text-muted-foreground">
         No desired skills added yet.
       </p>
     )}
   </motion.div>
 );
 
-// Projects List Component
+//projects allocation list
 export const ProjectsList = ({ projects, projectsError, loadingProjects }) => (
   <motion.div initial="hidden" animate="visible" variants={fadeIn}>
     <Card className="overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-[rgb(var(--primary-accent-background))] to-purple-50">
-        <CardTitle className="flex items-center text-[rgb(var(--card-foreground))]">
-          <Briefcase size={20} className="mr-3" /> My Projects & Allocations
+      <CardHeader>
+        <CardTitle className="flex items-center text-card-foreground">
+          <Briefcase size={20} className="mr-3 text-primary" />
+          My Projects & Allocations
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4 md:p-6">
@@ -468,8 +544,15 @@ export const ProjectsList = ({ projects, projectsError, loadingProjects }) => (
             <LoadingSpinner size={24} />
           </div>
         ) : projectsError ? (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-[var(--radius)]">
-            <p className="text-red-600 text-sm font-medium">{projectsError}</p>
+          <div
+            className={cn(
+              "p-4 rounded-lg text-sm shadow-sm",
+              "bg-[rgb(var(--destructive))/0.15]",
+              "text-[rgb(var(--destructive))]",
+              "border border-[rgb(var(--destructive))/0.4]"
+            )}
+          >
+            <p className="font-medium">{projectsError}</p>
           </div>
         ) : (
           <motion.div variants={staggerChildren} className="space-y-4">
@@ -478,18 +561,22 @@ export const ProjectsList = ({ projects, projectsError, loadingProjects }) => (
                 <motion.div
                   key={allocation._id}
                   variants={fadeIn}
-                  className="p-4 rounded-[var(--radius)] border border-[rgb(var(--border))] hover:shadow-md transition-shadow duration-200 bg-[rgb(var(--background))] hover:bg-[rgb(var(--muted))]"
+                  className={cn(
+                    "p-4 rounded-lg  transition-shadow duration-200",
+                    "bg-background hover:bg-muted",
+                    "shadow-sm hover:shadow-md"
+                  )}
                 >
-                  <div className="flex justify-between items-start mb-2">
+                  <div className="mb-2 flex items-start justify-between">
                     <Link
                       href={`/projects/${allocation.projectId?._id}`}
-                      className="font-semibold text-base text-[rgb(var(--primary))] hover:underline"
+                      className="text-base font-semibold text-primary hover:underline"
                     >
                       {allocation.projectId?.name || "Unknown Project"}
                     </Link>
                     <Badge
                       size="sm"
-                      pill={true}
+                      pill={false}
                       className={getAllocationPercentageColor(
                         allocation.allocationPercentage
                       )}
@@ -498,27 +585,21 @@ export const ProjectsList = ({ projects, projectsError, loadingProjects }) => (
                     </Badge>
                   </div>
 
-                  <div className="space-y-1 text-xs text-[rgb(var(--muted-foreground))]">
+                  <div className="space-y-1 text-xs text-muted-foreground">
                     <div className="flex items-center">
-                      <UserCog
-                        size={14}
-                        className="mr-2 text-[rgb(var(--primary))]"
-                      />
+                      <UserCog size={14} className="mr-2 text-primary" />
                       <span>
                         Role:{" "}
-                        <span className="font-medium text-[rgb(var(--foreground))]">
+                        <span className="font-medium text-foreground">
                           {allocation.role || "N/A"}
                         </span>
                       </span>
                     </div>
                     <div className="flex items-center">
-                      <CalendarDays
-                        size={14}
-                        className="mr-2 text-[rgb(var(--primary))]"
-                      />
+                      <CalendarDays size={14} className="mr-2 text-primary" />
                       <span>
                         Duration:{" "}
-                        <span className="font-medium text-[rgb(var(--foreground))]">
+                        <span className="font-medium text-foreground">
                           {formatDateRange(
                             allocation.startDate,
                             allocation.endDate
@@ -530,7 +611,7 @@ export const ProjectsList = ({ projects, projectsError, loadingProjects }) => (
                 </motion.div>
               ))
             ) : (
-              <p className="text-[rgb(var(--muted-foreground))] italic text-sm text-center py-4">
+              <p className="py-4 text-center text-sm italic text-muted-foreground">
                 No projects assigned yet.
               </p>
             )}

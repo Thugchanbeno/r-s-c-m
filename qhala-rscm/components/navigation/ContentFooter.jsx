@@ -1,7 +1,7 @@
 "use client";
 import { cn } from "@/lib/utils";
 
-const ContentHeader = ({ isAdminArea = false }) => {
+const ContentFooter = ({ isAdminArea = false }) => {
   const stripBg = isAdminArea ? "bg-slate-900" : "bg-background";
   const gradientFrom = isAdminArea ? "from-slate-900" : "from-background";
   const gradientVia = isAdminArea ? "via-slate-900/70" : "via-background/70";
@@ -20,13 +20,13 @@ const ContentHeader = ({ isAdminArea = false }) => {
         <>
           <div
             className={cn(
-              "absolute left-0 top-0 h-full w-12 pointer-events-none",
+              "absolute left-0 bottom-0 h-full w-12 pointer-events-none",
               `bg-gradient-to-r ${gradientFrom} ${gradientVia} ${gradientTo}`
             )}
           />
           <div
             className={cn(
-              "absolute right-0 top-0 h-full w-12 pointer-events-none",
+              "absolute right-0 bottom-0 h-full w-12 pointer-events-none",
               `bg-gradient-to-l ${gradientFrom} ${gradientVia} ${gradientTo}`
             )}
           />
@@ -37,4 +37,4 @@ const ContentHeader = ({ isAdminArea = false }) => {
   );
 };
 
-export default ContentHeader;
+export default ContentFooter;

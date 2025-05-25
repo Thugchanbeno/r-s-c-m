@@ -2,6 +2,7 @@
 import { Card, CardHeader, CardContent } from "@/components/common/Card";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { useProfileData } from "@/lib/hooks/useProfileData";
+import { cn } from "@/lib/utils";
 
 import {
   ProfileHeader,
@@ -54,7 +55,7 @@ const ProfileData = () => {
 
   if (status === "loading") {
     return (
-      <div className="flex justify-center items-center h-screen bg-[rgb(var(--background))]">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <LoadingSpinner size={32} />
       </div>
     );
@@ -62,11 +63,11 @@ const ProfileData = () => {
 
   if (status !== "authenticated" || !session?.user) {
     return (
-      <div className="flex justify-center items-center h-screen bg-[rgb(var(--background))] p-4">
+      <div className="flex justify-center items-center h-screen bg-background p-4">
         <Card className="w-full max-w-md text-center">
           <CardContent className="p-8">
             <div className="flex flex-col items-center justify-center">
-              <div className="text-[rgb(var(--primary))] mb-4">
+              <div className="text-primary mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-12 w-12"
@@ -82,10 +83,10 @@ const ProfileData = () => {
                   />
                 </svg>
               </div>
-              <h2 className="text-xl font-medium mb-2 text-[rgb(var(--foreground))]">
+              <h2 className="mb-2 text-xl font-medium text-foreground">
                 Authentication Required
               </h2>
-              <p className="text-[rgb(var(--muted-foreground))]">
+              <p className="text-muted-foreground">
                 Please sign in to view your profile.
               </p>
             </div>
@@ -96,17 +97,21 @@ const ProfileData = () => {
   }
 
   return (
-    <div className="animate-fade-in p-4 md:p-6 bg-[rgb(var(--muted))] rounded-[var(--radius)] transition-colors duration-300 flex-grow min-h-screen">
+    <div
+      className={cn(
+        "animate-fade-in flex-grow p-4 transition-colors duration-300 md:p-6",
+        "bg-muted rounded-lg"
+      )}
+    >
       <ProfileHeader
         title="My Profile"
         description="Manage your profile information and skills."
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <CardHeader>
+          <CardHeader className="p-0">
             <UserInfo
-              className="p-2"
               user={session.user}
               totalAllocation={totalAllocationSummary}
               loadingAllocationSummary={loadingAllocationSummary}
@@ -114,12 +119,12 @@ const ProfileData = () => {
             />
           </CardHeader>
           <CardContent>
-            <div className="space-y-8">
+            <div className="space-y-6">
               {saveError &&
                 (isEditingCurrentSkills || isEditingDesiredSkills) && (
                   <ErrorMessage message={saveError} />
                 )}
-              <div className="space-y-3 p-1">
+              <div className="space-y-3 ">
                 <SectionHeader
                   title="Current Skills"
                   isEditing={isEditingCurrentSkills}
@@ -137,9 +142,9 @@ const ProfileData = () => {
                     <LoadingSpinner size={20} />
                   </div>
                 ) : skillsError && !isEditingCurrentSkills ? (
-                  <p className="text-red-500 text-sm p-2 bg-red-50 rounded-[var(--radius)]">
+                  <div className="rounded-lg border border-destructive/40 bg-destructive/15 p-3 text-sm text-destructive">
                     {skillsError}
-                  </p>
+                  </div>
                 ) : isEditingCurrentSkills ? (
                   <CurrentSkillsEditor
                     groupedSkillsTaxonomy={groupedSkillsTaxonomy}
@@ -200,7 +205,7 @@ const ProfileData = () => {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <h3 className="text-lg font-medium text-[rgb(var(--card-foreground))]">
+              <h3 className="text-lg font-medium text-card-foreground">
                 Allocated Projects
               </h3>
             </CardHeader>

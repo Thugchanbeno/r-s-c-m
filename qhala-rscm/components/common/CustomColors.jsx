@@ -148,3 +148,15 @@ export const getStatusBadgeVariant = (status) => {
       return "default";
   }
 };
+export const darkItemStyles = {
+  base: "bg-slate-900 text-slate-100 border-slate-700",
+  hover: "hover:bg-slate-800 hover:text-[rgb(var(--accent))] hover:shadow-sm",
+};
+export const darkItemSelectedStyles = {
+  base: "bg-slate-800 text-[rgb(var(--accent))] border-slate-700",
+};
+export const proficiencySelectedStyles = {
+  base: "bg-[rgb(var(--accent))] text-[rgb(var(--accent-foreground))] border-[rgb(var(--accent))] scale-105 shadow-sm",
+};
+export const selectedItemRingStyles =
+  "ring-2 ring-offset-1 ring-[rgb(var(--qhala-soft-peach-darker))] ring-offset-background";

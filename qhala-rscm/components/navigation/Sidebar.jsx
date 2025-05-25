@@ -271,7 +271,7 @@ const Sidebar = () => {
               })}
           </nav>
 
-          <div className={cn("shrink-0 p-3 border-t border-slate-700")}>
+          <div className={cn("shrink-0 p-3")}>
             <div
               className={cn(
                 "flex items-center",

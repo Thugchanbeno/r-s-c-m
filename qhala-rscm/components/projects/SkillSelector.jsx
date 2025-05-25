@@ -1,7 +1,13 @@
 "use client";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Badge from "@/components/common/Badge";
-import { getSkillLevelColor } from "@/components/common/CustomColors";
+import {
+  getSkillLevelColor,
+  getSkillLevelName,
+  darkItemStyles,
+  darkItemSelectedStyles,
+  proficiencySelectedStyles,
+} from "@/components/common/CustomColors";
 import {
   Check,
   PlusCircle,
@@ -11,6 +17,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSkillSelector } from "@/lib/hooks/useSkillSelector";
+import { cn } from "@/lib/utils"; // Ensure cn is imported
 
 const fadeIn = {
   hidden: { opacity: 0, y: -10 },
@@ -37,72 +44,115 @@ const SkillSelector = ({
     sortedCategories,
   } = useSkillSelector(initialSelectedSkills, nlpSuggestedSkills, onChange);
 
+  const inputClasses =
+    "block w-full rounded-md bg-background text-foreground shadow-sm sm:text-sm p-2.5 transition-all duration-200 placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:ring-offset-background";
+  const categoryButtonBase =
+    "flex items-center justify-between w-full p-3 text-left transition-colors duration-150 focus:outline-none rounded-md";
+  const categoryButtonDefault = "bg-transparent text-primary";
+  const categoryButtonExpanded = "bg-muted/60 text-primary";
+  const categoryButtonHover =
+    "hover:bg-[rgb(var(--accent))] hover:text-[rgb(var(--accent-foreground))]";
+  const categoryButtonFocus =
+    "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background";
+  const skillItemBase =
+    "flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-2.5 rounded-md transition-all duration-150 ease-in-out";
+  const skillItemSelectedBg = "bg-primary-accent-background";
+  const skillItemHoverBg = "hover:bg-muted/50";
+  const skillItemNlpRing =
+    "ring-1 ring-[rgb(var(--warning))] ring-offset-1 ring-offset-background";
+  const toggleButtonBase =
+    "mr-2.5 p-1 rounded-full transition-colors flex-shrink-0";
+  const toggleButtonSelected =
+    "bg-success text-success-foreground hover:bg-success/90";
+  const toggleButtonDeselected =
+    "bg-muted hover:bg-muted/80 text-muted-foreground";
+
+  const darkFormControlBase = `${darkItemStyles.base} ${darkItemStyles.hover}`;
+  const darkFormCheckboxClasses = `mr-1.5 h-4 w-4 rounded-md border-slate-600 bg-slate-900 text-[rgb(var(--accent))] focus:ring-[rgb(var(--accent))] focus:ring-offset-slate-900 checked:bg-[rgb(var(--accent))] checked:border-transparent`;
+
   if (loadingSkills)
     return (
       <div className="p-4 text-center">
         <LoadingSpinner />
-        <p className="text-sm text-[rgb(var(--muted-foreground))]">
-          Loading skills...
-        </p>
+        <p className="text-sm text-muted-foreground">Loading skills...</p>
       </div>
     );
   if (errorSkills)
-    return <p className="text-red-500 p-4">Error: {errorSkills}</p>;
+    return (
+      <div className="rounded-md border border-destructive/40 bg-destructive/15 p-3 text-sm text-destructive">
+        Error: {errorSkills}
+      </div>
+    );
 
   return (
-    <div className="space-y-4 p-1">
+    <div className="space-y-3 p-1">
       <input
         type="text"
         placeholder="Search skills or categories..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="block w-full rounded-[var(--radius)] border-[rgb(var(--border))] bg-[rgb(var(--background))] text-[rgb(var(--foreground))] shadow-sm focus:border-[rgb(var(--primary))] focus:ring-1 focus:ring-[rgb(var(--primary))] sm:text-sm p-2.5 transition-all duration-200 placeholder:text-[rgb(var(--muted-foreground))]"
+        className={inputClasses}
       />
-
       {selectedSkillsMap.size > 0 && (
-        <div className="p-3 border border-dashed border-[rgb(var(--primary-accent-border))] rounded-[var(--radius)] bg-[rgb(var(--primary-accent-background))] space-y-2">
-          <h4 className="text-xs font-semibold uppercase text-[rgb(var(--primary))]">
+        <div className="space-y-2 rounded-md shadow-sm hover:shadow-md bg-primary-accent-background/50 p-3">
+          <h4 className="text-xs font-semibold uppercase text-primary">
             Selected for Project:
           </h4>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {Array.from(selectedSkillsMap.values())
               .sort((a, b) => a.skillName.localeCompare(b.skillName))
-              .map((sSkill) => (
-                <Badge
-                  key={sSkill.skillId}
-                  className={`${getSkillLevelColor(
-                    sSkill.proficiencyLevel
-                  )} flex items-center gap-1.5`}
-                  pill
-                  size="sm"
-                >
-                  <span>
-                    {sSkill.skillName} (L{sSkill.proficiencyLevel})
-                    {sSkill.isRequired ? "*" : ""}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleToggleSkill({
-                        _id: sSkill.skillId,
-                        name: sSkill.skillName,
-                        category: sSkill.category,
-                      })
-                    }
-                    className="text-current hover:opacity-70"
-                    aria-label={`Remove ${sSkill.skillName}`}
+              .map((sSkill) => {
+                const proficiencyName = sSkill.proficiencyLevel
+                  ? getSkillLevelName(sSkill.proficiencyLevel)
+                  : "";
+                return (
+                  <Badge
+                    key={sSkill.skillId}
+                    className={cn(
+                      "flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md",
+                      getSkillLevelColor(sSkill.proficiencyLevel)
+                    )}
+                    pill={false}
+                    size="sm"
                   >
-                    <XCircle size={12} />
-                  </button>
-                </Badge>
-              ))}
+                    <span>
+                      {sSkill.skillName}
+                      {proficiencyName && (
+                        <span className="ml-1 opacity-80">
+                          ({proficiencyName})
+                        </span>
+                      )}
+                      {sSkill.isRequired ? (
+                        <span className="ml-1 font-bold text-destructive">
+                          *
+                        </span>
+                      ) : (
+                        ""
+                      )}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleToggleSkill({
+                          _id: sSkill.skillId,
+                          name: sSkill.skillName,
+                          category: sSkill.category,
+                        })
+                      }
+                      className="text-current hover:opacity-70"
+                      aria-label={`Remove ${sSkill.skillName}`}
+                    >
+                      <XCircle size={12} />
+                    </button>
+                  </Badge>
+                );
+              })}
           </div>
         </div>
       )}
-
-      <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+      <div className="max-h-[300px] space-y-1.5 overflow-y-auto pr-1">
         {sortedCategories.length === 0 && !loadingSkills && (
-          <p className="text-sm text-center text-[rgb(var(--muted-foreground))] py-4">
+          <p className="py-4 text-center text-sm text-muted-foreground">
             No skills match your search or available.
           </p>
         )}
@@ -110,27 +160,32 @@ const SkillSelector = ({
           <motion.div
             key={category}
             variants={fadeIn}
-            className="border border-[rgb(var(--border))] rounded-[var(--radius)] overflow-hidden bg-[rgb(var(--background))]"
+            className="overflow-hidden rounded-md bg-background group"
           >
             <button
               type="button"
               onClick={() => toggleCategory(category)}
-              className="flex items-center justify-between w-full p-3 text-left bg-[rgb(var(--muted))] hover:bg-[rgba(var(--muted-rgb),0.8)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))]"
+              className={cn(
+                categoryButtonBase,
+                expandedCategories[category]
+                  ? categoryButtonExpanded
+                  : categoryButtonDefault,
+                categoryButtonHover,
+                categoryButtonFocus
+              )}
               aria-expanded={expandedCategories[category]}
               aria-controls={`category-skills-selector-${category}`}
             >
-              <h4 className="font-semibold text-md text-[rgb(var(--primary))]">
-                {category}
-              </h4>
+              <h4 className="text-md font-semibold">{category}</h4>
               {expandedCategories[category] ? (
                 <ChevronDown
                   size={20}
-                  className="text-[rgb(var(--muted-foreground))]"
+                  className="text-muted-foreground group-hover:text-[rgb(var(--accent-foreground))]"
                 />
               ) : (
                 <ChevronRight
                   size={20}
-                  className="text-[rgb(var(--muted-foreground))]"
+                  className="text-muted-foreground group-hover:text-[rgb(var(--accent-foreground))]"
                 />
               )}
             </button>
@@ -142,7 +197,7 @@ const SkillSelector = ({
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.2, ease: "easeInOut" }}
-                  className="p-3 space-y-2"
+                  className="space-y-1.5 shadow-sm p-2.5"
                 >
                   {skillsByCategory[category]
                     .sort((a, b) => a.name.localeCompare(b.name))
@@ -157,28 +212,24 @@ const SkillSelector = ({
                         <motion.div
                           key={skill._id}
                           variants={fadeIn}
-                          className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-2.5 rounded-[var(--radius)] transition-all duration-150 ease-in-out border
-                            ${
-                              isSelected
-                                ? "bg-[rgb(var(--primary-accent-background))] border-[rgb(var(--primary-accent-border))]"
-                                : "bg-transparent hover:bg-[rgb(var(--muted))] border-transparent hover:border-[rgb(var(--border))]"
-                            }
-                            ${
-                              isSuggestedByNlp && !isSelected
-                                ? "ring-1 ring-amber-500 ring-offset-1 ring-offset-[rgb(var(--background))]"
-                                : ""
-                            }`}
+                          className={cn(
+                            skillItemBase,
+                            isSelected ? skillItemSelectedBg : skillItemHoverBg,
+                            isSuggestedByNlp && !isSelected
+                              ? skillItemNlpRing
+                              : "border-transparent"
+                          )}
                         >
-                          <div className="flex items-center flex-grow">
+                          <div className="flex flex-grow items-center">
                             <button
                               type="button"
                               onClick={() => handleToggleSkill(skill)}
-                              className={`mr-2.5 p-1 rounded-full transition-colors flex-shrink-0
-                                ${
-                                  isSelected
-                                    ? "bg-green-500 text-white hover:bg-green-600"
-                                    : "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600"
-                                }`}
+                              className={cn(
+                                toggleButtonBase,
+                                isSelected
+                                  ? toggleButtonSelected
+                                  : toggleButtonDeselected
+                              )}
                               aria-label={
                                 isSelected
                                   ? `Deselect ${skill.name}`
@@ -192,15 +243,16 @@ const SkillSelector = ({
                               )}
                             </button>
                             <span
-                              className={`text-sm ${
+                              className={cn(
+                                "text-sm",
                                 isSelected
-                                  ? "font-medium text-[rgb(var(--primary))]"
-                                  : "text-[rgb(var(--foreground))]"
-                              }`}
+                                  ? "font-medium text-primary"
+                                  : "text-foreground"
+                              )}
                             >
                               {skill.name}
                               {isSuggestedByNlp && !isSelected && (
-                                <span className="ml-1.5 text-xs text-amber-600 font-normal">
+                                <span className="ml-1.5 text-xs font-normal text-warning">
                                   (Suggested)
                                 </span>
                               )}
@@ -208,11 +260,11 @@ const SkillSelector = ({
                           </div>
 
                           {isSelected && selectedData && (
-                            <div className="flex items-center gap-x-3 gap-y-1 mt-1.5 sm:mt-0 sm:ml-auto flex-wrap pl-8 sm:pl-0">
+                            <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-2 pl-8 sm:mt-0 sm:pl-0">
                               <div className="flex items-center">
                                 <label
                                   htmlFor={`prof-${skill._id}`}
-                                  className="text-xs text-[rgb(var(--muted-foreground))] mr-1.5 whitespace-nowrap"
+                                  className="mr-1.5 whitespace-nowrap text-xs text-muted-foreground"
                                 >
                                   Proficiency:
                                 </label>
@@ -222,14 +274,17 @@ const SkillSelector = ({
                                   onChange={(e) =>
                                     handleProficiencyChange(
                                       skill._id,
-                                      e.target.value
+                                      parseInt(e.target.value)
                                     )
                                   }
-                                  className="text-xs p-1 border border-[rgb(var(--border))] rounded-[var(--radius)] bg-[rgb(var(--background))] text-[rgb(var(--foreground))] focus:ring-1 focus:ring-[rgb(var(--primary))]"
+                                  className={cn(
+                                    "text-xs p-1.5 rounded-md appearance-none pr-6",
+                                    darkFormControlBase
+                                  )}
                                 >
                                   {[1, 2, 3, 4, 5].map((lvl) => (
                                     <option key={lvl} value={lvl}>
-                                      {lvl}
+                                      {getSkillLevelName(lvl)}{" "}
                                     </option>
                                   ))}
                                 </select>
@@ -245,11 +300,11 @@ const SkillSelector = ({
                                       e.target.checked
                                     )
                                   }
-                                  className="mr-1 h-3.5 w-3.5 rounded border-[rgb(var(--border))] text-[rgb(var(--primary))] focus:ring-[rgb(var(--primary))]"
+                                  className={darkFormCheckboxClasses}
                                 />
                                 <label
                                   htmlFor={`req-${skill._id}`}
-                                  className="text-xs text-[rgb(var(--muted-foreground))]"
+                                  className="text-xs text-muted-foreground"
                                 >
                                   Required
                                 </label>
@@ -260,7 +315,7 @@ const SkillSelector = ({
                       );
                     })}
                   {skillsByCategory[category].length === 0 && (
-                    <p className="text-xs text-[rgb(var(--muted-foreground))] text-center py-2">
+                    <p className="py-2 text-center text-xs text-muted-foreground">
                       No skills in this category.
                     </p>
                   )}
