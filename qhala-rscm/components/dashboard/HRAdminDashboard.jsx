@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
+  CardDescription,
 } from "@/components/common/Card";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import {
@@ -19,6 +20,7 @@ import {
 } from "lucide-react";
 import Badge from "@/components/common/Badge";
 import { getAllocationPercentageColor } from "@/components/common/CustomColors";
+import { cn } from "@/lib/utils";
 
 const HrAdminDashboardSummary = ({ user }) => {
   const [totalUserCount, setTotalUserCount] = useState(0);
@@ -60,7 +62,7 @@ const HrAdminDashboardSummary = ({ user }) => {
           fetch(`/api/allocations/summary?scope=overall`),
           fetch(`/api/skills/distribution`),
         ]);
-        //process user response
+
         if (!usersResponse.ok) {
           const errData = await usersResponse.json().catch(() => ({}));
           throw new Error(
@@ -70,7 +72,7 @@ const HrAdminDashboardSummary = ({ user }) => {
         }
         const usersResult = await usersResponse.json();
         fetchedUserCount = usersResult.data?.count || usersResult.count || 0;
-        //process projects response
+
         if (!projectsResponse.ok) {
           const errData = await projectsResponse.json().catch(() => ({}));
           throw new Error(
@@ -81,6 +83,7 @@ const HrAdminDashboardSummary = ({ user }) => {
         const projectsResult = await projectsResponse.json();
         fetchedProjectCount =
           projectsResult.data?.count || projectsResult.count || 0;
+
         if (!overallAllocationResponse.ok) {
           const errData = await overallAllocationResponse
             .json()
@@ -90,7 +93,6 @@ const HrAdminDashboardSummary = ({ user }) => {
               `Failed to fetch overall allocation summary: ${overallAllocationResponse.statusText} (${overallAllocationResponse.status})`
           );
         }
-        //process overall allocation
         const allocationSummaryResult = await overallAllocationResponse.json();
         if (allocationSummaryResult.success && allocationSummaryResult.data) {
           fetchedCapacityUtilization =
@@ -101,7 +103,7 @@ const HrAdminDashboardSummary = ({ user }) => {
               "Invalid overall allocation summary data."
           );
         }
-        // Process Skill Distribution Data
+
         if (skillDistributionResponse.ok) {
           const skillDistResult = await skillDistributionResponse.json();
           if (skillDistResult.success && Array.isArray(skillDistResult.data)) {
@@ -137,15 +139,20 @@ const HrAdminDashboardSummary = ({ user }) => {
             console.warn("Invalid skill distribution data format.");
           }
         } else {
-          console.warn("Failed to fetch skill distribution data.");
+          console.warn(
+            `Failed to fetch skill distribution data: ${skillDistributionResponse.statusText} (${skillDistributionResponse.status})`
+          );
         }
       } catch (err) {
+        // Corrected this line
         console.error("Error fetching HR/Admin summary data:", err);
         setSummaryError(err.message || "Could not load HR/Admin summary data.");
-
         fetchedUserCount = 0;
         fetchedProjectCount = 0;
         fetchedCapacityUtilization = 0;
+        fetchedTotalUniqueSkills = 0;
+        fetchedMostCommonSkill = { name: "N/A", count: 0 };
+        fetchedMostDesiredSkill = { name: "N/A", count: 0 };
       } finally {
         setTotalUserCount(fetchedUserCount);
         setTotalProjectCount(fetchedProjectCount);
@@ -159,12 +166,39 @@ const HrAdminDashboardSummary = ({ user }) => {
     fetchHrSummaryData();
   }, []);
 
+  const dashboardLinkStyles = cn(
+    "inline-block text-sm font-medium",
+    "bg-[rgb(var(--qhala-dark-navy))] text-[rgb(var(--accent))]",
+    "hover:text-[rgb(var(--qhala-soft-peach-darker))]",
+    "px-3 py-1.5",
+    "rounded-[var(--radius)]",
+    "transition-colors duration-150 ease-in-out",
+    "shadow-sm"
+  );
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">HR / Admin Overview</CardTitle>
+    <Card className="overflow-hidden">
+      <CardHeader className={cn("shadow-sm bg-[rgb(var(--accent))] p-4")}>
+        <CardTitle
+          className={cn(
+            "flex items-center gap-2 text-lg font-semibold text-[rgb(var(--accent-foreground))] md:text-xl"
+          )}
+        >
+          <Activity
+            size={22}
+            className="text-[rgb(var(--accent-foreground))]"
+          />
+          HR / Admin Overview
+        </CardTitle>
+        <CardDescription
+          className={cn(
+            "mt-1 text-sm text-[rgb(var(--accent-foreground))] opacity-90"
+          )}
+        >
+          Key metrics and insights for human resources and administration.
+        </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className={cn("p-5 md:p-6")}>
         {loadingSummary ? (
           <div className="flex flex-col items-center justify-center p-6 min-h-[200px]">
             <LoadingSpinner size={20} />
@@ -173,9 +207,16 @@ const HrAdminDashboardSummary = ({ user }) => {
             </p>
           </div>
         ) : summaryError ? (
-          <div className="flex items-center p-3 text-sm rounded-[var(--radius)] bg-red-50 text-red-700 border border-red-200 shadow-sm">
-            <AlertCircle size={16} className="mr-2 flex-shrink-0" />
-            <span>{summaryError}</span>
+          <div
+            className={cn(
+              "flex items-center p-4 rounded-lg text-sm shadow-sm",
+              "bg-[rgb(var(--destructive))]/15",
+              "text-[rgb(var(--destructive))]",
+              "border border-[rgb(var(--destructive))]/40"
+            )}
+          >
+            <AlertCircle size={20} className="mr-3 flex-shrink-0" />
+            <span className="font-medium">{summaryError}</span>
           </div>
         ) : (
           <div className="space-y-4">
@@ -215,7 +256,9 @@ const HrAdminDashboardSummary = ({ user }) => {
                 {overallCapacityUtilization}%
               </Badge>
             </div>
-            <div className="pt-3 border-t border-[rgb(var(--border))] mt-3"></div>{" "}
+
+            <div className="pt-3 mt-3 border-t border-[rgb(var(--border))]"></div>
+
             <div className="flex items-center justify-between text-sm">
               <span className="flex items-center text-[rgb(var(--muted-foreground))]">
                 <Wrench size={16} className="mr-2 text-purple-500" /> Total
@@ -231,10 +274,11 @@ const HrAdminDashboardSummary = ({ user }) => {
                 Skill:
               </span>
               <span
-                className="font-semibold text-[rgb(var(--foreground))] truncate max-w-[150px]"
+                className="font-semibold text-[rgb(var(--foreground))] truncate max-w-[150px] sm:max-w-[200px]"
                 title={mostCommonSkill.name}
               >
-                {mostCommonSkill.name} ({mostCommonSkill.count})
+                {mostCommonSkill.name}{" "}
+                {mostCommonSkill.count > 0 ? `(${mostCommonSkill.count})` : ""}
               </span>
             </div>
             <div className="flex items-center justify-between text-sm">
@@ -243,41 +287,30 @@ const HrAdminDashboardSummary = ({ user }) => {
                 Skill:
               </span>
               <span
-                className="font-semibold text-[rgb(var(--foreground))] truncate max-w-[150px]"
+                className="font-semibold text-[rgb(var(--foreground))] truncate max-w-[150px] sm:max-w-[200px]"
                 title={mostDesiredSkill.name}
               >
-                {mostDesiredSkill.name} ({mostDesiredSkill.count})
+                {mostDesiredSkill.name}{" "}
+                {mostDesiredSkill.count > 0
+                  ? `(${mostDesiredSkill.count})`
+                  : ""}
               </span>
             </div>
-            <div className="pt-4 border-t border-[rgb(var(--border))] mt-4 flex flex-wrap gap-x-4 gap-y-2">
-              <Link
-                href="/admin/users"
-                className="text-sm text-[rgb(var(--primary))] hover:underline font-medium"
-              >
+
+            <div className="pt-4 mt-4 border-t border-[rgb(var(--border))] flex flex-wrap gap-2">
+              <Link href="/admin/users" className={dashboardLinkStyles}>
                 Manage Users
               </Link>
-              <Link
-                href="/admin/skills"
-                className="text-sm text-[rgb(var(--primary))] hover:underline font-medium"
-              >
+              <Link href="/admin/skills" className={dashboardLinkStyles}>
                 Manage Skills
               </Link>
-              <Link
-                href="/admin/settings"
-                className="text-sm text-[rgb(var(--primary))] hover:underline font-medium"
-              >
+              <Link href="/admin/settings" className={dashboardLinkStyles}>
                 System Settings
               </Link>
-              <Link
-                href="/projects"
-                className="text-sm text-[rgb(var(--primary))] hover:underline font-medium"
-              >
+              <Link href="/projects" className={dashboardLinkStyles}>
                 View All Projects
               </Link>
-              <Link
-                href="/admin/analytics"
-                className="text-sm text-[rgb(var(--primary))] hover:underline font-medium"
-              >
+              <Link href="/admin/analytics" className={dashboardLinkStyles}>
                 View Skill Analytics
               </Link>
             </div>

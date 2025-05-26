@@ -1,9 +1,7 @@
 "use client";
-import RequestResourceForm from "@/components/user/RequestResourceForm";
-import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
+import RequestResourceForm from "@/components/user/RequestResourceForm";
 import {
   Card,
   CardHeader,
@@ -25,216 +23,50 @@ import {
   UserPlus,
   SearchCheck,
   Info,
+  Briefcase,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import {
   getAllocationPercentageColor,
   getSkillLevelColor,
+  getStatusBadgeVariant,
+  getSkillLevelName,
 } from "@/components/common/CustomColors";
-import { toast } from "react-toastify";
 import RecommendedUserList from "@/components/recommendations/RecommendedUserList";
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" },
-  },
-};
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.07, delayChildren: 0.1 },
-  },
-};
+import { useProjectDetailsData } from "@/lib/hooks/useProjectDetailsData";
+import { cn } from "@/lib/utils";
+import { formatDate } from "@/lib/dateUtils";
+import { fadeIn, containerVariants } from "@/lib/animations";
 
 const ProjectDetailPage = () => {
   const router = useRouter();
   const params = useParams();
   const projectId = params?.projectId;
-  const { data: session, status: sessionStatus } = useSession();
+  const { status: sessionStatus } = useSession();
 
-  const [project, setProject] = useState(null);
-  const [allocations, setAllocations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
-  const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
-  const [userToRequest, setUserToRequest] = useState(null);
+  const {
+    project,
+    allocations,
+    loading,
+    error,
+    isRequestModalOpen,
+    isSubmittingRequest,
+    userToRequest,
+    recommendedUsers,
+    loadingRecommendations,
+    recommendationError,
+    showRecommendations,
+    canManageTeam,
+    // fetchProjectData,
+    handleFetchRecommendations,
+    handleInitiateResourceRequest,
+    handleCloseRequestModal,
+    handleSubmitResourceRequest,
+  } = useProjectDetailsData(projectId);
 
-  const [recommendedUsers, setRecommendedUsers] = useState([]);
-  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
-  const [recommendationError, setRecommendationError] = useState(null);
-  const [showRecommendations, setShowRecommendations] = useState(false);
-
-  const fetchProjectData = useCallback(async () => {
-    if (!projectId) {
-      setError("Project ID is missing.");
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const [projectResponse, allocationsResponse] = await Promise.all([
-        fetch(`/api/projects/${projectId}`),
-        fetch(`/api/allocations?projectId=${projectId}`),
-      ]);
-
-      if (!projectResponse.ok) {
-        const errData = await projectResponse.json().catch(() => ({}));
-        throw new Error(
-          errData.error ||
-            `Failed to fetch project: ${projectResponse.statusText} (${projectResponse.status})`
-        );
-      }
-      const projectResult = await projectResponse.json();
-      if (projectResult.success && projectResult.data) {
-        setProject(projectResult.data);
-      } else {
-        throw new Error(
-          projectResult.error || "Invalid project data received."
-        );
-      }
-
-      if (!allocationsResponse.ok) {
-        const errData = await allocationsResponse.json().catch(() => ({}));
-        throw new Error(
-          errData.error ||
-            `Failed to fetch allocations: ${allocationsResponse.statusText} (${allocationsResponse.status})`
-        );
-      }
-      const allocationsResult = await allocationsResponse.json();
-      if (allocationsResult.success && Array.isArray(allocationsResult.data)) {
-        setAllocations(allocationsResult.data);
-      } else {
-        throw new Error(
-          allocationsResult.error || "Invalid allocations data received."
-        );
-      }
-    } catch (err) {
-      console.error("Error fetching project details:", err);
-      setError(err.message || "Could not load project details.");
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId]);
-
-  useEffect(() => {
-    if (projectId) {
-      fetchProjectData();
-    }
-  }, [projectId, fetchProjectData]);
-
-  const handleFetchRecommendations = async () => {
-    if (!projectId) return;
-    setLoadingRecommendations(true);
-    setRecommendationError(null);
-    setRecommendedUsers([]);
-    setShowRecommendations(true);
-
-    try {
-      const response = await fetch(
-        `/api/recommendations/users?projectId=${projectId}`
-      );
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || "Failed to fetch recommendations.");
-      }
-      setRecommendedUsers(result.data || []);
-    } catch (err) {
-      console.error("Error fetching recommendations:", err);
-      setRecommendationError(err.message);
-      setRecommendedUsers([]);
-    } finally {
-      setLoadingRecommendations(false);
-    }
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const getStatusBadgeVariant = (status) => {
-    switch (status) {
-      case "Active":
-        return "success";
-      case "Completed":
-        return "primary";
-      case "Planning":
-        return "warning";
-      case "On Hold":
-        return "default";
-      case "Cancelled":
-        return "error";
-      default:
-        return "default";
-    }
-  };
-
-  const canManageTeam =
-    session?.user &&
-    project &&
-    (session.user.id === project.pmId?._id ||
-      session.user.role === "admin" ||
-      session.user.role === "hr");
-
-  const handleInitiateResourceRequest = (user) => {
-    setUserToRequest(user);
-    setIsRequestModalOpen(true);
-  };
-
-  const handleCloseRequestModal = () => {
-    setIsRequestModalOpen(false);
-    setUserToRequest(null);
-    setIsSubmittingRequest(false);
-  };
-
-  const handleSubmitResourceRequest = async (formDataFromForm) => {
-    if (!userToRequest || !project) return;
-    setIsSubmittingRequest(true);
-
-    const payload = {
-      projectId: project._id,
-      requestedUserId: userToRequest._id,
-      requestedRole: formDataFromForm.requestedRole,
-      requestedPercentage: formDataFromForm.requestedPercentage,
-      requestedStartDate: formDataFromForm.requestedStartDate,
-      requestedEndDate: formDataFromForm.requestedEndDate,
-      pmNotes: formDataFromForm.pmNotes,
-    };
-
-    try {
-      const response = await fetch("/api/resourcerequests", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || "Failed to submit request");
-      }
-      toast.success(
-        `Request for ${userToRequest.name} submitted successfully!`
-      );
-      handleCloseRequestModal();
-    } catch (error) {
-      console.error("Error submitting resource request:", error);
-      toast.error(`Error: ${error.message || "Could not submit request."}`);
-      setIsSubmittingRequest(false);
-    }
-  };
-
-  if (sessionStatus === "loading" || (loading && !project)) {
+  if (sessionStatus === "loading" || (loading && !project && !error)) {
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-[rgb(var(--background))] p-10 text-center">
+      <div className="flex flex-col justify-center items-center min-h-screen bg-[rgb(var(--background))] p-10 text-center rounded-lg">
         <LoadingSpinner size={30} />
         <p className="mt-3 text-[rgb(var(--muted-foreground))]">
           Loading project details...
@@ -243,16 +75,21 @@ const ProjectDetailPage = () => {
     );
   }
 
-  if (error) {
+  if (error && !project) {
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-[rgb(var(--muted))] p-6 text-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-red-600 flex items-center justify-center">
-              <AlertCircle size={24} className="mr-2" /> Error
+      <div className="flex flex-col justify-center items-center min-h-screen bg-[rgb(var(--background))] p-6 text-center rounded-lg">
+        <Card className="w-full max-w-md bg-[rgb(var(--card))] shadow-lg rounded-[var(--radius)]">
+          <CardHeader
+            className={cn(
+              "bg-[rgb(var(--destructive))]/10 text-[rgb(var(--destructive))]",
+              "border-b border-[rgb(var(--destructive))]/20"
+            )}
+          >
+            <CardTitle className="flex items-center justify-center gap-2 text-base">
+              <AlertCircle /> Error Loading Project
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <p className="text-[rgb(var(--muted-foreground))]">{error}</p>
             <Button
               variant="outline"
@@ -267,19 +104,24 @@ const ProjectDetailPage = () => {
     );
   }
 
-  if (!project) {
+  if (!project && !loading) {
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-[rgb(var(--muted))] p-6 text-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-center text-[rgb(var(--foreground))]">
-              <AlertCircle size={24} className="mr-2 text-amber-500" /> Project
-              Not Found
+      <div className="flex flex-col justify-center items-center min-h-screen bg-[rgb(var(--background))] p-6 text-center rounded-lg">
+        <Card className="w-full max-w-md bg-[rgb(var(--card))] shadow-lg rounded-[var(--radius)]">
+          <CardHeader
+            className={cn(
+              "bg-[rgb(var(--warning))]/10 text-[rgb(var(--warning))]",
+              "border-b border-[rgb(var(--warning))]/20"
+            )}
+          >
+            <CardTitle className="flex items-center justify-center gap-2 text-base">
+              <AlertCircle /> Project Not Found
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <p className="text-[rgb(var(--muted-foreground))]">
-              The project you are looking for could not be found.
+              The project you are looking for could not be found or you do not
+              have permission to view it.
             </p>
             <Button
               variant="outline"
@@ -294,56 +136,68 @@ const ProjectDetailPage = () => {
     );
   }
 
+  if (!project) return null;
+
   return (
     <motion.div
-      className="p-4 md:p-6 bg-[rgb(var(--muted))] min-h-screen"
+      className="p-4 md:p-6 bg-[rgb(var(--background))] min-h-screen rounded-lg"
       initial="hidden"
       animate="visible"
       variants={fadeIn}
     >
       <div className="max-w-5xl mx-auto space-y-8">
-        <div className="mb-6">
+        <motion.div variants={fadeIn} className="mb-6">
           <Button
             variant="ghost"
             onClick={() => router.push("/projects")}
-            className="text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))]"
+            className="text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))]"
           >
             <ArrowLeft size={18} className="mr-2" /> Back to All Projects
           </Button>
-        </div>
-
+        </motion.div>
         <motion.div variants={fadeIn}>
-          <Card>
-            <CardHeader className="border-b border-[rgb(var(--border))]">
+          <Card className="shadow-lg bg-[rgb(var(--card))] rounded-[var(--radius)]">
+            <CardHeader
+              className={cn(
+                "border-b border-[rgb(var(--border))]",
+                "bg-[rgb(var(--accent))] text-[rgb(var(--accent-foreground))]"
+              )}
+            >
               <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-2">
-                <CardTitle className="text-2xl md:text-3xl text-[rgb(var(--foreground))]">
-                  {project.name}
-                </CardTitle>
+                <div className="flex-grow">
+                  <CardTitle className="text-2xl md:text-3xl text-[rgb(var(--foreground))] flex items-center gap-2">
+                    <Briefcase
+                      size={24}
+                      className="text-[rgb(var(--primary))]"
+                    />
+                    {project.name}
+                  </CardTitle>
+                  {project.pmId?.name && (
+                    <CardDescription className="text-sm text-[rgb(var(--muted-foreground))] mt-2 flex items-center">
+                      <UserCog
+                        size={15}
+                        className="mr-1.5 text-[rgb(var(--muted-foreground))]"
+                      />
+                      Managed by:{" "}
+                      <span className="font-medium text-[rgb(var(--foreground))] ml-1">
+                        {project.pmId.name}
+                      </span>
+                    </CardDescription>
+                  )}
+                </div>
                 <Badge
                   variant={getStatusBadgeVariant(project.status)}
                   pill={true}
                   size="md"
-                  className="mt-1 sm:mt-0"
+                  className="mt-1 sm:mt-0 self-start sm:self-auto"
                 >
                   {project.status}
                 </Badge>
               </div>
-              {project.pmId?.name && (
-                <div className="text-sm text-[rgb(var(--muted-foreground))] mt-3 flex items-center">
-                  <UserCog
-                    size={16}
-                    className="mr-2 text-[rgb(var(--primary))]"
-                  />
-                  Managed by:{" "}
-                  <span className="font-medium text-[rgb(var(--foreground))] ml-1">
-                    {project.pmId.name}
-                  </span>
-                </div>
-              )}
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
               <div>
-                <h3 className="text-sm font-semibold text-[rgb(var(--muted-foreground))] mb-1">
+                <h3 className="text-sm font-semibold uppercase text-[rgb(var(--muted-foreground))] mb-1.5">
                   Description
                 </h3>
                 <p className="text-base text-[rgb(var(--foreground))] whitespace-pre-wrap leading-relaxed">
@@ -352,11 +206,11 @@ const ProjectDetailPage = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                 <div>
-                  <h3 className="text-sm font-semibold text-[rgb(var(--muted-foreground))] mb-1 flex items-center">
+                  <h3 className="text-sm font-semibold uppercase text-[rgb(var(--muted-foreground))] mb-1.5 flex items-center">
                     <CalendarDays
-                      size={16}
-                      className="mr-2 text-[rgb(var(--primary))]"
-                    />{" "}
+                      size={15}
+                      className="mr-2 text-[rgb(var(--muted-foreground))]"
+                    />
                     Start Date
                   </h3>
                   <p className="text-base text-[rgb(var(--foreground))]">
@@ -364,11 +218,11 @@ const ProjectDetailPage = () => {
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-[rgb(var(--muted-foreground))] mb-1 flex items-center">
+                  <h3 className="text-sm font-semibold uppercase text-[rgb(var(--muted-foreground))] mb-1.5 flex items-center">
                     <CalendarDays
-                      size={16}
-                      className="mr-2 text-[rgb(var(--primary))]"
-                    />{" "}
+                      size={15}
+                      className="mr-2 text-[rgb(var(--muted-foreground))]"
+                    />
                     End Date
                   </h3>
                   <p className="text-base text-[rgb(var(--foreground))]">
@@ -378,41 +232,48 @@ const ProjectDetailPage = () => {
               </div>
               {project.requiredSkills && project.requiredSkills.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-[rgb(var(--muted-foreground))] mb-2 flex items-center">
+                  <h3 className="text-sm font-semibold uppercase text-[rgb(var(--muted-foreground))] mb-2 flex items-center">
                     <Wrench
-                      size={16}
-                      className="mr-2 text-[rgb(var(--primary))]"
-                    />{" "}
+                      size={15}
+                      className="mr-2 text-[rgb(var(--muted-foreground))]"
+                    />
                     Required Skills
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {project.requiredSkills.map((reqSkill) => (
-                      <Badge
-                        key={reqSkill.skillId}
-                        className={getSkillLevelColor(
-                          reqSkill.proficiencyLevel
-                        )}
-                        pill={true}
-                        size="sm"
-                      >
-                        {reqSkill.skillName || "Unnamed Skill"}
-                        {reqSkill.proficiencyLevel &&
-                          ` (L${reqSkill.proficiencyLevel})`}
-                        {reqSkill.isRequired ? "*" : ""}
-                      </Badge>
-                    ))}
+                    {project.requiredSkills.map((reqSkill) => {
+                      const proficiencyName = reqSkill.proficiencyLevel
+                        ? getSkillLevelName(reqSkill.proficiencyLevel)
+                        : "";
+
+                      return (
+                        <Badge
+                          key={reqSkill.skillId || reqSkill.skillName}
+                          className={getSkillLevelColor(
+                            reqSkill.proficiencyLevel
+                          )}
+                          pill={true}
+                          size="sm"
+                        >
+                          {reqSkill.skillName || "Unnamed Skill"}
+                          {proficiencyName && (
+                            <span className="ml-1.5 opacity-80">
+                              ({proficiencyName})
+                            </span>
+                          )}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </div>
               )}
             </CardContent>
           </Card>
         </motion.div>
-
         <motion.div variants={fadeIn}>
-          <Card>
+          <Card className="shadow-lg bg-[rgb(var(--card))] rounded-[var(--radius)]">
             <CardHeader>
-              <CardTitle className="text-xl text-[rgb(var(--foreground))] flex items-center">
-                <Users size={20} className="mr-2 text-[rgb(var(--primary))]" />{" "}
+              <CardTitle className="text-xl text-[rgb(var(--foreground))] flex items-center gap-2">
+                <Users size={20} className="text-[rgb(var(--primary))]" />
                 Allocated Team Members
               </CardTitle>
             </CardHeader>
@@ -430,22 +291,25 @@ const ProjectDetailPage = () => {
                       variants={fadeIn}
                       className="p-4 border border-[rgb(var(--border))] rounded-[var(--radius)] bg-[rgb(var(--background))] hover:bg-[rgb(var(--muted))] transition-colors duration-150"
                     >
-                      <div className="flex justify-between items-center mb-1">
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-1">
                         <span className="font-semibold text-base text-[rgb(var(--foreground))]">
                           {alloc.userId?.name || "Unknown User"}
                         </span>
                         <Badge
                           size="sm"
                           pill={true}
-                          className={getAllocationPercentageColor(
-                            alloc.allocationPercentage
+                          className={cn(
+                            "mt-1 sm:mt-0",
+                            getAllocationPercentageColor(
+                              alloc.allocationPercentage
+                            )
                           )}
                         >
                           {alloc.allocationPercentage}%
                         </Badge>
                       </div>
-                      <p className="text-xs text-[rgb(var(--muted-foreground))]">
-                        Role: {alloc.role}
+                      <p className="text-xs text-[rgb(var(--muted-foreground))] mt-1">
+                        Role: {alloc.role || "N/A"}
                       </p>
                       <p className="text-xs text-[rgb(var(--muted-foreground))] mt-0.5">
                         Duration: {formatDate(alloc.startDate)} -{" "}
@@ -462,20 +326,17 @@ const ProjectDetailPage = () => {
             </CardContent>
           </Card>
         </motion.div>
-
         {canManageTeam && (
           <motion.div variants={fadeIn}>
-            <Card>
+            <Card className="shadow-lg bg-[rgb(var(--card))] rounded-[var(--radius)]">
               <CardHeader>
-                <CardTitle className="text-xl text-[rgb(var(--foreground))] flex items-center">
-                  <UserPlus
-                    size={20}
-                    className="mr-2 text-[rgb(var(--primary))]"
-                  />
-                  Manage Team / Request Resources
+                <CardTitle className="text-xl text-[rgb(var(--foreground))] flex items-center gap-2">
+                  <UserPlus size={20} className="text-[rgb(var(--primary))]" />
+                  Manage Team & Find Recommendations
                 </CardTitle>
-                <CardDescription className="mt-1">
-                  Find AI-powered user recommendations for this project.
+                <CardDescription className="mt-1 text-[rgb(var(--muted-foreground))]">
+                  Use AI to find suitable users or manually request resources
+                  for this project.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -496,9 +357,14 @@ const ProjectDetailPage = () => {
                       : "Find Matching Users (AI)"}
                   </Button>
                   {recommendationError && (
-                    <p className="text-sm text-red-600 mt-3 p-3 bg-red-50 border border-red-200 rounded-[var(--radius)] shadow">
+                    <div
+                      className={cn(
+                        "mt-3 p-3 rounded-[var(--radius)] text-sm shadow",
+                        "bg-[rgb(var(--destructive))]/15 text-[rgb(var(--destructive))] border border-[rgb(var(--destructive))]/30"
+                      )}
+                    >
                       Error finding recommendations: {recommendationError}
-                    </p>
+                    </div>
                   )}
                 </div>
 
@@ -522,7 +388,7 @@ const ProjectDetailPage = () => {
                   showRecommendations &&
                   recommendedUsers.length === 0 &&
                   !recommendationError && (
-                    <div className="text-center py-8 px-4 rounded-lg bg-[rgb(var(--background))] border border-[rgb(var(--border))]">
+                    <div className="text-center py-8 px-4 rounded-lg bg-[rgb(var(--background))] border border-[rgb(var(--border))] shadow-sm">
                       <Info
                         size={32}
                         className="mx-auto mb-3 text-[rgb(var(--primary))]"
@@ -531,9 +397,8 @@ const ProjectDetailPage = () => {
                         No Specific Recommendations Found
                       </h4>
                       <p className="text-sm text-[rgb(var(--muted-foreground))]">
-                        The AI couldn't pinpoint specific user recommendations
-                        based on the current project criteria. You can still
-                        manually browse and request resources if needed.
+                        The AI couldn't pinpoint specific user recommendations.
+                        You can manually browse and request resources.
                       </p>
                     </div>
                   )}
@@ -542,6 +407,7 @@ const ProjectDetailPage = () => {
           </motion.div>
         )}
       </div>
+
       {userToRequest && project && (
         <Modal
           isOpen={isRequestModalOpen}

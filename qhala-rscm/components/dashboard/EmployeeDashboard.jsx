@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
+  CardDescription,
 } from "@/components/common/Card";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Badge from "@/components/common/Badge";
@@ -14,11 +15,12 @@ import {
   GraduationCap,
   AlertCircle,
   Activity as CapacityIcon,
+  User,
 } from "lucide-react";
 import { getAllocationPercentageColor } from "@/components/common/CustomColors";
+import { cn } from "@/lib/utils";
 
 const EmployeeDashboardSummary = ({ user }) => {
-  // State for this component's specific data
   const [projectCount, setProjectCount] = useState(0);
   const [currentSkillCount, setCurrentSkillCount] = useState(0);
   const [capacitySummary, setCapacitySummary] = useState({
@@ -107,12 +109,36 @@ const EmployeeDashboardSummary = ({ user }) => {
     }
   }, [user?.id]);
 
+  const dashboardLinkStyles = cn(
+    "inline-block text-sm font-medium",
+    "bg-[rgb(var(--qhala-dark-navy))] text-[rgb(var(--accent))]",
+    " hover:text-[rgb(var(--qhala-soft-peach-darker))]",
+    "px-3 py-1.5",
+    "rounded-[var(--radius)]",
+    "transition-colors duration-150 ease-in-out",
+    "shadow-sm"
+  );
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">My Summary</CardTitle>
+    <Card className="overflow-hidden">
+      <CardHeader className={cn("shadow-sm bg-[rgb(var(--accent))] p-4")}>
+        <CardTitle
+          className={cn(
+            "flex items-center gap-2 text-lg font-semibold text-[rgb(var(--accent-foreground))] md:text-xl"
+          )}
+        >
+          <User size={22} className="text-[rgb(var(--accent-foreground))]" />
+          My Summary
+        </CardTitle>
+        <CardDescription
+          className={cn(
+            "mt-1 text-sm text-[rgb(var(--accent-foreground))] opacity-90"
+          )}
+        >
+          Your personal overview, current capacity, and skill status.
+        </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className={cn("p-5 md:p-6")}>
         {loadingSummary ? (
           <div className="flex flex-col items-center justify-center p-6 min-h-[150px]">
             <LoadingSpinner size={20} />
@@ -121,9 +147,16 @@ const EmployeeDashboardSummary = ({ user }) => {
             </p>
           </div>
         ) : summaryError ? (
-          <div className="flex items-center p-3 text-sm rounded-[var(--radius)] bg-red-50 text-red-700 border border-red-200 shadow-sm">
-            <AlertCircle size={16} className="mr-2 flex-shrink-0" />
-            <span>{summaryError}</span>
+          <div
+            className={cn(
+              "flex items-center p-4 rounded-lg text-sm shadow-sm",
+              "bg-[rgb(var(--destructive))]/15",
+              "text-[rgb(var(--destructive))]",
+              "border border-[rgb(var(--destructive))]/40"
+            )}
+          >
+            <AlertCircle size={20} className="mr-3 flex-shrink-0" />
+            <span className="font-medium">{summaryError}</span>
           </div>
         ) : (
           <div className="space-y-4">
@@ -139,7 +172,6 @@ const EmployeeDashboardSummary = ({ user }) => {
                 {projectCount}
               </span>
             </div>
-
             <div className="flex items-center justify-between text-sm">
               <span className="flex items-center text-[rgb(var(--muted-foreground))]">
                 <GraduationCap
@@ -152,7 +184,6 @@ const EmployeeDashboardSummary = ({ user }) => {
                 {currentSkillCount}
               </span>
             </div>
-
             <div className="flex items-center justify-between text-sm">
               <span className="flex items-center text-[rgb(var(--muted-foreground))]">
                 <CapacityIcon
@@ -177,12 +208,8 @@ const EmployeeDashboardSummary = ({ user }) => {
                 this week)
               </p>
             )}
-
-            <div className="pt-3 border-t border-[rgb(var(--border))] mt-4">
-              <Link
-                href="/profile"
-                className="text-sm text-[rgb(var(--primary))] hover:underline font-medium"
-              >
+            <div className="pt-3 mt-4 border-t border-[rgb(var(--border))]">
+              <Link href="/profile" className={dashboardLinkStyles}>
                 View/Edit My Profile & Skills &rarr;
               </Link>
             </div>

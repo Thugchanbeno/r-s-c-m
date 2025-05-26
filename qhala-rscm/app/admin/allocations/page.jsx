@@ -15,10 +15,10 @@ import {
   Edit,
   Trash2,
   AlertCircle,
+  CheckCircle,
 } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-
 import {
   pageVariants,
   itemVariants,
@@ -26,10 +26,11 @@ import {
 } from "@/lib/animations";
 import {
   getAllocationPercentageColor,
-  getAvailabilityStyles,
+  // getAvailabilityStyles, // This is for card borders/shadows, not the dot's BG
 } from "@/components/common/CustomColors";
 import { formatDate } from "@/lib/dateUtils";
 import { useAllocations } from "@/lib/hooks/useAllocations";
+import { cn } from "@/lib/utils";
 
 const AllocationsListPage = () => {
   const { data: session, status: sessionStatus } = useSession({
@@ -53,7 +54,9 @@ const AllocationsListPage = () => {
     selectAllocationForEdit,
     clearEditingAllocation,
     submitAllocation,
-    removeAllocation,
+    confirmDeleteId,
+    handleDeleteClick,
+    cancelDeleteConfirmation,
   } = useAllocations();
 
   const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false);
@@ -83,7 +86,7 @@ const AllocationsListPage = () => {
 
   const handleFormSubmit = async (formData) => {
     const result = await submitAllocation(formData);
-    if (result.success) {
+    if (result && result.success) {
       closeAllocationModal();
     }
   };
@@ -100,7 +103,7 @@ const AllocationsListPage = () => {
 
   if (isInitialLoading) {
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-[rgb(var(--background))] p-10 text-center">
+      <div className="flex flex-col justify-center items-center min-h-screen bg-[rgb(var(--background))] p-10 text-center rounded-lg">
         <LoadingSpinner size={30} />
         <p className="mt-3 text-[rgb(var(--muted-foreground))]">
           Loading allocations...
@@ -111,7 +114,7 @@ const AllocationsListPage = () => {
 
   return (
     <motion.div
-      className="p-4 md:p-6 bg-[rgb(var(--muted))] min-h-screen"
+      className="p-4 md:p-6 bg-[rgb(var(--background))] min-h-screen rounded-lg"
       initial="hidden"
       animate="visible"
       variants={pageVariants}
@@ -119,24 +122,24 @@ const AllocationsListPage = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         <motion.div
           variants={itemVariants}
-          className="flex flex-col sm:flex-row justify-between sm:items-center gap-4"
+          className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pb-4 border-b border-[rgb(var(--border))]"
         >
           <div>
-            <Link href="/admin">
+            <Link href="/admin" className="inline-block mb-2">
               <Button
                 variant="ghost"
-                className="text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))] mb-2 sm:mb-0 -ml-2"
+                size="sm"
+                className="text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))] -ml-2"
               >
-                <ArrowLeft size={18} className="mr-2" /> Back to Admin Dashboard
+                <ArrowLeft size={16} className="mr-2" />
+                Back to Admin Dashboard
               </Button>
             </Link>
             <h1 className="text-2xl md:text-3xl font-bold text-[rgb(var(--foreground))]">
-              {" "}
-              Manage Allocations{" "}
+              Manage Allocations
             </h1>
             <p className="text-[rgb(var(--muted-foreground))] mt-1">
-              {" "}
-              View, create, edit, and delete resource allocations.{" "}
+              View, create, edit, and delete resource allocations.
             </p>
           </div>
           {(session?.user?.role === "admin" ||
@@ -144,41 +147,53 @@ const AllocationsListPage = () => {
             <Button
               variant="primary"
               onClick={openCreateAllocationModal}
-              disabled={isProcessingAction}
+              disabled={isProcessingAction || loadingDropdowns}
+              isLoading={loadingDropdowns && !isAllocationModalOpen}
             >
               <PlusCircle size={18} className="mr-2" /> Create New Allocation
             </Button>
           )}
         </motion.div>
+
         {error && (
           <motion.div
             variants={itemVariants}
-            className="p-4 bg-red-50 text-red-700 border border-red-200 rounded-[var(--radius)] flex items-center gap-2"
+            className={cn(
+              "flex items-center p-4 rounded-lg text-sm shadow-sm",
+              "bg-[rgb(var(--destructive))]/15 text-[rgb(var(--destructive))] border border-[rgb(var(--destructive))]/40"
+            )}
           >
-            <AlertCircle size={20} /> {error}
+            <AlertCircle size={20} className="mr-2 flex-shrink-0" /> {error}
           </motion.div>
         )}
-        {loading && allocations.length > 0 && (
+
+        {loading && allocations.length > 0 && !isInitialLoading && (
           <div className="flex justify-center py-4">
-            {" "}
-            <LoadingSpinner size={24} />{" "}
+            <LoadingSpinner size={24} />
           </div>
         )}
+
         {!loading && allocations.length === 0 && !error && (
-          <motion.p
+          <motion.div
             variants={itemVariants}
-            className="text-center text-[rgb(var(--muted-foreground))] py-10"
+            className="text-center text-[rgb(var(--muted-foreground))] py-10 bg-[rgb(var(--card))] rounded-[var(--radius)] shadow-sm border border-[rgb(var(--border))]"
           >
+            <UserCheck
+              size={40}
+              className="mx-auto mb-3 text-[rgb(var(--muted-foreground))]"
+              strokeWidth={1.5}
+            />
             No allocations found.
-          </motion.p>
+          </motion.div>
         )}
+
         {allocations.length > 0 && !error && (
           <motion.div
             variants={listContainerVariants}
             initial="hidden"
             animate="visible"
           >
-            <Card>
+            <Card className="shadow-md bg-[rgb(var(--card))] rounded-[var(--radius)] overflow-hidden">
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-[rgb(var(--border))]">
@@ -188,43 +203,38 @@ const AllocationsListPage = () => {
                           scope="col"
                           className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-[rgb(var(--foreground))] sm:pl-6"
                         >
-                          {" "}
-                          User{" "}
+                          User
                         </th>
                         <th
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-[rgb(var(--foreground))]"
                         >
-                          {" "}
-                          Project{" "}
+                          Project
                         </th>
                         <th
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-[rgb(var(--foreground))]"
                         >
-                          {" "}
-                          Role{" "}
+                          Role
                         </th>
                         <th
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-[rgb(var(--foreground))]"
                         >
-                          {" "}
-                          Allocation{" "}
+                          Allocation
                         </th>
                         <th
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-[rgb(var(--foreground))]"
                         >
-                          {" "}
-                          Dates{" "}
+                          Dates
                         </th>
                         <th
                           scope="col"
-                          className="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                          className="relative py-3.5 pl-3 pr-4 sm:pr-6 text-right"
                         >
-                          {" "}
-                          <span className="sr-only">Actions</span>{" "}
+                          <span className="sr-only">Actions</span>
+                          Actions
                         </th>
                       </tr>
                     </thead>
@@ -242,7 +252,7 @@ const AllocationsListPage = () => {
                                   <Image
                                     className="h-10 w-10 rounded-full object-cover"
                                     src={alloc.userId.avatarUrl}
-                                    alt=""
+                                    alt={alloc.userId.name || "User avatar"}
                                     width={40}
                                     height={40}
                                     sizes="40px"
@@ -253,15 +263,23 @@ const AllocationsListPage = () => {
                                   </div>
                                 )}
                                 <span
-                                  className={`absolute -bottom-0.5 -right-0.5 block h-2.5 w-2.5 rounded-full ring-2 ring-[rgb(var(--card))] ${getAvailabilityStyles(
-                                    alloc.userId?.availabilityStatus
-                                  )
-                                    .split(" ")[0]
-                                    .replace("border-", "bg-")
-                                    .replace("-400", "-500")}`}
-                                  aria-label={`Availability: ${
-                                    alloc.userId?.availabilityStatus ||
-                                    "unknown"
+                                  className={cn(
+                                    "absolute -bottom-0.5 -right-0.5 block h-3 w-3 rounded-full ring-2 ring-[rgb(var(--card))]",
+                                    // Corrected: Direct background color for the dot based on status
+                                    alloc.userId?.availabilityStatus ===
+                                      "available" && "bg-green-500",
+                                    alloc.userId?.availabilityStatus ===
+                                      "unavailable" && "bg-red-500",
+                                    alloc.userId?.availabilityStatus ===
+                                      "on_leave" && "bg-yellow-500", // Changed to yellow for 'on_leave'
+                                    !alloc.userId?.availabilityStatus &&
+                                      "bg-gray-300" // Default if status unknown
+                                  )}
+                                  title={`Availability: ${
+                                    alloc.userId?.availabilityStatus?.replace(
+                                      "_",
+                                      " "
+                                    ) || "unknown"
                                   }`}
                                 ></span>
                               </div>
@@ -303,21 +321,34 @@ const AllocationsListPage = () => {
                                 size="icon-sm"
                                 onClick={() => openEditAllocationModal(alloc)}
                                 disabled={isProcessingAction}
-                                className="text-[rgb(var(--primary))] hover:bg-[rgba(var(--primary),0.1)]"
+                                className="text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-accent-background))]"
                                 aria-label={`Edit allocation for ${alloc.userId?.name}`}
                               >
                                 <Edit size={16} />
                               </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon-sm"
-                                onClick={() => handleDelete(alloc._id)}
-                                disabled={isProcessingAction}
-                                className="text-red-600 hover:bg-red-50"
-                                aria-label={`Delete allocation for ${alloc.userId?.name}`}
-                              >
-                                <Trash2 size={16} />
-                              </Button>
+                              {confirmDeleteId === alloc._id ? (
+                                <Button
+                                  variant="destructive"
+                                  size="icon-sm"
+                                  onClick={() => handleDeleteClick(alloc._id)}
+                                  onMouseLeave={cancelDeleteConfirmation}
+                                  disabled={isProcessingAction}
+                                  aria-label={`Confirm delete allocation for ${alloc.userId?.name}`}
+                                >
+                                  <CheckCircle size={16} />
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  onClick={() => handleDeleteClick(alloc._id)}
+                                  disabled={isProcessingAction}
+                                  className="text-[rgb(var(--destructive))] hover:bg-[rgb(var(--destructive))]/10"
+                                  aria-label={`Delete allocation for ${alloc.userId?.name}`}
+                                >
+                                  <Trash2 size={16} />
+                                </Button>
+                              )}
                             </div>
                           </td>
                         </motion.tr>
@@ -329,10 +360,11 @@ const AllocationsListPage = () => {
             </Card>
           </motion.div>
         )}
+
         {totalPages > 1 && !error && (
           <motion.div
             variants={itemVariants}
-            className="flex justify-center items-center space-x-2 mt-6"
+            className="flex justify-center items-center space-x-2 mt-6 pt-4 border-t border-[rgb(var(--border))]"
           >
             <Button
               onClick={() => goToPage(currentPage - 1)}
@@ -340,12 +372,10 @@ const AllocationsListPage = () => {
               variant="outline"
               size="sm"
             >
-              {" "}
-              Previous{" "}
+              Previous
             </Button>
             <span className="text-sm text-[rgb(var(--muted-foreground))]">
-              {" "}
-              Page {currentPage} of {totalPages}{" "}
+              Page {currentPage} of {totalPages}
             </span>
             <Button
               onClick={() => goToPage(currentPage + 1)}
@@ -355,12 +385,12 @@ const AllocationsListPage = () => {
               variant="outline"
               size="sm"
             >
-              {" "}
-              Next{" "}
+              Next
             </Button>
           </motion.div>
         )}
       </div>
+
       {isAllocationModalOpen && (
         <Modal
           isOpen={isAllocationModalOpen}

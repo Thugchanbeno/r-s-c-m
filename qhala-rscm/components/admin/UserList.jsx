@@ -4,7 +4,13 @@ import { motion } from "framer-motion";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Image from "next/image";
 import Button from "@/components/common/Button";
-import { Card, CardContent } from "@/components/common/Card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/common/Card";
 import Badge from "@/components/common/Badge";
 import {
   Edit,
@@ -14,16 +20,18 @@ import {
   UserCheck,
   Search,
   UserPlus,
+  AlertCircle,
+  Users as UsersIcon,
 } from "lucide-react";
 import { getAvailabilityStyles } from "@/components/common/CustomColors";
+import { cn } from "@/lib/utils";
 
-// Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.07, // Adjusted stagger
+      staggerChildren: 0.07,
     },
   },
 };
@@ -102,17 +110,15 @@ const UserList = ({
 
   const handleEditClick = (userId) => {
     if (onEditUser) onEditUser(userId);
-    // else console.warn("UserList: onEditUser prop not provided.");
   };
 
   const handleDeleteClick = (userId) => {
     if (onDeleteUser) onDeleteUser(userId);
-    // else console.warn("UserList: onDeleteUser prop not provided.");
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[300px] bg-[rgb(var(--muted))] rounded-[var(--radius)] shadow-sm">
+      <div className="flex justify-center items-center min-h-[300px] bg-[rgb(var(--card))] rounded-[var(--radius)] shadow-sm">
         <div className="flex flex-col items-center gap-3">
           <LoadingSpinner size={24} />
           <p className="text-sm text-[rgb(var(--muted-foreground))]">
@@ -128,169 +134,181 @@ const UserList = ({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="p-6 bg-red-50 border border-red-200 rounded-[var(--radius)] shadow-sm"
+        className={cn(
+          "flex items-center p-4 rounded-lg text-sm shadow-sm",
+          "bg-[rgb(var(--destructive))]/15",
+          "text-[rgb(var(--destructive))]",
+          "border border-[rgb(var(--destructive))]/40"
+        )}
       >
-        <div className="flex items-center gap-3 text-red-600">
-          <span className="p-2 bg-red-100 rounded-lg">
-            <Search className="w-5 h-5" /> {/* Or AlertCircle */}
-          </span>
-          <p className="font-medium">Error loading users: {error}</p>
-        </div>
+        <AlertCircle size={20} className="mr-3 flex-shrink-0" />
+        <span className="font-medium">Error loading users: {error}</span>
       </motion.div>
     );
   }
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="space-y-4"
-    >
-      {users.length === 0 ? (
-        <motion.div
-          variants={itemVariants}
-          className="flex flex-col items-center justify-center py-12 px-6 bg-[rgb(var(--muted))] rounded-[var(--radius)] border-2 border-dashed border-[rgb(var(--border))]"
-        >
-          <Search className="w-12 h-12 text-[rgb(var(--muted-foreground))] mb-3" />
-          <p className="text-[rgb(var(--muted-foreground))] text-center">
-            {searchTerm || skillSearchTerm
-              ? `No users found matching your criteria.`
-              : "No users found."}
-          </p>
-        </motion.div>
-      ) : (
-        users.map((user) => {
-          const availabilityStyleClasses = getAvailabilityStyles(
-            user.availabilityStatus
-          );
+    <>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="space-y-4 pt-0"
+      >
+        {users.length === 0 ? (
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-col items-center justify-center py-12 px-6 bg-[rgb(var(--muted))] rounded-[var(--radius)] border-2 border-dashed border-[rgb(var(--border))]"
+          >
+            <Search
+              className="w-12 h-12 text-[rgb(var(--muted-foreground))] mb-3"
+              strokeWidth={1.5}
+            />
+            <p className="text-[rgb(var(--muted-foreground))] text-center">
+              {searchTerm || skillSearchTerm
+                ? `No users found matching your criteria.`
+                : "No users found."}
+            </p>
+          </motion.div>
+        ) : (
+          users.map((user) => {
+            const availabilityStyleClasses = getAvailabilityStyles(
+              user.availabilityStatus
+            );
 
-          return (
-            <motion.div key={user._id} variants={itemVariants}>
-              <Card
-                className={`group overflow-hidden transition-all duration-300 border-2 ${availabilityStyleClasses}`}
-              >
-                <CardContent className="p-6">
-                  <div className="flex flex-col sm:flex-row items-start gap-6">
-                    <div className="flex items-center gap-4 sm:gap-5">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-[rgb(var(--primary))] to-purple-500 rounded-full opacity-0 group-hover:opacity-75 transition-opacity duration-300" />
-                        {user.avatarUrl ? (
-                          <div className="relative h-16 w-16">
-                            <Image
-                              className="rounded-full object-cover border-4 border-[rgb(var(--card))]"
-                              src={user.avatarUrl}
-                              alt={`${user.name}'s avatar`}
-                              fill
-                              sizes="64px"
+            return (
+              <motion.div key={user._id} variants={itemVariants}>
+                <Card
+                  className={cn(
+                    "group overflow-hidden transition-all duration-300 border-2 hover:shadow-xl",
+                    availabilityStyleClasses,
+                    "bg-[rgb(var(--card))]"
+                  )}
+                >
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex flex-col sm:flex-row items-start gap-4 md:gap-6">
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          {user.avatarUrl ? (
+                            <div className="relative h-16 w-16">
+                              <Image
+                                className="rounded-full object-cover border-4 border-[rgb(var(--background))]"
+                                src={user.avatarUrl}
+                                alt={`${user.name}'s avatar`}
+                                fill
+                                sizes="64px"
+                              />
+                            </div>
+                          ) : (
+                            <div className="relative h-16 w-16 bg-[rgb(var(--muted))] rounded-full flex items-center justify-center border-4 border-[rgb(var(--background))]">
+                              <UserCheck
+                                size={32}
+                                className="text-[rgb(var(--muted-foreground))]"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-grow">
+                          <h3 className="text-lg sm:text-xl font-semibold text-[rgb(var(--foreground))] group-hover:text-[rgb(var(--primary))] transition-colors duration-300">
+                            {user.name}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-[rgb(var(--muted-foreground))] flex items-center mt-1">
+                            <Mail
+                              size={14}
+                              className="mr-2 text-[rgb(var(--muted-foreground))] opacity-80"
                             />
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="w-full sm:w-auto flex flex-col sm:items-end sm:ml-auto mt-4 sm:mt-0 space-y-2">
+                        <div className="flex flex-wrap sm:flex-col items-start sm:items-end gap-2">
+                          <div className="flex items-center gap-2">
+                            {/* Reverted Badge variants to original logic */}
+                            <Badge
+                              variant={
+                                user.availabilityStatus === "available"
+                                  ? "success"
+                                  : user.availabilityStatus === "unavailable"
+                                  ? "error"
+                                  : "default"
+                              }
+                              className="capitalize px-2.5 py-1 text-[10px] sm:text-xs"
+                              pill={true}
+                            >
+                              {user.availabilityStatus?.replace("_", " ") ||
+                                "Unknown"}
+                            </Badge>
+                            <Badge
+                              variant={
+                                user.role === "admin" || user.role === "hr"
+                                  ? "error" // These were your original variants
+                                  : user.role === "pm"
+                                  ? "warning"
+                                  : "success"
+                              }
+                              className="capitalize px-2.5 py-1 text-[10px] sm:text-xs"
+                              pill={true}
+                            >
+                              {user.role}
+                            </Badge>
                           </div>
-                        ) : (
-                          <div className="relative h-16 w-16 bg-[rgb(var(--muted))] rounded-full flex items-center justify-center border-4 border-[rgb(var(--card))]">
-                            <UserCheck
-                              size={32}
+                          <div className="flex items-center gap-1.5 text-xs sm:text-sm text-[rgb(var(--muted-foreground))]">
+                            <Building
+                              size={14}
                               className="text-[rgb(var(--muted-foreground))]"
                             />
+                            <span className="font-medium text-[rgb(var(--foreground))]">
+                              {user.department || "N/A"}
+                            </span>
                           </div>
-                        )}
-                      </div>
-                      <div className="flex-grow">
-                        <h3 className="text-lg sm:text-xl font-semibold text-[rgb(var(--card-foreground))] group-hover:text-[rgb(var(--primary))] transition-colors duration-300">
-                          {user.name}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-[rgb(var(--muted-foreground))] flex items-center mt-1">
-                          <Mail size={14} className="mr-2 opacity-70" />
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="w-full sm:w-auto flex flex-col sm:items-end sm:ml-auto mt-4 sm:mt-0">
-                      <div className="flex sm:flex-col items-start sm:items-end gap-2 mb-3 sm:mb-0">
-                        <div className="flex items-center gap-2">
-                          <Badge
-                            variant={
-                              user.availabilityStatus === "available"
-                                ? "success"
-                                : user.availabilityStatus === "unavailable"
-                                ? "error"
-                                : "default"
-                            }
-                            className="capitalize px-2.5 py-1 text-[10px] sm:text-xs"
-                            pill={true}
-                          >
-                            {user.availabilityStatus?.replace("_", " ")}
-                          </Badge>
-                          <Badge
-                            variant={
-                              user.role === "admin" || user.role === "hr"
-                                ? "error"
-                                : user.role === "pm"
-                                ? "warning"
-                                : "success"
-                            }
-                            className="capitalize px-2.5 py-1 text-[10px] sm:text-xs"
-                            pill={true}
-                          >
-                            {user.role}
-                          </Badge>
                         </div>
-                        <div className="flex items-center gap-2 text-xs sm:text-sm text-[rgb(var(--muted-foreground))]">
-                          <Building
-                            size={14}
-                            className="text-[rgb(var(--muted-foreground))]"
-                          />
-                          <span className="font-medium text-[rgb(var(--card-foreground))]">
-                            {user.department || "N/A"}
-                          </span>
+
+                        <div className="flex items-center gap-2 mt-auto self-start sm:self-end pt-2">
+                          {onInitiateRequest && (
+                            <Button
+                              variant="success" // Keep themed success variant
+                              size="xs"
+                              onClick={() => onInitiateRequest(user)}
+                              aria-label={`Request ${user.name} for project`}
+                            >
+                              <UserPlus size={16} className="mr-1 sm:mr-1.5" />
+                              <span className="hidden sm:inline">Request</span>
+                            </Button>
+                          )}
+                          {onEditUser && (
+                            <Button
+                              variant="outline"
+                              size="xs"
+                              onClick={() => handleEditClick(user._id)}
+                              className="text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-accent-background))]"
+                              aria-label="Edit user"
+                            >
+                              <Edit size={16} />
+                            </Button>
+                          )}
+                          {onDeleteUser && (
+                            <Button
+                              variant="destructive_outline" // Keep themed destructive outline
+                              size="xs"
+                              onClick={() => handleDeleteClick(user._id)}
+                              aria-label="Delete user"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          )}
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-2 mt-auto self-start sm:self-end">
-                        {onInitiateRequest && ( // Conditionally render Request button
-                          <Button
-                            variant="outline" // Or a different variant like "success" or "primary"
-                            size="xs"
-                            onClick={() => onInitiateRequest(user)} // Pass the whole user object
-                            className="text-green-600 border-green-600 hover:bg-green-50"
-                            aria-label={`Request ${user.name} for project`}
-                          >
-                            <UserPlus size={16} className="mr-1 sm:mr-1.5" />
-                            <span className="hidden sm:inline">Request</span>
-                          </Button>
-                        )}
-                        {onEditUser && ( // Conditionally render Edit button
-                          <Button
-                            variant="ghost"
-                            size="xs"
-                            onClick={() => handleEditClick(user._id)}
-                            className="text-[rgb(var(--primary))] hover:bg-[rgba(var(--primary),0.1)] p-1.5"
-                            aria-label="Edit user"
-                          >
-                            <Edit size={16} />
-                          </Button>
-                        )}
-                        {onDeleteUser && ( // Conditionally render Delete button
-                          <Button
-                            variant="ghost"
-                            size="xs"
-                            onClick={() => handleDeleteClick(user._id)}
-                            className="text-red-600 hover:bg-red-50 p-1.5"
-                            aria-label="Delete user"
-                          >
-                            <Trash2 size={16} />
-                          </Button>
-                        )}
-                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          );
-        })
-      )}
-    </motion.div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })
+        )}
+      </motion.div>
+    </>
   );
 };
 

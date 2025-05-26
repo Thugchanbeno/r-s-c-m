@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
+  CardDescription,
 } from "@/components/common/Card";
 import Button from "@/components/common/Button";
 import Badge from "@/components/common/Badge";
@@ -15,8 +16,9 @@ import {
   Users,
   AlertTriangle,
   AlertCircle,
-  BellRing,
+  LayoutGrid,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const PmDashboardSummary = ({ user }) => {
   const [managedProjectCount, setManagedProjectCount] = useState(0);
@@ -29,6 +31,7 @@ const PmDashboardSummary = ({ user }) => {
     const fetchPmSummaryData = async () => {
       if (!user?.id) {
         setLoadingSummary(false);
+        setSummaryError("User information not available to load summary.");
         return;
       }
       setLoadingSummary(true);
@@ -49,7 +52,7 @@ const PmDashboardSummary = ({ user }) => {
             `/api/resourcerequests?requestedByPmId=${user.id}&status=pending&countOnly=true`
           ),
         ]);
-        //process managed project count
+
         if (!projectsResponse.ok) {
           const errData = await projectsResponse.json().catch(() => ({}));
           throw new Error(
@@ -60,7 +63,7 @@ const PmDashboardSummary = ({ user }) => {
         const projectsResult = await projectsResponse.json();
         fetchedProjectCount =
           projectsResult.data?.count || projectsResult.count || 0;
-        //process allocated resources (unique users)
+
         if (!resourcesSummaryResponse.ok) {
           const errData = await resourcesSummaryResponse
             .json()
@@ -73,7 +76,6 @@ const PmDashboardSummary = ({ user }) => {
         const resourcesResult = await resourcesSummaryResponse.json();
         fetchedResourceCount = resourcesResult.data?.uniqueUserCount || 0;
 
-        // Process Pending Resource Requests Count
         if (!pendingRequestsResponse.ok) {
           const errData = await pendingRequestsResponse
             .json()
@@ -89,7 +91,6 @@ const PmDashboardSummary = ({ user }) => {
       } catch (err) {
         console.error("Error fetching PM summary data:", err);
         setSummaryError(err.message || "Could not load PM summary data.");
-        // Reset counts on error
         fetchedProjectCount = 0;
         fetchedResourceCount = 0;
         fetchedPendingReqCount = 0;
@@ -108,12 +109,47 @@ const PmDashboardSummary = ({ user }) => {
     }
   }, [user?.id]);
 
+  const dashboardLinkStyles = cn(
+    "inline-block text-sm font-medium",
+    "bg-[rgb(var(--qhala-dark-navy))] text-[rgb(var(--accent))]",
+    " hover:text-[rgb(var(--qhala-soft-peach-darker))]",
+    "px-3 py-1.5",
+    "rounded-[var(--radius)]",
+    "transition-colors duration-150 ease-in-out",
+    "shadow-sm"
+  );
+
+  const buttonAsDashboardLinkClasses = cn(
+    "bg-[rgb(var(--qhala-dark-navy))] text-[rgb(var(--accent))]",
+    " hover:text-[rgb(var(--qhala-soft-peach-darker))]",
+    "shadow-sm",
+    "px-3 py-1.5",
+    "rounded-[var(--radius)]"
+  );
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Project Manager Overview</CardTitle>
+    <Card className="overflow-hidden">
+      <CardHeader className={cn("shadow-sm bg-[rgb(var(--accent))] p-4")}>
+        <CardTitle
+          className={cn(
+            "flex items-center gap-2 text-lg font-semibold text-[rgb(var(--accent-foreground))] md:text-xl"
+          )}
+        >
+          <LayoutGrid
+            size={22}
+            className="text-[rgb(var(--accent-foreground))]"
+          />
+          Project Manager Overview
+        </CardTitle>
+        <CardDescription
+          className={cn(
+            "mt-1 text-sm text-[rgb(var(--accent-foreground))] opacity-90"
+          )}
+        >
+          Summary of your projects, resources, and pending actions.
+        </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className={cn("p-5 md:p-6")}>
         {loadingSummary ? (
           <div className="flex flex-col items-center justify-center p-6 min-h-[150px]">
             <LoadingSpinner size={20} />
@@ -122,9 +158,16 @@ const PmDashboardSummary = ({ user }) => {
             </p>
           </div>
         ) : summaryError ? (
-          <div className="flex items-center p-3 text-sm rounded-[var(--radius)] bg-red-50 text-red-700 border border-red-200 shadow-sm">
-            <AlertCircle size={16} className="mr-2 flex-shrink-0" />
-            <span>{summaryError}</span>
+          <div
+            className={cn(
+              "flex items-center p-4 rounded-lg text-sm shadow-sm",
+              "bg-[rgb(var(--destructive))]/15",
+              "text-[rgb(var(--destructive))]",
+              "border border-[rgb(var(--destructive))]/40"
+            )}
+          >
+            <AlertCircle size={20} className="mr-3 flex-shrink-0" />
+            <span className="font-medium">{summaryError}</span>
           </div>
         ) : (
           <div className="space-y-4">
@@ -151,10 +194,7 @@ const PmDashboardSummary = ({ user }) => {
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="flex items-center text-[rgb(var(--muted-foreground))]">
-                <AlertTriangle // Or BellRing
-                  size={16}
-                  className="mr-2 text-amber-500"
-                />
+                <AlertTriangle size={16} className="mr-2 text-amber-500" />
                 My Pending Resource Requests:
               </span>
               <span className="font-semibold text-[rgb(var(--foreground))]">
@@ -163,27 +203,27 @@ const PmDashboardSummary = ({ user }) => {
                     {pendingRequestCount}
                   </Badge>
                 ) : (
-                  pendingRequestCount // Show 0 if no pending requests
+                  pendingRequestCount
                 )}
               </span>
             </div>
-            <div className="pt-4 border-t border-[rgb(var(--border))] mt-4 flex flex-wrap items-center gap-3">
+            <div className="pt-4 mt-4 border-t border-[rgb(var(--border))] flex flex-wrap items-center gap-2">
               <Link href="/projects/new">
-                {/* The Button component itself will be the clickable link element */}
-                <Button variant="primary" size="sm">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className={buttonAsDashboardLinkClasses}
+                >
                   Create Project
                 </Button>
               </Link>
               <Link
                 href={`/projects?pmId=${user?.id}`}
-                className="text-sm text-[rgb(var(--primary))] hover:underline font-medium"
+                className={dashboardLinkStyles}
               >
                 View My Projects
               </Link>
-              <Link
-                href="/resources?tab=users"
-                className="text-sm text-[rgb(var(--primary))] hover:underline font-medium"
-              >
+              <Link href="/resources?tab=users" className={dashboardLinkStyles}>
                 View Resources
               </Link>
             </div>

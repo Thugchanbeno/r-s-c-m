@@ -98,40 +98,120 @@ export const getAvailabilityStyles = (status) => {
 
 export const getMatchScoreColorClasses = (score, type = "text") => {
   const percentage = Math.max(0, Math.min(1, score)) * 100;
+  const colorScale = [
+    {
+      p: 0,
+      text: "text-red-600 dark:text-red-400",
+      bg: "bg-red-500",
+      border: "border-red-500",
+    },
+    {
+      p: 10,
+      text: "text-red-500 dark:text-red-400",
+      bg: "bg-red-400",
+      border: "border-red-400",
+    },
+    {
+      p: 20,
+      text: "text-orange-600 dark:text-orange-400",
+      bg: "bg-orange-500",
+      border: "border-orange-500",
+    },
+    {
+      p: 30,
+      text: "text-orange-500 dark:text-orange-400",
+      bg: "bg-orange-400",
+      border: "border-orange-400",
+    },
+    {
+      p: 40,
+      text: "text-amber-600 dark:text-amber-400",
+      bg: "bg-amber-500",
+      border: "border-amber-500",
+    },
+    {
+      p: 50,
+      text: "text-amber-500 dark:text-amber-400",
+      bg: "bg-amber-400",
+      border: "border-amber-400",
+    },
+    {
+      p: 60,
+      text: "text-yellow-500 dark:text-yellow-300",
+      bg: "bg-yellow-400",
+      border: "border-yellow-400",
+    },
+    {
+      p: 70,
+      text: "text-lime-600 dark:text-lime-400",
+      bg: "bg-lime-500",
+      border: "border-lime-500",
+    },
+    {
+      p: 80,
+      text: "text-lime-500 dark:text-lime-400",
+      bg: "bg-lime-400",
+      border: "border-lime-400",
+    },
+    {
+      p: 90,
+      text: "text-green-600 dark:text-green-400",
+      bg: "bg-green-500",
+      border: "border-green-500",
+    },
+    {
+      p: 100,
+      text: "text-green-500 dark:text-green-400",
+      bg: "bg-green-400",
+      border: "border-green-400",
+    },
+  ];
 
-  if (type === "text") {
-    if (percentage >= 75) return "text-green-600 dark:text-green-400";
-    if (percentage >= 50) return "text-yellow-600 dark:text-yellow-400";
-    if (percentage >= 25) return "text-orange-600 dark:text-orange-400";
-    return "text-red-600 dark:text-red-400";
+  let selectedColor = colorScale[0];
+  for (let i = colorScale.length - 1; i >= 0; i--) {
+    if (percentage >= colorScale[i].p) {
+      selectedColor = colorScale[i];
+      break;
+    }
   }
-  if (type === "bg") {
-    if (percentage >= 75) return "bg-green-500";
-    if (percentage >= 50) return "bg-yellow-500";
-    if (percentage >= 25) return "bg-orange-500";
-    return "bg-red-500";
-  }
-  if (type === "border") {
-    if (percentage >= 75) return "border-green-500";
-    if (percentage >= 50) return "border-yellow-500";
-    if (percentage >= 25) return "border-orange-500";
-    return "border-red-500";
+  selectedColor = colorScale[colorScale.length - 1];
+  for (let i = 0; i < colorScale.length; i++) {
+    if (percentage <= colorScale[i].p) {
+      selectedColor = colorScale[i];
+      break;
+    }
   }
 
-  if (percentage >= 75) return "text-green-600 dark:text-green-400";
-  if (percentage >= 50) return "text-yellow-600 dark:text-yellow-400";
-  return "text-red-600 dark:text-red-400";
+  switch (type) {
+    case "text":
+      return selectedColor.text;
+    case "bg":
+      return selectedColor.bg;
+    case "border":
+      return selectedColor.border;
+    default:
+      return selectedColor.text;
+  }
 };
 
 export const getScoreRatingText = (score) => {
   const percentage = Math.max(0, Math.min(1, score)) * 100;
-  if (percentage >= 85) return "Excellent";
-  if (percentage >= 70) return "Great";
-  if (percentage >= 55) return "Good";
+
+  if (percentage >= 95) return "Excellent";
+  if (percentage >= 90) return "Outstanding";
+  if (percentage >= 85) return "Very Good";
+  if (percentage >= 80) return "Great";
+  if (percentage >= 75) return "Good";
+  if (percentage >= 70) return "Above Average";
+  if (percentage >= 60) return "Fairly Good";
+  if (percentage >= 50) return "Average";
   if (percentage >= 40) return "Fair";
-  if (percentage >= 25) return "Considerable";
-  return "Needs Review";
+  if (percentage >= 30) return "Considerable";
+  if (percentage >= 20) return "Needs Improvement";
+  if (percentage >= 10) return "Poor";
+  return "Very Poor";
 };
+
 export const getStatusBadgeVariant = (status) => {
   switch (status) {
     case "Planning":

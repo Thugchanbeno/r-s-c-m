@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
+  CardDescription,
 } from "@/components/common/Card";
 import Button from "@/components/common/Button";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
@@ -18,7 +19,9 @@ import {
   Percent,
   CalendarDays,
   MessageSquare,
+  BellRing,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const PendingRequestsList = ({ onProcessRequest, processingRequestId }) => {
   const [requests, setRequests] = useState([]);
@@ -48,6 +51,7 @@ const PendingRequestsList = ({ onProcessRequest, processingRequestId }) => {
     } catch (err) {
       console.error("Error fetching pending requests:", err);
       setError(err.message || "Could not load pending requests.");
+      setRequests([]);
     } finally {
       setLoading(false);
     }
@@ -55,7 +59,7 @@ const PendingRequestsList = ({ onProcessRequest, processingRequestId }) => {
 
   useEffect(() => {
     fetchPendingRequests();
-  }, [fetchPendingRequests]); // Key prop on this component in parent will trigger re-mount and thus re-fetch
+  }, [fetchPendingRequests]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -79,7 +83,14 @@ const PendingRequestsList = ({ onProcessRequest, processingRequestId }) => {
 
   if (error) {
     return (
-      <div className="flex items-center p-4 text-sm rounded-[var(--radius)] bg-red-50 text-red-700 border border-red-200 shadow-sm">
+      <div
+        className={cn(
+          "flex items-center p-4 rounded-lg text-sm shadow-sm",
+          "bg-[rgb(var(--destructive))]/15",
+          "text-[rgb(var(--destructive))]",
+          "border border-[rgb(var(--destructive))]/40"
+        )}
+      >
         <AlertCircle size={18} className="mr-2 flex-shrink-0" />
         <span>Error: {error}</span>
       </div>
@@ -97,14 +108,25 @@ const PendingRequestsList = ({ onProcessRequest, processingRequestId }) => {
   return (
     <div className="space-y-4">
       {requests.map((req) => {
-        // Determine if this specific request is the one being processed
         const isThisRequestProcessing = processingRequestId === req._id;
 
         return (
-          <Card key={req._id} className="overflow-hidden">
-            <CardHeader className="bg-[rgb(var(--muted))] p-4 border-b border-[rgb(var(--border))]">
+          <Card
+            key={req._id}
+            className="overflow-hidden shadow-md bg-[rgb(var(--card))] rounded-[var(--radius)]"
+          >
+            <CardHeader
+              className={cn(
+                "p-4 border-b border-[rgb(var(--border))]",
+                "bg-[rgb(var(--muted))]/50"
+              )}
+            >
               <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                <CardTitle className="text-base sm:text-lg text-[rgb(var(--foreground))]">
+                <CardTitle className="text-base sm:text-lg text-[rgb(var(--foreground))] flex items-center gap-1.5">
+                  <User
+                    size={18}
+                    className="text-[rgb(var(--muted-foreground))]"
+                  />
                   Request for{" "}
                   <span className="font-semibold text-[rgb(var(--primary))]">
                     {req.requestedUserId?.name || "Unknown User"}
@@ -114,63 +136,104 @@ const PendingRequestsList = ({ onProcessRequest, processingRequestId }) => {
                   {req.status}
                 </Badge>
               </div>
-              <p className="text-xs text-[rgb(var(--muted-foreground))] mt-1">
-                Project: {req.projectId?.name || "Unknown Project"} | Requested
-                by: {req.requestedByPmId?.name || "Unknown PM"} on{" "}
-                {formatDate(req.createdAt)}
-              </p>
+              <CardDescription className="text-xs text-[rgb(var(--muted-foreground))] mt-1.5 space-x-2">
+                <span>
+                  Project:{" "}
+                  <span className="font-medium text-[rgb(var(--foreground))]">
+                    {req.projectId?.name || "Unknown Project"}
+                  </span>
+                </span>
+                <span>|</span>
+                <span>
+                  By:{" "}
+                  <span className="font-medium text-[rgb(var(--foreground))]">
+                    {req.requestedByPmId?.name || "Unknown PM"}
+                  </span>
+                </span>
+                <span>on {formatDate(req.createdAt)}</span>
+              </CardDescription>
             </CardHeader>
             <CardContent className="p-4 space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                <div>
-                  <span className="font-medium text-[rgb(var(--muted-foreground))] block">
-                    Role:
-                  </span>
-                  <span className="text-[rgb(var(--foreground))]">
-                    {req.requestedRole}
-                  </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <Briefcase
+                    size={14}
+                    className="text-[rgb(var(--muted-foreground))]"
+                  />
+                  <div>
+                    <span className="font-medium text-[rgb(var(--muted-foreground))] text-xs block">
+                      Role
+                    </span>
+                    <span className="text-[rgb(var(--foreground))]">
+                      {req.requestedRole}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <span className="font-medium text-[rgb(var(--muted-foreground))] block">
-                    Allocation:
-                  </span>
-                  <span className="text-[rgb(var(--foreground))]">
-                    {req.requestedPercentage}%
-                  </span>
+                <div className="flex items-center gap-2">
+                  <Percent
+                    size={14}
+                    className="text-[rgb(var(--muted-foreground))]"
+                  />
+                  <div>
+                    <span className="font-medium text-[rgb(var(--muted-foreground))] text-xs block">
+                      Allocation
+                    </span>
+                    <span className="text-[rgb(var(--foreground))]">
+                      {req.requestedPercentage}%
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <span className="font-medium text-[rgb(var(--muted-foreground))] block">
-                    Requested Dates:
-                  </span>
-                  <span className="text-[rgb(var(--foreground))]">
-                    {req.requestedStartDate
-                      ? formatDate(req.requestedStartDate)
-                      : "ASAP"}{" "}
-                    -{" "}
-                    {req.requestedEndDate
-                      ? formatDate(req.requestedEndDate)
-                      : "Ongoing"}
-                  </span>
+                <div className="flex items-center gap-2">
+                  <CalendarDays
+                    size={14}
+                    className="text-[rgb(var(--muted-foreground))]"
+                  />
+                  <div>
+                    <span className="font-medium text-[rgb(var(--muted-foreground))] text-xs block">
+                      Requested Dates
+                    </span>
+                    <span className="text-[rgb(var(--foreground))]">
+                      {req.requestedStartDate
+                        ? formatDate(req.requestedStartDate)
+                        : "ASAP"}{" "}
+                      -{" "}
+                      {req.requestedEndDate
+                        ? formatDate(req.requestedEndDate)
+                        : "Ongoing"}
+                    </span>
+                  </div>
                 </div>
               </div>
               {req.pmNotes && (
-                <div className="pt-2 border-t border-[rgb(var(--border))]">
-                  <p className="text-xs font-medium text-[rgb(var(--muted-foreground))] mb-0.5">
-                    PM Notes:
-                  </p>
-                  <p className="text-sm text-[rgb(var(--foreground))] whitespace-pre-wrap bg-slate-50 p-2 rounded-md">
+                <div className="pt-3 mt-2 border-t border-[rgb(var(--border))]">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <MessageSquare
+                      size={14}
+                      className="text-[rgb(var(--muted-foreground))]"
+                    />
+                    <p className="text-xs font-medium text-[rgb(var(--muted-foreground))]">
+                      PM Notes:
+                    </p>
+                  </div>
+                  <p
+                    className={cn(
+                      "text-sm text-[rgb(var(--foreground))] whitespace-pre-wrap p-2.5 rounded-md",
+                      "bg-[rgb(var(--muted))]/70 border border-[rgb(var(--border))]"
+                    )}
+                  >
                     {req.pmNotes}
                   </p>
                 </div>
               )}
-              <div className="flex justify-end space-x-2 pt-3">
+              <div className="flex justify-end space-x-2 pt-3 mt-2 border-t border-[rgb(var(--border))]">
                 <Button
-                  variant="outline"
+                  variant="destructive_outline"
                   size="sm"
                   onClick={() => onProcessRequest(req._id, "rejected")}
                   disabled={isThisRequestProcessing}
-                  isLoading={isThisRequestProcessing}
-                  className="text-red-600 border-red-500 hover:bg-red-50"
+                  isLoading={
+                    isThisRequestProcessing && req.status !== "rejected"
+                  }
                 >
                   <XCircle size={16} className="mr-1.5" /> Reject
                 </Button>
@@ -179,7 +242,9 @@ const PendingRequestsList = ({ onProcessRequest, processingRequestId }) => {
                   size="sm"
                   onClick={() => onProcessRequest(req._id, "approved")}
                   disabled={isThisRequestProcessing}
-                  isLoading={isThisRequestProcessing}
+                  isLoading={
+                    isThisRequestProcessing && req.status !== "approved"
+                  }
                 >
                   <CheckCircle size={16} className="mr-1.5" /> Approve
                 </Button>

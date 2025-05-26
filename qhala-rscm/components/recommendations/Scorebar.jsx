@@ -19,13 +19,13 @@ const EnhancedScoreBar = ({ score, label = "Overall Match" }) => {
           {ratingText} ({percentage.toFixed(0)}%)
         </span>
       </div>
-      <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 shadow-inner overflow-hidden">
+      <div className="w-full bg-[rgb(var(--muted))] rounded-full h-3 shadow-inner overflow-hidden">
         <div
-          className={`${barColorClass} h-3 rounded-full transition-all duration-700 ease-out flex items-center justify-end`}
+          className={`${barColorClass} h-4 rounded-md transition-all duration-700 ease-out flex items-center justify-end`}
           style={{ width: `${percentage}%` }}
         >
-          {/* Optional: add a subtle shine or pattern to the bar */}
-          <div className="w-1/2 h-full bg-white/20 blur-sm"></div>
+          {/* The shine effect might need to be removed or adjusted if it clashes with the new bar colors */}
+          {/* <div className="w-1/2 h-full bg-white/20 blur-sm"></div> */}
         </div>
       </div>
     </div>

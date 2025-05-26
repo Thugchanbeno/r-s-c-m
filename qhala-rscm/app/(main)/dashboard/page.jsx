@@ -3,21 +3,10 @@ import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { motion } from "framer-motion";
-
 import EmployeeDashboard from "@/components/dashboard/EmployeeDashboard.jsx";
 import HrAdminDashboard from "@/components/dashboard/HRAdminDashboard.jsx";
 import PmDashboard from "@/components/dashboard/PMDashboard.jsx";
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.1,
-    },
-  },
-};
+import { containerVariants } from "@/lib/animations.js";
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -56,14 +45,12 @@ export default function DashboardPage() {
 
   return (
     <motion.div
-      className="p-4 md:p-6 bg-[rgb(var(--muted))] min-h-screen rounded-lg"
+      className="p-4 md:p-6 bg-[rgb(var(--background))] min-h-screen rounded-lg"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
       <motion.div className="mb-8" variants={itemVariants}>
-        {" "}
-        {/* Animated header */}
         <h1 className="text-2xl md:text-3xl font-bold text-[rgb(var(--foreground))]">
           Welcome back, {userName}!
         </h1>

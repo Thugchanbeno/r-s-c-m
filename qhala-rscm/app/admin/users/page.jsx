@@ -3,6 +3,7 @@ import { useState, useCallback } from "react";
 import UserList from "@/components/admin/UserList";
 import Modal from "@/components/common/Modal";
 import EditUserForm from "@/components/admin/UserForm";
+import { cn } from "@/lib/utils";
 
 export default function AdminUsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,33 +22,32 @@ export default function AdminUsersPage() {
 
   const handleUserUpdated = useCallback(() => {
     handleCloseModal();
-
     setRefreshKey((prevKey) => prevKey + 1);
   }, [handleCloseModal]);
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-900">
-        Manage Users
-      </h1>
+    <div className="p-4 md:p-6 bg-[rgb(var(--background))] min-h-screen rounded-lg">
+      <div className="mb-6 pb-4 border-b border-[rgb(var(--border))]">
+        <h1 className="text-2xl md:text-3xl font-bold text-[rgb(var(--foreground))]">
+          Manage Users
+        </h1>
+        <p className="mt-1 text-[rgb(var(--muted-foreground))]">
+          View, search, and edit user profiles and roles.
+        </p>
+      </div>
 
-      {/* UserList component fetches and displays users */}
-      {/* Pass handleEditClick and a key for refreshing */}
       <UserList
         key={refreshKey}
         onEditUser={handleEditClick}
-        // Pass onDeleteUser later when implementing delete
-        // onDeleteUser={handleDeleteUser}
+        // onDeleteUser={handleDeleteUser} // Implement when ready
       />
 
-      {/* Render Modal conditionally */}
       {isModalOpen && editingUserId && (
         <Modal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          title={`Edit User (ID: ${editingUserId.substring(0, 8)}...)`} // Show partial ID in title might change later for clarity
+          title={`Edit User`} // Simplified title, more details can be in the form
         >
-          {/* Render EditUserForm inside the modal */}
           <EditUserForm
             userId={editingUserId}
             onUserUpdated={handleUserUpdated}
