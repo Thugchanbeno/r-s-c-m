@@ -47,19 +47,19 @@ export default function AdminLayout({ children }) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-      <div className="flex flex-grow">
-        <div className="w-60 ">
-          <AdminNavigation />
+    <>
+      <div className="flex h-screen overflow-hidden">
+        <AdminNavigation />
+        <div className="flex flex-col flex-1 h-screen overflow-hidden">
+          <Navbar className="sticky top-0" />
+          <div className="flex flex-col overflow-y-auto">
+            <main className="flex-grow p-4 md:p-6 lg:p-8">
+              {children}
+            </main>
+            <Footer />
+          </div>
         </div>
-
-        {/* Main content */}
-        <main className="flex-grow container mx-auto px-6 py-8">
-          {children}
-        </main>
       </div>
-      <Footer />
-    </div>
+    </>
   );
 }

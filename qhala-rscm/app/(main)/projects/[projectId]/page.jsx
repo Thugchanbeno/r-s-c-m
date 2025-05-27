@@ -287,14 +287,14 @@ const ProjectDetailPage = () => {
                 <CardTitle className="text-2xl md:text-3xl text-[rgb(var(--foreground))]">
                   {project.name}
                 </CardTitle>
-                <Badge
+                {/* <Badge
                   variant={getStatusBadgeVariant(project.status)}
                   pill={true}
                   size="md"
                   className="mt-1 sm:mt-0"
                 >
                   {project.status}
-                </Badge>
+                </Badge> */}
               </div>
               {project.pmId?.name && (
                 <div className="text-sm text-[rgb(var(--muted-foreground))] mt-3 flex items-center">

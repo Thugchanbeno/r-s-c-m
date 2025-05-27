@@ -71,7 +71,7 @@ export const useProfileData = () => {
     if (Object.keys(groupedSkillsTaxonomy).length > 0) {
       const initialExpandedState = Object.keys(groupedSkillsTaxonomy).reduce(
         (acc, category) => {
-          acc[category] = false; // Start all collapsed
+          acc[category] = true; // Start all collapsed
           return acc;
         },
         {}

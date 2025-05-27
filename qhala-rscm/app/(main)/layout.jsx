@@ -23,11 +23,11 @@ export default function MainAppLayout({ children }) {
 
   return (
     <>
-      <Navbar />
       <div className="flex h-screen overflow-hidden">
         <Sidebar />
-        <div className="flex-1 flex flex-col overflow-y-auto">
-          <main className="flex-grow p-4 md:p-6 lg:p-8">{children}</main>
+        <div className="flex flex-col flex-1 h-screen overflow-hidden"> 
+          <Navbar className = "sticky top-0" />
+          <main className="flex-grow  overflow-y-auto p-4 md:p-6 lg:p-8">{children}</main>
         </div>
       </div>
     </>
