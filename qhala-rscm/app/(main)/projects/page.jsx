@@ -1,5 +1,5 @@
 "use client";
-import ProjectList from "@/components/ProjectList.jsx";
+import ProjectList from "@/components/projects/ProjectList.jsx";
 import Link from "next/link";
 import Button from "@/components/common/Button.jsx";
 import { PlusCircle } from "lucide-react";

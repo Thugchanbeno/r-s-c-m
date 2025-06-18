@@ -13,6 +13,7 @@ import {
 import UserList from "@/components/admin/UserList";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { toast } from "react-toastify";
+import { cn } from "@/lib/utils";
 
 const ResourcesView = () => {
   const { data: session, status } = useSession({ required: true });
@@ -26,7 +27,6 @@ const ResourcesView = () => {
   const canManageRequests =
     userRole === "admin" || userRole === "hr" || userRole === "pm";
 
-  // Handler for processing requests (approve/reject)
   const handleProcessRequest = async (
     requestId,
     newStatus,
@@ -47,19 +47,9 @@ const ResourcesView = () => {
       }
       toast.success(`Request successfully ${newStatus}!`);
       setRequestListKey((prevKey) => prevKey + 1);
-
-      // TODO: Trigger a refresh of the PendingRequestsList.
-      // This often involves lifting state up or passing a refetch function down.
-      // A simple way for now, if PendingRequestsList re-fetches on prop change or mount,
-      // would be to force a re-render of it, e.g., by changing a key.
-      // Or, if PendingRequestsList exposes a refetch function:
-      // pendingRequestsListRef.current.fetchPendingRequests();
-      // For now, the user will have to manually see the list update on next load/filter.
-      // A better solution is to make PendingRequestsList refetch.
     } catch (error) {
       console.error(`Error processing request ${requestId}:`, error);
-      toast.error(`Error processing request ${requestId}:`, error);
-      alert(`Error: ${error.message}`);
+      toast.error(error.message || `Error processing request ${requestId}.`);
     } finally {
       setProcessingRequestId(null);
     }
@@ -80,9 +70,8 @@ const ResourcesView = () => {
     "block w-full rounded-[var(--radius)] border-[rgb(var(--border))] bg-[rgb(var(--background))] text-[rgb(var(--foreground))] shadow-sm focus:border-[rgb(var(--primary))] focus:ring-1 focus:ring-[rgb(var(--primary))] sm:text-sm placeholder:text-[rgb(var(--muted-foreground))]";
 
   return (
-    <div className="animate-fade-in p-4 md:p-6 bg-[rgb(var(--muted))] min-h-screen">
+    <div className="animate-fade-in p-4 md:p-6 bg-[rgb(var(--background))] min-h-screen rounded-lg">
       <div className="max-w-7xl mx-auto">
-        {/* Header and Search/Tabs */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-[rgb(var(--foreground))]">
@@ -112,7 +101,6 @@ const ResourcesView = () => {
                 <BellRing size={16} className="mr-2" /> Manage Requests
               </Button>
             )}
-            {/* Search Inputs - Show only for Users tab */}
             {activeTab === "users" && (
               <>
                 <div className="relative flex-grow md:flex-grow-0 w-full sm:w-auto">
@@ -140,30 +128,54 @@ const ResourcesView = () => {
           </div>
         </div>
 
-        {/* Tab Content */}
         <div>
           {activeTab === "users" && (
-            <Card>
-              <CardHeader>
-                <CardTitle>User Directory</CardTitle>
+            <Card className="shadow-md">
+              <CardHeader
+                className={cn(
+                  "bg-[rgb(var(--accent))] text-[rgb(var(--accent-foreground))]"
+                )}
+              >
+                <CardTitle className="flex items-center gap-2">
+                  <UsersIcon
+                    size={20}
+                    className="text-[rgb(var(--accent-foreground))]"
+                  />
+                  User Directory
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <UserList
                   searchTerm={searchTerm}
                   skillSearchTerm={skillSearchTerm}
-                  // onEditUser={(userId) => console.log("Edit user:", userId)}
-                  // onDeleteUser={(userId) => console.log("Delete user:", userId)}
                 />
               </CardContent>
             </Card>
           )}
 
           {activeTab === "requests" && canManageRequests && (
-            <PendingRequests
-              onProcessRequest={handleProcessRequest}
-              key={requestListKey}
-              processingRequesId={processingRequestId}
-            />
+            <Card className="shadow-md">
+              <CardHeader
+                className={cn(
+                  "bg-[rgb(var(--accent))] text-[rgb(var(--accent-foreground))]"
+                )}
+              >
+                <CardTitle className="flex items-center gap-2">
+                  <BellRing
+                    size={20}
+                    className="text-[rgb(var(--accent-foreground))]"
+                  />
+                  Pending Resource Requests
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <PendingRequests
+                  onProcessRequest={handleProcessRequest}
+                  key={requestListKey}
+                  processingRequestId={processingRequestId}
+                />
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>

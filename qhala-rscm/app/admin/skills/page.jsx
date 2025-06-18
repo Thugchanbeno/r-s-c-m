@@ -1,6 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
-import SkillTaxonomyList from "@/components/SkillTaxonomyList";
+import SkillTaxonomyList from "@/components/user/SkillTaxonomyList";
 import SkillForm from "@/components/admin/SkillForm";
 import Button from "@/components/common/Button";
 import Modal from "@/components/common/Modal";

@@ -1,6 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import Skills from "@/models/Skills.js";
-import User from "@/models/User.js";
 
 const UserSkillSchema = new Schema(
   {
@@ -8,7 +6,6 @@ const UserSkillSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
     },
     skillId: {
       type: Schema.Types.ObjectId,
@@ -31,5 +28,6 @@ const UserSkillSchema = new Schema(
 );
 
 UserSkillSchema.index({ userId: 1, skillId: 1 }, { unique: true });
+
 export default mongoose.models.UserSkill ||
   mongoose.model("UserSkill", UserSkillSchema);

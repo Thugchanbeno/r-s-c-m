@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Project from "@/models/Project";
 import mongoose from "mongoose";
+import Skill from "@/models/Skills";
+import User from "@/models/User";
 
 export async function GET(request, { params }) {
   const { projectId } = params;
@@ -31,7 +33,7 @@ export async function GET(request, { params }) {
     console.error(`API Error fetching project ${projectId}:`, error);
     return NextResponse.json(
       { success: false, error: "Server Error fetching project details" },
-      { status: 500 } // Internal Server Error
+      { status: 500 }
     );
   }
 }

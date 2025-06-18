@@ -1,6 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import Project from "./Project";
-import User from "./User";
 
 const ResourceRequestSchema = new Schema(
   {
@@ -30,7 +28,6 @@ const ResourceRequestSchema = new Schema(
       enum: ["pending", "approved", "rejected", "cancelled"],
       default: "pending",
       required: true,
-      index: true,
     },
     pmNotes: { type: String, required: false },
     approverNotes: { type: String, required: false },
@@ -41,6 +38,7 @@ const ResourceRequestSchema = new Schema(
 );
 
 ResourceRequestSchema.index({ projectId: 1, status: 1 });
+
 ResourceRequestSchema.index({ status: 1 });
 
 export default mongoose.models.ResourceRequest ||

@@ -1,15 +1,23 @@
 import mongoose, { Schema } from "mongoose";
-import Skill from "@/models/Skills.js";
-import User from "@/models/User.js";
-//implement department when creating a project.
+import { departmentEnum, projectStatusEnum } from "@/lib/projectconstants";
+
 const ProjectSchema = new Schema(
   {
-    name: { type: String, required: true, trim: true },
+    name: { type: String, required: true, trim: true, index: true },
     description: { type: String, required: true },
+    department: {
+      type: String,
+      required: true,
+      enum: departmentEnum,
+      default: "Unassigned",
+    },
     requiredSkills: [
       {
         skillId: { type: Schema.Types.ObjectId, ref: "Skill", required: true },
+        skillName: { type: String, required: true },
         proficiencyLevel: { type: Number, required: true, min: 1, max: 5 },
+        isRequired: { type: Boolean, required: true, default: true },
+        _id: false,
       },
     ],
     nlpExtractedSkills: [{ type: String, required: false }],
@@ -24,13 +32,14 @@ const ProjectSchema = new Schema(
     status: {
       type: String,
       required: true,
-      enum: ["Planning", "Active", "On Hold", "Completed", "Cancelled"],
+      enum: projectStatusEnum,
       default: "Planning",
-      index: true,
     },
   },
   { timestamps: true }
 );
+
+ProjectSchema.index({ status: 1, department: 1 });
 
 export default mongoose.models.Project ||
   mongoose.model("Project", ProjectSchema);

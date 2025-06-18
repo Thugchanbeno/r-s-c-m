@@ -4,6 +4,13 @@ import Link from "next/link";
 import Button from "@/components/common/Button";
 import { ArrowLeft } from "lucide-react";
 import SkillDistributionChart from "@/components/admin/SkillDistributionChart";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -26,7 +33,7 @@ const itemVariants = {
 export default function AnalyticsPage() {
   return (
     <motion.div
-      className="p-4 md:p-6 bg-[rgb(var(--muted))] min-h-screen"
+      className="p-4 md:p-6 bg-[rgb(var(--background))] min-h-screen rounded-lg"
       initial="hidden"
       animate="visible"
       variants={pageVariants}
@@ -36,15 +43,19 @@ export default function AnalyticsPage() {
           <Link href="/admin">
             <Button
               variant="ghost"
-              className="text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))]"
+              size="sm"
+              className="text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))]"
             >
-              <ArrowLeft size={18} className="mr-2" />
+              <ArrowLeft size={16} className="mr-2" />
               Back to Admin Dashboard
             </Button>
           </Link>
         </motion.div>
 
-        <motion.div variants={itemVariants} className="mb-8">
+        <motion.div
+          variants={itemVariants}
+          className="mb-8 pb-4 border-b border-[rgb(var(--border))]"
+        >
           <h1 className="text-2xl md:text-3xl font-bold text-[rgb(var(--foreground))]">
             System Analytics
           </h1>
@@ -53,17 +64,16 @@ export default function AnalyticsPage() {
           </p>
         </motion.div>
 
-        {/* Embed the Skill Distribution Chart */}
         <motion.div variants={itemVariants}>
           <SkillDistributionChart />
         </motion.div>
 
-        {/* Placeholder for future analytics, e.g., Google Analytics integration */}
-        {/* 
-        <motion.div variants={itemVariants} className="mt-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Website Traffic (Google Analytics)</CardTitle>
+        <motion.div variants={itemVariants} className="mt-10">
+          <Card className="shadow-md bg-[rgb(var(--card))] rounded-[var(--radius)]">
+            <CardHeader className="border-b border-[rgb(var(--border))]">
+              <CardTitle className="text-[rgb(var(--foreground))]">
+                Website Traffic (Google Analytics)
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-center text-[rgb(var(--muted-foreground))] py-10">
@@ -72,7 +82,6 @@ export default function AnalyticsPage() {
             </CardContent>
           </Card>
         </motion.div>
-        */}
       </div>
     </motion.div>
   );

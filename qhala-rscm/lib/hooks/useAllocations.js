@@ -21,13 +21,14 @@ export function useAllocations() {
   // State for CRUD operations
   const [editingAllocation, setEditingAllocation] = useState(null);
   const [isProcessingAction, setIsProcessingAction] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
-  // Fetch Allocation List Data
   const fetchAllocations = useCallback(
     async (page = 1) => {
       setLoading(true);
       setError(null);
-      if (page !== currentPage) {
+
+      if (page !== currentPage && allocations.length > 0) {
         setAllocations([]);
       }
       try {
@@ -58,28 +59,29 @@ export function useAllocations() {
         console.error("Error fetching allocations:", err);
         setError(err.message || "Could not load allocations.");
         setAllocations([]);
-        setCurrentPage(1);
-        setTotalPages(1);
-        setTotalAllocations(0);
+        // setCurrentPage(1);
+        // setTotalPages(1);
+        // setTotalAllocations(0);
       } finally {
         setLoading(false);
       }
     },
-    [currentPage]
+    [currentPage, allocations.length]
   );
 
-  // Fetch Dropdown Data (Users & Projects)
   const fetchDropdownData = useCallback(async () => {
     setLoadingDropdowns(true);
     setDropdownError(null);
     try {
       const [usersRes, projectsRes] = await Promise.all([
-        fetch("/api/users?limit=100"),
-        fetch("/api/projects?limit=100&status=Active"),
+        fetch("/api/users?limit=1000&active=true"),
+        fetch("/api/projects?limit=1000&status=Active&status=Planning"),
       ]);
 
-      // Process Users
-      if (!usersRes.ok) throw new Error("Failed to fetch users");
+      if (!usersRes.ok) {
+        const errData = await usersRes.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to fetch users");
+      }
       const usersData = await usersRes.json();
       if (usersData.success && Array.isArray(usersData.data)) {
         setUsersList(usersData.data);
@@ -87,8 +89,10 @@ export function useAllocations() {
         throw new Error(usersData.error || "Invalid users data");
       }
 
-      // Process Projects
-      if (!projectsRes.ok) throw new Error("Failed to fetch projects");
+      if (!projectsRes.ok) {
+        const errData = await projectsRes.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to fetch projects");
+      }
       const projectsData = await projectsRes.json();
       if (projectsData.success && Array.isArray(projectsData.data)) {
         setProjectsList(projectsData.data);
@@ -107,23 +111,25 @@ export function useAllocations() {
     }
   }, []);
 
-  // Effect for fetching allocation list
   useEffect(() => {
     fetchAllocations(currentPage);
   }, [currentPage, fetchAllocations]);
 
-  // Effect for fetching dropdown data (runs once on hook mount)
   useEffect(() => {
     fetchDropdownData();
   }, [fetchDropdownData]);
 
-  //  CRUD and Pagination Functions
   const refetchAllocations = useCallback(() => {
     fetchAllocations(currentPage);
   }, [currentPage, fetchAllocations]);
 
   const goToPage = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
+    if (
+      newPage >= 1 &&
+      newPage <= totalPages &&
+      newPage !== currentPage &&
+      !loading
+    ) {
       setCurrentPage(newPage);
     }
   };
@@ -173,15 +179,13 @@ export function useAllocations() {
         err.message ||
           `Could not ${isEditing ? "submit" : "create"} allocation.`
       );
-      // Set main error state if needed, or rely on toast
-      // setError(err.message || `Could not ${isEditing ? "submit" : "create"} allocation.`);
       return { success: false, error: err.message };
     } finally {
       setIsProcessingAction(false);
     }
   };
 
-  const removeAllocation = async (allocationId) => {
+  const removeAllocationAPI = async (allocationId) => {
     if (!allocationId) {
       toast.error("Cannot delete: Invalid allocation ID");
       return { success: false, error: "Invalid allocation ID" };
@@ -191,7 +195,6 @@ export function useAllocations() {
     try {
       const response = await fetch(`/api/allocations/${allocationId}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
       });
       const data = await response.json();
       if (!response.ok || !data.success) {
@@ -208,30 +211,45 @@ export function useAllocations() {
       setIsProcessingAction(false);
     }
   };
+
+  const handleDeleteClick = async (allocationId) => {
+    if (confirmDeleteId === allocationId) {
+      await removeAllocationAPI(allocationId);
+      setConfirmDeleteId(null);
+    } else {
+      setConfirmDeleteId(allocationId);
+    }
+  };
+
+  const cancelDeleteConfirmation = () => {
+    setConfirmDeleteId(null);
+  };
+
   return {
-    // Allocation List Data & State
     allocations,
     loading,
     error,
+    setError,
     currentPage,
     totalPages,
     totalAllocations,
     goToPage,
     refetchAllocations,
-    setError,
 
-    // Form Dropdown Data & State
     usersList,
     projectsList,
     loadingDropdowns,
     dropdownError,
 
-    // CRUD related state and functions
     editingAllocation,
     isProcessingAction,
     selectAllocationForEdit,
     clearEditingAllocation,
     submitAllocation,
-    removeAllocation,
+    // removeAllocation: removeAllocationAPI, /
+
+    confirmDeleteId,
+    handleDeleteClick,
+    cancelDeleteConfirmation,
   };
 }
