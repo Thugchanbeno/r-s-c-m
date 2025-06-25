@@ -132,6 +132,7 @@ export const UserInfo = ({
     </div>
   </motion.div>
 );
+
 // Error Message Component
 export const ErrorMessage = ({ message }) => (
   <motion.div
@@ -149,7 +150,7 @@ export const ErrorMessage = ({ message }) => (
   </motion.div>
 );
 
-// Section Header Component
+// Section Header Component - Updated with sticky positioning when editing
 export const SectionHeader = ({
   title,
   isEditing,
@@ -200,7 +201,7 @@ export const SectionHeader = ({
   </motion.div>
 );
 
-// current skills editor
+// Current Skills Editor - Updated with scrollable container and fade effects
 export const CurrentSkillsEditor = ({
   groupedSkillsTaxonomy,
   expandedCategories,
@@ -214,134 +215,151 @@ export const CurrentSkillsEditor = ({
   const categories = Object.keys(groupedSkillsTaxonomy).sort();
 
   return (
-    <motion.div
-      className={cn("space-y-3 p-3 md:p-4 rounded-lg", "bg-card shadow-sm ")}
-    >
-      {loadingTaxonomy ? (
-        <LoadingSpinner size={20} className="mx-auto my-4" />
-      ) : categories.length === 0 ? (
-        <p className="py-4 text-center text-sm text-muted-foreground">
-          No skills available to select.
-        </p>
-      ) : (
-        categories.map((category) => (
-          <motion.div
-            key={category}
-            variants={fadeIn}
-            className="rounded-md bg-background group"
-          >
-            <button
-              onClick={() => toggleCategory(category)}
-              className={cn(
-                "flex w-full items-center justify-between p-3 text-left transition-colors duration-150 focus:outline-none rounded-md",
-                expandedCategories[category]
-                  ? "bg-muted/60 text-primary"
-                  : "bg-transparent text-primary",
-                "hover:bg-[rgb(var(--accent))] hover:text-[rgb(var(--accent-foreground))]",
-                "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
-              )}
-              aria-expanded={expandedCategories[category]}
-              aria-controls={`category-skills-current-${category}`}
+    <motion.div className="relative bg-card shadow-sm rounded-lg">
+      {/* Sticky header container */}
+      <div className="sticky top-0 z-20 bg-card/95 px-3 md:px-4 py-3">
+        <div className="flex items-center justify-between">
+        </div>
+      </div>
+      
+      {/* Scrollable content container */}
+      <div className="relative max-h-[50vh] overflow-hidden">
+        {/* Top fade overlay */}
+        <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-card to-transparent z-10 pointer-events-none" />
+        
+        {/* Scrollable content */}
+        <div className="overflow-y-auto max-h-[50vh] p-3 md:p-4 space-y-3">
+        {loadingTaxonomy ? (
+          <LoadingSpinner size={20} className="mx-auto my-4" />
+        ) : categories.length === 0 ? (
+          <p className="py-4 text-center text-sm text-muted-foreground">
+            No skills available to select.
+          </p>
+        ) : (
+          categories.map((category) => (
+            <motion.div
+              key={category}
+              variants={fadeIn}
+              className="rounded-md bg-background group"
             >
-              <h4 className="text-md font-semibold">{category}</h4>
-              {expandedCategories[category] ? (
-                <ChevronDown
-                  size={20}
-                  className={cn(
-                    "text-muted-foreground",
-                    "group-hover:text-[rgb(var(--accent-foreground))]"
-                  )}
-                />
-              ) : (
-                <ChevronRight
-                  size={20}
-                  className={cn(
-                    "text-muted-foreground",
-                    "group-hover:text-[rgb(var(--accent-foreground))]"
-                  )}
-                />
-              )}
-            </button>
-            <AnimatePresence>
-              {expandedCategories[category] && (
-                <motion.div
-                  id={`category-skills-current-${category}`}
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.25, ease: "easeInOut" }}
-                  className="space-y-2 p-3 "
-                >
-                  {groupedSkillsTaxonomy[category].map((skill) => {
-                    const isSelected = selectedCurrentSkillsMap.has(skill._id);
-                    const currentProficiency = isSelected
-                      ? selectedCurrentSkillsMap.get(skill._id)
-                      : null;
-                    return (
-                      <motion.div
-                        key={skill._id}
-                        className={cn(
-                          "flex flex-col items-start justify-between gap-2 rounded-md p-2 transition-all duration-200 sm:flex-row sm:items-center"
-                        )}
-                      >
-                        <Badge
+              <button
+                onClick={() => toggleCategory(category)}
+                className={cn(
+                  "flex w-full items-center justify-between p-3 text-left transition-colors duration-150 focus:outline-none rounded-md",
+                  expandedCategories[category]
+                    ? "bg-muted/60 text-primary"
+                    : "bg-transparent text-primary",
+                  "hover:bg-[rgb(var(--accent))] hover:text-[rgb(var(--accent-foreground))]",
+                  "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
+                )}
+                aria-expanded={expandedCategories[category]}
+                aria-controls={`category-skills-current-${category}`}
+              >
+                <h4 className="text-md font-semibold">{category}</h4>
+                {expandedCategories[category] ? (
+                  <ChevronDown
+                    size={20}
+                    className={cn(
+                      "text-muted-foreground",
+                      "group-hover:text-[rgb(var(--accent-foreground))]"
+                    )}
+                  />
+                ) : (
+                  <ChevronRight
+                    size={20}
+                    className={cn(
+                      "text-muted-foreground",
+                      "group-hover:text-[rgb(var(--accent-foreground))]"
+                    )}
+                  />
+                )}
+              </button>
+              <AnimatePresence>
+                {expandedCategories[category] && (
+                  <motion.div
+                    id={`category-skills-current-${category}`}
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                    className="space-y-2 p-3"
+                  >
+                    {groupedSkillsTaxonomy[category].map((skill) => {
+                      const isSelected = selectedCurrentSkillsMap.has(skill._id);
+                      const currentProficiency = isSelected
+                        ? selectedCurrentSkillsMap.get(skill._id)
+                        : null;
+                      return (
+                        <motion.div
+                          key={skill._id}
                           className={cn(
-                            "cursor-pointer px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 rounded-md border",
-                            isSelected
-                              ? `${darkItemSelectedStyles.base} ${selectedItemRingStyles}`
-                              : `${darkItemStyles.base} ${darkItemStyles.hover}`
+                            "flex flex-col items-start justify-between gap-2 rounded-md p-2 transition-all duration-200 sm:flex-row sm:items-center"
                           )}
-                          onClick={() => handleToggleCurrentSkill(skill._id)}
-                          pill={false}
-                          size="md"
                         >
-                          {skill.name}
-                        </Badge>
+                          <Badge
+                            className={cn(
+                              "cursor-pointer px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 rounded-md border",
+                              isSelected
+                                ? `${darkItemSelectedStyles.base} ${selectedItemRingStyles}`
+                                : `${darkItemStyles.base} ${darkItemStyles.hover}`
+                            )}
+                            onClick={() => handleToggleCurrentSkill(skill._id)}
+                            pill={false}
+                            size="md"
+                          >
+                            {skill.name}
+                          </Badge>
 
-                        {isSelected && (
-                          <div className="mt-1 flex items-center gap-2 sm:mt-0">
-                            <span className="text-xs text-foreground">
-                              Proficiency:
-                            </span>
-                            <div className="flex gap-1.5">
-                              {[1, 2, 3, 4, 5].map((level) => (
-                                <button
-                                  key={level}
-                                  type="button"
-                                  onClick={() =>
-                                    handleSetProficiency(skill._id, level)
-                                  }
-                                  disabled={isSaving}
-                                  className={cn(
-                                    "flex h-[26px] w-[26px] items-center justify-center rounded-md border text-xs font-medium transition-all duration-150",
-                                    currentProficiency === level
-                                      ? `${proficiencySelectedStyles.base} ${selectedItemRingStyles}`
-                                      : `${darkItemStyles.base} ${darkItemStyles.hover}`
-                                  )}
-                                >
-                                  {level}
-                                </button>
-                              ))}
+                          {isSelected && (
+                            <div className="mt-1 flex items-center gap-2 sm:mt-0">
+                              <span className="text-xs text-foreground">
+                                Proficiency:
+                              </span>
+                              <div className="flex gap-1.5">
+                                {[1, 2, 3, 4, 5].map((level) => (
+                                  <button
+                                    key={level}
+                                    type="button"
+                                    onClick={() =>
+                                      handleSetProficiency(skill._id, level)
+                                    }
+                                    disabled={isSaving}
+                                    className={cn(
+                                      "flex h-[26px] w-[26px] items-center justify-center rounded-md border text-xs font-medium transition-all duration-150",
+                                      currentProficiency === level
+                                        ? `${proficiencySelectedStyles.base} ${selectedItemRingStyles}`
+                                        : `${darkItemStyles.base} ${darkItemStyles.hover}`
+                                    )}
+                                  >
+                                    {level}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </motion.div>
-                    );
-                  })}
-                  {groupedSkillsTaxonomy[category].length === 0 && (
-                    <p className="py-2 text-center text-xs text-muted-foreground">
-                      No skills in this category.
-                    </p>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        ))
-      )}
+                          )}
+                        </motion.div>
+                      );
+                    })}
+                    {groupedSkillsTaxonomy[category].length === 0 && (
+                      <p className="py-2 text-center text-xs text-muted-foreground">
+                        No skills in this category.
+                      </p>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ))
+        )}
+      </div>
+      </div>
+
+      {/* Bottom fade overlay */}
+      <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-card to-transparent z-10 pointer-events-none" />
     </motion.div>
   );
 };
+
 // Current Skills Display Component
 export const CurrentSkillsDisplay = ({ currentSkills }) => (
   <motion.div
@@ -385,7 +403,7 @@ export const CurrentSkillsDisplay = ({ currentSkills }) => (
   </motion.div>
 );
 
-// Desired Skills Editor Component
+// Desired Skills Editor - Updated with scrollable container and fade effects
 export const DesiredSkillsEditor = ({
   groupedSkillsTaxonomy,
   expandedCategories,
@@ -398,105 +416,121 @@ export const DesiredSkillsEditor = ({
   const categories = Object.keys(groupedSkillsTaxonomy).sort();
 
   return (
-    <motion.div
-      className={cn("space-y-3 p-3 md:p-4 rounded-lg", "bg-card shadow-sm ")}
-    >
-      {loadingTaxonomy ? (
-        <LoadingSpinner size={20} className="mx-auto my-4" />
-      ) : categories.length === 0 ? (
-        <p className="py-4 text-center text-sm text-muted-foreground">
-          No skills available to select.
-        </p>
-      ) : (
-        categories.map((category) => (
-          <motion.div
-            key={category}
-            variants={fadeIn}
-            className="rounded-md bg-background group"
-          >
-            <button
-              onClick={() => toggleCategory(category)}
-              className={cn(
-                "flex w-full items-center justify-between p-3 text-left transition-colors duration-150 focus:outline-none rounded-md",
-                expandedCategories[category]
-                  ? "bg-muted/60 text-primary"
-                  : "bg-transparent text-primary",
-                "hover:bg-[rgb(var(--accent))] hover:text-[rgb(var(--accent-foreground))]",
-                "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
-              )}
-              aria-expanded={expandedCategories[category]}
-              aria-controls={`category-skills-desired-${category}`}
+    <motion.div className="relative bg-card shadow-sm rounded-lg">
+      {/* Sticky header container */}
+      <div className="sticky top-0 z-20 bg-card/95 px-3 md:px-4 py-3">
+        <div className="flex items-center justify-between">
+        </div>
+      </div>
+      
+      {/* Scrollable content container */}
+      <div className="relative max-h-[50vh] overflow-hidden">
+        {/* Top fade overlay */}
+        <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-card to-transparent z-10 pointer-events-none" />
+        
+        {/* Scrollable content */}
+        <div className="overflow-y-auto max-h-[50vh] p-3 md:p-4 space-y-3">
+        {loadingTaxonomy ? (
+          <LoadingSpinner size={20} className="mx-auto my-4" />
+        ) : categories.length === 0 ? (
+          <p className="py-4 text-center text-sm text-muted-foreground">
+            No skills available to select.
+          </p>
+        ) : (
+          categories.map((category) => (
+            <motion.div
+              key={category}
+              variants={fadeIn}
+              className="rounded-md bg-background group"
             >
-              <h4 className="text-md font-semibold">{category}</h4>
-              {expandedCategories[category] ? (
-                <ChevronDown
-                  size={20}
-                  className={cn(
-                    "text-muted-foreground",
-                    "group-hover:text-[rgb(var(--accent-foreground))]"
-                  )}
-                />
-              ) : (
-                <ChevronRight
-                  size={20}
-                  className={cn(
-                    "text-muted-foreground",
-                    "group-hover:text-[rgb(var(--accent-foreground))]"
-                  )}
-                />
-              )}
-            </button>
-            <AnimatePresence>
-              {expandedCategories[category] && (
-                <motion.div
-                  id={`category-skills-desired-${category}`}
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.25, ease: "easeInOut" }}
-                  className="space-y-2 p-3 "
-                >
-                  {groupedSkillsTaxonomy[category].map((skill) => {
-                    const isSelected = selectedDesiredSkillIds.has(skill._id);
-                    return (
-                      <motion.div
-                        key={skill._id}
-                        className={cn(
-                          "flex items-center rounded-md p-0.5 transition-all duration-200"
-                        )}
-                      >
-                        <Badge
+              <button
+                onClick={() => toggleCategory(category)}
+                className={cn(
+                  "flex w-full items-center justify-between p-3 text-left transition-colors duration-150 focus:outline-none rounded-md",
+                  expandedCategories[category]
+                    ? "bg-muted/60 text-primary"
+                    : "bg-transparent text-primary",
+                  "hover:bg-[rgb(var(--accent))] hover:text-[rgb(var(--accent-foreground))]",
+                  "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
+                )}
+                aria-expanded={expandedCategories[category]}
+                aria-controls={`category-skills-desired-${category}`}
+              >
+                <h4 className="text-md font-semibold">{category}</h4>
+                {expandedCategories[category] ? (
+                  <ChevronDown
+                    size={20}
+                    className={cn(
+                      "text-muted-foreground",
+                      "group-hover:text-[rgb(var(--accent-foreground))]"
+                    )}
+                  />
+                ) : (
+                  <ChevronRight
+                    size={20}
+                    className={cn(
+                      "text-muted-foreground",
+                      "group-hover:text-[rgb(var(--accent-foreground))]"
+                    )}
+                  />
+                )}
+              </button>
+              <AnimatePresence>
+                {expandedCategories[category] && (
+                  <motion.div
+                    id={`category-skills-desired-${category}`}
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                    className="space-y-2 p-3"
+                  >
+                    {groupedSkillsTaxonomy[category].map((skill) => {
+                      const isSelected = selectedDesiredSkillIds.has(skill._id);
+                      return (
+                        <motion.div
+                          key={skill._id}
                           className={cn(
-                            "w-full cursor-pointer px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 rounded-md border",
-                            isSelected
-                              ? `${darkItemSelectedStyles.base} ${selectedItemRingStyles}`
-                              : `${darkItemStyles.base} ${darkItemStyles.hover}`
+                            "flex items-center rounded-md p-0.5 transition-all duration-200"
                           )}
-                          onClick={() => handleToggleDesiredSkill(skill._id)}
-                          pill={false}
-                          size="md"
                         >
-                          {skill.name}
-                        </Badge>
-                      </motion.div>
-                    );
-                  })}
-                  {groupedSkillsTaxonomy[category].length === 0 && (
-                    <p className="py-2 text-center text-xs text-muted-foreground">
-                      No skills in this category.
-                    </p>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        ))
-      )}
+                          <Badge
+                            className={cn(
+                              "w-full cursor-pointer px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 rounded-md border",
+                              isSelected
+                                ? `${darkItemSelectedStyles.base} ${selectedItemRingStyles}`
+                                : `${darkItemStyles.base} ${darkItemStyles.hover}`
+                            )}
+                            onClick={() => handleToggleDesiredSkill(skill._id)}
+                            pill={false}
+                            size="md"
+                          >
+                            {skill.name}
+                          </Badge>
+                        </motion.div>
+                      );
+                    })}
+                    {groupedSkillsTaxonomy[category].length === 0 && (
+                      <p className="py-2 text-center text-xs text-muted-foreground">
+                        No skills in this category.
+                      </p>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ))
+        )}
+      </div>
+
+      {/* Bottom fade overlay */}
+      <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-card to-transparent z-10 pointer-events-none" />
+      </div>
     </motion.div>
   );
 };
 
-//Desired skills display
+// Desired skills display
 export const DesiredSkillsDisplay = ({ desiredSkills }) => (
   <motion.div
     initial="hidden"
@@ -528,7 +562,7 @@ export const DesiredSkillsDisplay = ({ desiredSkills }) => (
   </motion.div>
 );
 
-//projects allocation list
+// Projects allocation list
 export const ProjectsList = ({ projects, projectsError, loadingProjects }) => (
   <motion.div initial="hidden" animate="visible" variants={fadeIn}>
     <Card className="overflow-hidden">
@@ -614,7 +648,7 @@ export const ProjectsList = ({ projects, projectsError, loadingProjects }) => (
               <p className="py-4 text-center text-sm italic text-muted-foreground">
                 No projects assigned yet.
               </p>
-            )}
+              )}
           </motion.div>
         )}
       </CardContent>

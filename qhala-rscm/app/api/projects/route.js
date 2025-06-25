@@ -33,7 +33,7 @@ export async function GET(request) {
       }
       if (
         loggedInUserId !== pmId &&
-        !["admin", "hr", "pm"].includes(loggedInUserRole)
+        !["admin", "hr", "pm", "employee"].includes(loggedInUserRole)
       ) {
         return NextResponse.json(
           {
@@ -46,7 +46,7 @@ export async function GET(request) {
       }
       query.pmId = pmId;
     } else {
-      if (!["admin", "hr", "pm"].includes(loggedInUserRole)) {
+      if (!["admin", "hr", "pm","employee"].includes(loggedInUserRole)) {
         return NextResponse.json(
           {
             success: false,
@@ -85,7 +85,7 @@ export async function POST(request) {
   if (!session || !session.user || !session.user.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-  const allowedRoles = ["pm", "hr", "admin"];
+  const allowedRoles = ["pm", "hr", "admin","employee"];
   if (!allowedRoles.includes(session.user.role)) {
     return NextResponse.json(
       { message: "Forbidden: Insufficient permissions to create projects" },
