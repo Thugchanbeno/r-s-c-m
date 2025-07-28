@@ -1,6 +1,11 @@
 export const formatDate = (dateString) => {
   if (!dateString) return "N/A";
-  const date = new Date(dateString + "T00:00:00Z");
+  const date = new Date(dateString);
+
+  if (isNaN(date.getTime())) {
+    return "Invalid Date";
+  }
+
   const options = {
     year: "numeric",
     month: "short",
@@ -11,13 +16,28 @@ export const formatDate = (dateString) => {
 };
 
 export const formatDateRange = (startDate, endDate) => {
-  const options = { year: "numeric", month: "short", timeZone: "UTC" };
-  const start = startDate
-    ? new Date(startDate + "T00:00:00Z").toLocaleDateString(undefined, options)
-    : "N/A";
-  const end = endDate
-    ? new Date(endDate + "T00:00:00Z").toLocaleDateString(undefined, options)
-    : "Present";
+  const options = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  };
+
+  let start = "N/A";
+  if (startDate) {
+    const d = new Date(startDate);
+    if (!isNaN(d.getTime())) {
+      start = d.toLocaleDateString(undefined, options);
+    }
+  }
+
+  let end = "Present";
+  if (endDate) {
+    const d = new Date(endDate);
+    if (!isNaN(d.getTime())) {
+      end = d.toLocaleDateString(undefined, options);
+    }
+  }
 
   if (!startDate && !endDate) return "Dates N/A";
   if (!startDate) return `Until ${end}`;
@@ -38,12 +58,10 @@ export const parseDatePickerDate = (dateString) => {
     typeof dateString !== "string" ||
     !/^\d{4}-\d{2}-\d{2}$/.test(dateString)
   ) {
-    return null; // Return null for invalid or empty strings
+    return null;
   }
   const parts = dateString.split("-");
   return new Date(
-    parseInt(parts[0]),
-    parseInt(parts[1]) - 1,
-    parseInt(parts[2])
+    Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))
   );
 };

@@ -1,0 +1,86 @@
+Qhala RSCM – Codebase Architecture & Flow
+1. Tech Stack
+Frontend: Next.js (React), Tailwind CSS, Framer Motion, Lucide Icons
+Backend: Next.js API routes (serverless), MongoDB (Mongoose ODM)
+Authentication: NextAuth.js (Google OAuth)
+Deployment: Vercel
+Other: NLP microservice for skill extraction
+2. Core Domain Models
+User: Stores user profile, role (admin, hr, pm, employee), department, skills, and availability.
+Skill: Taxonomy of skills, with categories and aliases.
+Project: Contains project details, required skills, department, PM, status, and NLP-extracted skills.
+Allocation: Tracks which users are allocated to which projects, with percentage and dates.
+ResourceRequest: PMs can request resources for projects; HR/Admin can approve/deny.
+3. Authentication & Authorization
+NextAuth.js handles login (Google OAuth).
+User roles are checked in API routes and UI to restrict access (e.g., only HR/Admin can manage users/skills).
+Session is provided globally via <AuthProvider>.
+4. UI Structure
+Layouts:
+layout.jsx: Root layout, wraps everything in Auth and Theme providers.
+layout.jsx: Main app layout, includes sidebar, header, footer, and handles session loading.
+layout.jsx: Admin area layout, restricts access to admin/hr roles.
+Navigation:
+Sidebar and AdminSidebar components render navigation based on user role.
+5. Main Features & Flows
+A. Project Management
+Create/Edit Project:
+Accessible to PM, HR, Admin.
+Uses ProjectForm with AI skill suggestions (calls /api/recommendations/skills which hits the NLP service).
+Required skills can be set manually or via NLP.
+Project Details:
+Shows project info, required skills, allocations, and allows team management.
+PM/HR/Admin can allocate users, request resources, and view AI recommendations for team members.
+B. Resource Allocation
+Allocations:
+Users are assigned to projects with a percentage and role.
+Capacity is tracked; users over 100% are flagged.
+Resource Requests:
+PMs can request users for their projects.
+HR/Admin can approve/deny requests.
+C. Skills Management
+Skill Taxonomy:
+Admin/HR can manage the list of skills and categories.
+Users can set their current and desired skills.
+NLP Integration:
+Project descriptions are analyzed for skill extraction via an external NLP API.
+D. User Profiles
+Profile Page:
+Users can view and edit their skills, see their allocations, and project history.
+Capacity and allocation summary are shown.
+E. Dashboards
+Role-based Dashboards:
+Admin/HR: See system stats, manage users/skills, view analytics.
+PM: See managed projects, pending requests, and resource stats.
+Employee: See their own allocations, skills, and project involvement.
+6. API Layer
+RESTful API routes under api for users, projects, skills, allocations, resource requests, and recommendations.
+Authorization is enforced in each route using NextAuth sessions and role checks.
+Database operations use Mongoose models.
+7. State & Data Fetching
+React hooks (e.g., useProfileData, useProjectFormData, useProjectDetailsData) manage fetching, updating, and local state for forms and views.
+Optimistic UI and loading states are handled throughout.
+8. Styling & Theming
+Tailwind CSS is used for all styling.
+CSS variables in globals.css provide theme colors.
+Dark mode supported via CSS variables.
+9. Deployment & Environment
+Vercel is used for deployment.
+Environment variables are managed in Vercel dashboard and .env files for secrets, DB, and API URLs.
+Typical User Flows
+Admin/HR
+Log in → Dashboard → Manage users/skills/projects → Approve resource requests → View analytics
+Project Manager (PM)
+Log in → Dashboard → Create/edit projects → Add required skills → Request resources → Allocate team → Monitor project status
+Employee
+Log in → Dashboard → View/edit profile and skills → See allocations and project history
+AI/NLP Integration
+When creating/editing a project, the description can be analyzed for skill extraction.
+The frontend calls /api/recommendations/skills, which proxies to an NLP microservice.
+Suggested skills are shown in the UI for quick assignment.
+Summary
+Role-based access ensures users see only what they should.
+Projects are the central entity, tying together users, skills, and allocations.
+Skills are managed centrally and linked to both users and projects.
+Resource allocation is tracked and managed, with AI assistance for matching.
+Dashboards and profile pages provide tailored overviews for each role.

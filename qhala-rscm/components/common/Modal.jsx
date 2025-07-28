@@ -3,6 +3,7 @@ import { Dialog, Transition, TransitionChild } from "@headlessui/react";
 import { Fragment } from "react";
 import { X } from "lucide-react";
 import Button from "@/components/common/Button";
+import { cn } from "@/lib/utils";
 
 export default function Modal({
   isOpen,
@@ -10,7 +11,14 @@ export default function Modal({
   title,
   children,
   initialFocus,
+  size = "md",
 }) {
+  const sizeClasses = {
+    md: "max-w-md",
+    lg: "max-w-2xl",
+    xl: "max-w-4xl",
+  };
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
@@ -46,7 +54,12 @@ export default function Modal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <div className="w-full max-w-md transform overflow-hidden rounded-[var(--radius)] bg-[rgb(var(--card))] p-6 text-left align-middle shadow-xl transition-all">
+              <div
+                className={cn(
+                  "w-full transform overflow-hidden rounded-[var(--radius)] bg-[rgb(var(--card))] p-6 text-left align-middle shadow-xl transition-all",
+                  sizeClasses[size]
+                )}
+              >
                 <div className="flex items-center justify-between border-b border-[rgb(var(--border))] pb-4 mb-4">
                   <h3
                     className="text-lg font-medium leading-6 text-[rgb(var(--card-foreground))]"

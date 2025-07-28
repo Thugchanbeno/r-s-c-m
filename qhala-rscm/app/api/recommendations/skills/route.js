@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
+import connectDB from "@/lib/db";
+import CvCache from "@/models/CvCache";
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
@@ -21,7 +23,7 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { description } = body;
+    const { description, fileName, cacheResult } = body;
 
     if (
       !description ||
@@ -37,25 +39,14 @@ export async function POST(request) {
       );
     }
 
-    // This URL should point to your FastAPI instance and the /extract-skills endpoint
     const nlpServiceUrl = `${
       process.env.NLP_API_URL || "http://localhost:8000"
     }/extract-skills`;
 
-    console.log(
-      `Next.js API (/api/nlp/extract-from-text): Proxying to NLP service: ${nlpServiceUrl} for description: "${description.substring(
-        0,
-        50
-      )}..."`
-    );
-
     const nlpResponse = await fetch(nlpServiceUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // Add any auth headers if your FastAPI is protected
-      },
-      body: JSON.stringify({ text: description }), // FastAPI /extract-skills expects {"text": "..."}
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: description }),
     });
 
     const nlpResult = await nlpResponse.json();
@@ -70,45 +61,33 @@ export async function POST(request) {
           success: false,
           error:
             nlpResult.detail || nlpResult.error || "NLP service request failed",
-          details: nlpResult,
         },
         { status: nlpResponse.status }
       );
     }
 
-    if (nlpResult && typeof nlpResult.extracted_skills !== "undefined") {
-      if (!Array.isArray(nlpResult.extracted_skills)) {
-        console.error(
-          "FastAPI /extract-skills 'extracted_skills' field was not an array:",
-          nlpResult.extracted_skills
-        );
-        return NextResponse.json(
-          {
-            success: false,
-            error: "Invalid skill data format from NLP service (not an array).",
-          },
-          { status: 500 }
-        );
+    const extractedSkills = nlpResult.extracted_skills || [];
+
+    if (cacheResult && fileName) {
+      try {
+        await connectDB();
+        await CvCache.create({
+          fileName,
+          rawText: description,
+          extractedSkills: extractedSkills,
+        });
+        console.log(`Successfully cached CV: ${fileName}`);
+      } catch (cacheError) {
+        console.error("Failed to save CV to cache:", cacheError);
       }
-      return NextResponse.json({
-        success: true,
-        data: nlpResult.extracted_skills,
-      });
-    } else {
-      console.error(
-        "FastAPI /extract-skills response did not contain 'extracted_skills' key or was invalid:",
-        nlpResult
-      );
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid or missing skill data from NLP service.",
-        },
-        { status: 500 }
-      );
     }
+
+    return NextResponse.json({
+      success: true,
+      data: extractedSkills,
+    });
   } catch (error) {
-    console.error("Next.js API Error in /api/nlp/extract-from-text:", error);
+    console.error("Next.js API Error in /api/recommendations/skills:", error);
     if (error.cause && error.cause.code === "ECONNREFUSED") {
       return NextResponse.json(
         {
