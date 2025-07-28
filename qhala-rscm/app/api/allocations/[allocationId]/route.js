@@ -6,6 +6,7 @@ import Project from "@/models/Project";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import mongoose from "mongoose";
+import { updateUserAvailabilityStatus } from "@/lib/userUtils";
 
 // @desc    Update an allocation
 // @route   PUT /api/allocations/[allocationId]
@@ -17,7 +18,6 @@ export async function PUT(request, { params }) {
   if (!session || !session.user) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-
   // Only admins and HR can update allocations
   if (!["admin", "hr"].includes(session.user.role)) {
     return NextResponse.json(
@@ -28,7 +28,6 @@ export async function PUT(request, { params }) {
       { status: 403 }
     );
   }
-
   // Validate the allocation ID format
   if (!mongoose.Types.ObjectId.isValid(allocationId)) {
     return NextResponse.json(
@@ -39,7 +38,6 @@ export async function PUT(request, { params }) {
 
   try {
     await connectDB();
-
     // Find the existing allocation
     const existingAllocation = await Allocation.findById(allocationId);
     if (!existingAllocation) {
@@ -189,6 +187,7 @@ export async function PUT(request, { params }) {
         { status: 404 }
       );
     }
+    await updateUserAvailabilityStatus(updatedAllocation.userId);
 
     return NextResponse.json({ success: true, data: updatedAllocation });
   } catch (error) {

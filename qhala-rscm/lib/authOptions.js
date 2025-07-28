@@ -36,83 +36,50 @@ export const authOptions = {
     error: "/auth/error",
   },
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
-      console.log("signin callback triggered");
-
+    async signIn({ user, account, profile }) {
       if (!user || !account || !user.email) {
         console.error("Missing user or account information during sign-in.");
-        return false; // Prevent sign-in if user or account is missing
+        return false;
       }
 
       try {
         await connectDB();
-        // First try to find by email since that's more stable than provider ID
         let dbUser = await User.findOne({ email: user.email });
 
-        if (!dbUser) {
+        if (dbUser) {
+          if (
+            !dbUser.authProviderId ||
+            dbUser.authProviderId === "pending_invite"
+          ) {
+            dbUser.authProviderId = user.id || account.providerAccountId;
+            dbUser.name = user.name || dbUser.name;
+            dbUser.avatarUrl = user.image || dbUser.avatarUrl;
+            await dbUser.save();
+            console.log(
+              `Admin-created user ${dbUser.email} has linked their Google account.`
+            );
+          }
+        } else {
           console.log(`User not found (${user.email}). Creating new user...`);
-
-          // Create new user with default "employee" role
           dbUser = await User.create({
             email: user.email,
             name: user.name || "New User",
             avatarUrl: user.image || "",
-            authProviderId: user.id || "",
-            role: "employee", // Default role
+            authProviderId: user.id || account.providerAccountId,
+            role: "employee",
           });
           console.log(
-            "New user created in DB:",
-            dbUser.email,
-            "with role:",
-            dbUser.role
+            `New user ${dbUser.email} created with role: ${dbUser.role}`
           );
-        } else {
-          // Update user information if needed
-          let updated = false;
-          if (user.name && dbUser.name !== user.name) {
-            dbUser.name = user.name;
-            updated = true;
-          }
-          if (user.image && dbUser.avatarUrl !== user.image) {
-            dbUser.avatarUrl = user.image;
-            updated = true;
-          }
-          // Make sure we always have the provider ID
-          if (
-            user.id &&
-            (!dbUser.authProviderId || dbUser.authProviderId !== user.id)
-          ) {
-            dbUser.authProviderId = user.id;
-            updated = true;
-          }
-
-          if (updated) {
-            await dbUser.save();
-            console.log(
-              "User updated in DB:",
-              dbUser.email,
-              "with role:",
-              dbUser.role
-            );
-          } else {
-            console.log(
-              "Existing user signed in:",
-              dbUser.email,
-              "with role:",
-              dbUser.role
-            );
-          }
         }
-
         return true;
       } catch (error) {
         console.error("Error during sign-in:", error);
-        return false; // Prevent sign-in on error
+        return false;
       }
     },
 
     async jwt({ token, user, account, profile, trigger }) {
-      // Initial sign-in
       if (account && user) {
         console.log("JWT callback: Initial sign-in");
 
@@ -121,11 +88,9 @@ export const authOptions = {
           const dbUser = await User.findOne({ email: user.email });
 
           if (dbUser) {
-            // Important! Store all user data in the token
             token.id = dbUser._id.toString();
             token.role = dbUser.role;
             token.email = dbUser.email;
-            // Use dbUser fields first, fall back to OAuth data
             token.picture = dbUser.avatarUrl || user.image;
             token.name = dbUser.name || user.name;
 

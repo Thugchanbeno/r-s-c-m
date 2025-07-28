@@ -24,11 +24,17 @@ const AllocationSchema = new Schema(
       enum: ["Lead developer", "Developer", "Tester", "Manager", "Admin"],
       default: "Developer",
     },
+    status: {
+      type: String,
+      enum: ["active", "completed", "cancelled"],
+      default: "active",
+      index: true,
+    },
   },
   { timestamps: true }
 );
 
-AllocationSchema.index({ userId: 1, startDate: 1, endDate: 1 });
+AllocationSchema.index({ userId: 1, status: 1, startDate: 1, endDate: 1 });
 AllocationSchema.index({ projectId: 1 });
 
 export default mongoose.models.Allocation ||

@@ -6,6 +6,7 @@ import Project from "@/models/Project";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import mongoose from "mongoose";
+import { updateUserAvailabilityStatus } from "@/lib/userUtils";
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
@@ -240,6 +241,8 @@ export async function POST(request) {
     };
 
     const newAllocation = await Allocation.create(newAllocationData);
+
+    await updateUserAvailabilityStatus(newAllocation.userId);
 
     return NextResponse.json(
       { success: true, data: newAllocation },
