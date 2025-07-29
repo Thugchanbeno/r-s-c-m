@@ -109,7 +109,7 @@ export const UserCreationForm = ({ initialData, onBack, onSuccess }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="e.g., Jane Doe"
+              placeholder="e.g., Dismas Ombuya"
             />
           </div>
           <div className="space-y-2">
@@ -120,7 +120,7 @@ export const UserCreationForm = ({ initialData, onBack, onSuccess }) => {
               type="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="e.g., jane.doe@example.com"
+              placeholder="e.g., D.Ombuya@gmail.com"
               required
             />
           </div>

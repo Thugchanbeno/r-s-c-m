@@ -32,24 +32,18 @@ export async function GET(request) {
     );
   }
 
-  // Your FastAPI endpoint for user recommendations
   const FASTAPI_RECOMMENDER_URL = `${
     process.env.NLP_API_URL || "http://localhost:8000"
   }/recommend/users-for-project`;
 
   try {
-    console.log(
-      `Next.js API (/api/recommendations/users): Forwarding recommendation request for project ${projectId} (limit: ${limit}) to ${FASTAPI_RECOMMENDER_URL}`
-    );
-
     const fastApiResponse = await fetch(FASTAPI_RECOMMENDER_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // Add any necessary auth headers if your FastAPI is protected
       },
       body: JSON.stringify({
-        id: projectId, // FastAPI expects "id" for project_id
+        id: projectId,
         limit: limit,
       }),
     });
@@ -58,8 +52,8 @@ export async function GET(request) {
 
     if (!fastApiResponse.ok) {
       console.error(
-        `FastAPI recommender error for project ${projectId} (Status: ${fastApiResponse.status}):`,
-        fastApiResult
+        `FastAPI recommender error for project ${projectId}:`,
+        fastApiResult.detail || fastApiResult.error
       );
       return NextResponse.json(
         {
@@ -68,20 +62,16 @@ export async function GET(request) {
             fastApiResult.detail ||
             fastApiResult.error ||
             "Failed to get recommendations from FastAPI service.",
-          details: fastApiResult, // Send full FastAPI error details if available
+          details: fastApiResult,
         },
         { status: fastApiResponse.status }
       );
     }
 
-    // FastAPI returns {"recommendations": [...]}
-    // We want to return the array directly under a "data" key for consistency
-    // or handle if "recommendations" key is missing.
     if (fastApiResult && typeof fastApiResult.recommendations !== "undefined") {
       if (!Array.isArray(fastApiResult.recommendations)) {
         console.error(
-          "FastAPI response 'recommendations' field was not an array:",
-          fastApiResult.recommendations
+          "FastAPI response 'recommendations' field was not an array"
         );
         return NextResponse.json(
           {
@@ -97,10 +87,7 @@ export async function GET(request) {
         data: fastApiResult.recommendations,
       });
     } else {
-      console.error(
-        "FastAPI response did not contain 'recommendations' key or was invalid:",
-        fastApiResult
-      );
+      console.error("FastAPI response missing 'recommendations' key");
       return NextResponse.json(
         {
           success: false,
@@ -111,10 +98,10 @@ export async function GET(request) {
     }
   } catch (error) {
     console.error(
-      `Next.js API Error in /api/recommendations/users for project ${projectId}:`,
-      error
+      `Recommendations API Error for project ${projectId}:`,
+      error.message
     );
-    // Check if it's a fetch error (e.g., FastAPI server down)
+
     if (error.cause && error.cause.code === "ECONNREFUSED") {
       return NextResponse.json(
         {
@@ -122,7 +109,7 @@ export async function GET(request) {
           error:
             "Could not connect to the recommendation service. Please try again later.",
         },
-        { status: 503 } // Service Unavailable
+        { status: 503 }
       );
     }
     return NextResponse.json(

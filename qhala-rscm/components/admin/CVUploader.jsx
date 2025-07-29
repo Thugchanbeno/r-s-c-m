@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { LlamaParse } from "llama-parse";
 import { UploadCloud } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -23,14 +22,114 @@ export const CVUploader = ({ onSuccess }) => {
       setError(null);
 
       try {
-        setLoadingMessage("Parsing document with LlamaParse...");
-        const parser = new LlamaParse({
-          apiKey: process.env.NEXT_PUBLIC_LLAMA_CLOUD_API_KEY,
-          resultType: "text",
+        const apiKey = process.env.NEXT_PUBLIC_LLAMA_CLOUD_API_KEY;
+        if (!apiKey) {
+          throw new Error("NEXT_PUBLIC_LLAMA_CLOUD_API_KEY is not set");
+        }
+
+        setLoadingMessage("Uploading document to LlamaParse...");
+
+        const formData = new FormData();
+        formData.append("file", file, file.name);
+
+        const baseUrl = "https://api.cloud.llamaindex.ai/api/parsing";
+        const uploadUrl = `${baseUrl}/upload`;
+
+        const uploadResponse = await fetch(uploadUrl, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: formData,
         });
 
-        const documents = await parser.loadData(file);
-        const rawText = documents[0]?.text || "";
+        if (!uploadResponse.ok) {
+          const errorText = await uploadResponse.text();
+          throw new Error(
+            `Upload failed: ${uploadResponse.status} - ${errorText}`
+          );
+        }
+
+        const uploadResult = await uploadResponse.json();
+        const jobId = uploadResult.id;
+        if (!jobId) {
+          throw new Error("No job ID returned from upload");
+        }
+
+        const statusUrl = `${baseUrl}/job/${jobId}`;
+        setLoadingMessage("Processing document...");
+
+        let jobCompleted = false;
+        let attempts = 0;
+        const maxAttempts = 60;
+
+        while (!jobCompleted && attempts < maxAttempts) {
+          attempts++;
+
+          const statusResponse = await fetch(statusUrl, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+            },
+          });
+
+          if (!statusResponse.ok) {
+            const errorText = await statusResponse.text();
+            throw new Error(
+              `Status check failed: ${statusResponse.status} - ${errorText}`
+            );
+          }
+
+          const statusData = await statusResponse.json();
+          const status = statusData.status;
+
+          if (status === "SUCCESS") {
+            jobCompleted = true;
+          } else if (status === "ERROR" || status === "FAILED") {
+            const errorMsg =
+              statusData.error || statusData.message || "Unknown error";
+            throw new Error(
+              `Job failed with status: ${status}. Error: ${errorMsg}`
+            );
+          } else if (status === "PENDING" || status === "RUNNING") {
+            setLoadingMessage(
+              `Processing document... (${attempts}/${maxAttempts}) - Status: ${status}`
+            );
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+          } else {
+            setLoadingMessage(
+              `Processing document... (${attempts}/${maxAttempts}) - Status: ${status}`
+            );
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+          }
+        }
+
+        if (!jobCompleted) {
+          throw new Error(
+            "Timeout waiting for document processing. Please try again."
+          );
+        }
+
+        setLoadingMessage("Retrieving processed text...");
+        const resultType = "text";
+        const resultUrl = `${baseUrl}/job/${jobId}/result/${resultType}`;
+
+        const resultResponse = await fetch(resultUrl, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+          },
+        });
+
+        if (!resultResponse.ok) {
+          const errorText = await resultResponse.text();
+          throw new Error(
+            `Failed to get results: ${resultResponse.status} - ${errorText}`
+          );
+        }
+
+        const resultData = await resultResponse.json();
+        const rawText = resultData[resultType] || resultData.text || "";
 
         if (!rawText) {
           throw new Error(
@@ -38,40 +137,47 @@ export const CVUploader = ({ onSuccess }) => {
           );
         }
 
-        setLoadingMessage("Extracting and normalizing skills...");
-        const response = await fetch("/api/recommendations/skills", {
+        setLoadingMessage("Extracting data from CV...");
+
+        const backendPayload = {
+          text: rawText,
+          fileName: file.name,
+          cacheResult: true,
+        };
+
+        const response = await fetch("/api/cv/extract-entities", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            description: rawText,
-            fileName: file.name,
-            cacheResult: true,
-          }),
+          body: JSON.stringify(backendPayload),
         });
 
         const result = await response.json();
+
         if (!response.ok || !result.success) {
-          throw new Error(result.error || "Backend failed to extract skills.");
+          throw new Error(result.error || "Backend failed to extract data.");
         }
 
-        const skills = result.data || [];
-        const emailMatch = rawText.match(/[\w\.-]+@[\w\.-]+/);
-        const phoneMatch = rawText.match(
-          /(\(?\d{3}\)?[\s\.-]?)?\d{3}[\s\.-]?\d{4}/
-        );
+        const entityData = result.data || {};
+        const skills = entityData.skills || [];
+        const personalInfo = entityData.personal_info || {};
+        const experience = entityData.experience || [];
+        const education = entityData.education || [];
 
         const finalData = {
           prepopulatedData: {
-            name: null,
-            email: emailMatch ? emailMatch[0] : null,
-            phone: phoneMatch ? phoneMatch[0] : null,
+            name: personalInfo.name || null,
+            email: personalInfo.email || null,
+            phone: personalInfo.phone || null,
             skills: skills,
+            experience: experience,
+            education: education,
           },
+          rawEntities: entityData,
         };
 
         onSuccess(finalData);
       } catch (err) {
-        console.error(err);
+        console.error("CV Upload Error:", err.message);
         setError(err.message);
       } finally {
         setIsLoading(false);
@@ -82,7 +188,11 @@ export const CVUploader = ({ onSuccess }) => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { "application/pdf": [".pdf"] },
+    accept: {
+      "application/pdf": [".pdf"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        [".docx"],
+    },
     maxFiles: 1,
   });
 
@@ -114,7 +224,7 @@ export const CVUploader = ({ onSuccess }) => {
             <p className="font-semibold text-foreground">
               Drop CV here or click to upload
             </p>
-            <p className="text-xs mt-1">PDF format recommended</p>
+            <p className="text-xs mt-1">PDF or DOCX format recommended</p>
           </div>
         )}
       </div>
