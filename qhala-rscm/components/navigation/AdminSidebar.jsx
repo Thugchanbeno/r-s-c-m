@@ -11,7 +11,6 @@ import {
   Settings,
   UserCircle,
   FileText,
-  Menu,
   ChevronLeft,
   X,
   LogOut,
@@ -23,9 +22,12 @@ import {
 import Button from "@/components/common/Button.jsx";
 import { cn } from "@/lib/utils";
 
-const AdminSidebar = () => {
+const AdminSidebar = ({ 
+  isMobileOpen = false, 
+  onMobileClose = () => {},
+  showMobileToggle = true 
+}) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { data: session } = useSession();
   const pathname = usePathname();
 
@@ -34,7 +36,6 @@ const AdminSidebar = () => {
   const userAvatar = session?.user?.image || "/images/default-avatar.png";
 
   const toggleSidebar = () => setIsExpanded(!isExpanded);
-  const toggleMobileSidebar = () => setIsMobileOpen(!isMobileOpen);
 
   const sidebarTheme = {
     bg: "bg-slate-900",
@@ -78,7 +79,7 @@ const AdminSidebar = () => {
     {
       name: "Reports",
       icon: FileText,
-      href: "/admin/reports",
+      href: "/admin/analytics",
       roles: ["admin", "hr"],
     },
     {
@@ -107,9 +108,7 @@ const AdminSidebar = () => {
   };
 
   const handleNavLinkClick = () => {
-    if (isMobileOpen) {
-      setIsMobileOpen(false);
-    }
+    onMobileClose();
   };
 
   const isActiveLink = (item) => {
@@ -118,8 +117,6 @@ const AdminSidebar = () => {
     }
     if (pathname.startsWith(item.href)) {
       if (item.href === "/admin" && pathname !== "/admin") return false;
-      // The dashboard check was specific to AdminSidebar, keep if needed
-      // if (item.href === "/dashboard" && pathname !== "/dashboard") return false;
       return true;
     }
     return false;
@@ -128,12 +125,12 @@ const AdminSidebar = () => {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768 && isMobileOpen) {
-        setIsMobileOpen(false);
+        onMobileClose();
       }
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [isMobileOpen]);
+  }, [isMobileOpen, onMobileClose]);
 
   const sidebarWidthClass = isExpanded ? "w-60" : "w-[72px]";
   const mobileTransformClass = isMobileOpen
@@ -142,33 +139,23 @@ const AdminSidebar = () => {
 
   return (
     <>
-      <div className="fixed top-3 left-3 z-[60] md:hidden">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={toggleMobileSidebar}
-          className="p-2 rounded-md shadow-lg bg-[rgb(var(--card))] text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))]"
-          aria-label="Open admin sidebar"
-        >
-          <Menu size={20} />
-        </Button>
-      </div>
-
+      {/* Mobile overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-black/60 z-[55] md:hidden"
-          onClick={toggleMobileSidebar}
+          className="fixed inset-0 bg-black/60 z-[70] md:hidden"
+          onClick={onMobileClose}
           aria-hidden="true"
         />
       )}
 
       <aside
         className={cn(
-          `fixed left-0 top-0 z-50 h-full flex flex-col 
-           transition-all duration-300 ease-in-out md:sticky md:translate-x-0`,
+          `fixed left-0 top-0 z-[75] h-full flex flex-col 
+           transition-all duration-300 ease-in-out md:sticky md:translate-x-0 md:z-auto`,
           sidebarTheme.bg,
           sidebarTheme.textPrimary,
           sidebarWidthClass,
+          "md:transform-none",
           mobileTransformClass
         )}
         aria-label="Admin Sidebar"
@@ -216,7 +203,7 @@ const AdminSidebar = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={toggleMobileSidebar}
+              onClick={onMobileClose}
               className={cn(
                 "md:hidden p-2",
                 sidebarTheme.textSecondary,

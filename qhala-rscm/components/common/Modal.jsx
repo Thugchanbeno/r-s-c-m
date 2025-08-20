@@ -4,6 +4,7 @@ import { Fragment } from "react";
 import { X } from "lucide-react";
 import Button from "@/components/common/Button";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Modal({
   isOpen,

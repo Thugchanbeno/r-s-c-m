@@ -42,11 +42,11 @@ export default function AdminUsersPage() {
           <h1 className="text-2xl md:text-3xl font-bold text-[rgb(var(--foreground))]">
             Manage Users
           </h1>
-          <p className="mt-1 text-[rgb(var(--muted-foreground))]">
+          <p className="mt-1 text-sm md:text-lg lg:text-xl text-[rgb(var(--muted-foreground))]">
             View, search, and edit user profiles and roles.
           </p>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
+        <Button className=" ml-2 flex gap-1 text-xs md:text-md lg:text-lg "onClick={() => setIsCreateModalOpen(true)}>
           <UserPlus className="mr-2 h-4 w-4" />
           Create User
         </Button>
@@ -78,7 +78,7 @@ export default function AdminUsersPage() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         title="Create New User"
-        size="xl" // Use the larger size for the form
+        size="xl" 
       >
         <CreateUserFlow
           onClose={() => setIsCreateModalOpen(false)}

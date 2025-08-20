@@ -1,9 +1,8 @@
-// app/api/notifications/mark-all-read/route.js
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import connectDB from "@/lib/db";
-import Notifications from "@/models/Notifications";
+import Notification from "@/models/Notifications"; 
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
@@ -13,15 +12,49 @@ export async function POST(request) {
 
   try {
     await connectDB();
+    const body = await request.json();
+    const { notificationIds } = body;
 
-    const result = await Notifications.updateMany(
-      { userId: session.user.id, isRead: false },
-      { $set: { isRead: true } }
-    );
+    let result;
+
+    if (notificationIds && Array.isArray(notificationIds)) {
+      // Mark specific notifications as read
+      if (notificationIds.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "No notification IDs provided" },
+          { status: 400 }
+        );
+      }
+
+      result = await Notification.updateMany(
+        {
+          _id: { $in: notificationIds },
+          userId: session.user.id,
+        },
+        {
+          $set: { isRead: true, readAt: new Date() },
+        }
+      );
+
+      if (result.matchedCount === 0) {
+        return NextResponse.json(
+          { success: false, error: "No notifications found" },
+          { status: 404 }
+        );
+      }
+    } else {
+      // Mark all unread notifications as read (for backward compatibility)
+      result = await Notification.updateMany(
+        { userId: session.user.id, isRead: false, isArchived: { $ne: true } },
+        { $set: { isRead: true, readAt: new Date() } }
+      );
+    }
 
     return NextResponse.json({
       success: true,
-      message: `${result.modifiedCount} notifications marked as read.`,
+      message: `${result.modifiedCount} notification${
+        result.modifiedCount !== 1 ? "s" : ""
+      } marked as read`,
       modifiedCount: result.modifiedCount,
     });
   } catch (error) {
