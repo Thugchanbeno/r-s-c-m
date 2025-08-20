@@ -29,7 +29,7 @@ export default function ProjectsPage() {
 
         {canCreateProject && (
           <Link href="/projects/new" passHref>
-            <Button variant="primary">
+            <Button variant="primary " className=" ml-16 flex gap-1 text-xs md:text-md lg:text-lg ">
               <PlusCircle size={18} className="mr-2" /> Create New Project
             </Button>
           </Link>
