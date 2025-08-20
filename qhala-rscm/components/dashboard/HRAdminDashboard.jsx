@@ -18,7 +18,7 @@ import {
   Wrench,
   Star,
 } from "lucide-react";
-import Badge from "@/components/common/Badge";
+import { Badge } from "@/components/ui/badge";
 import { getAllocationPercentageColor } from "@/components/common/CustomColors";
 import { cn } from "@/lib/utils";
 

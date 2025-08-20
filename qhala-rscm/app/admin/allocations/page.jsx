@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Card, CardContent } from "@/components/common/Card";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import Badge from "@/components/common/Badge";
+import { Badge } from "@/components/ui/badge";
 import Modal from "@/components/common/Modal";
 import AllocationForm from "@/components/admin/AllocationForm";
 import {

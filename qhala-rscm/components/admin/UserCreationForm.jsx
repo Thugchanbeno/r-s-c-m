@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Save, User, ArrowLeft } from "lucide-react";
-import Button from "@/components/common/Button";
-import { Input } from "@/components/common/Input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/common/Label";
 import Select from "@/components/common/Select";
 import { ErrorMessage } from "@/components/user/ProfileComponents";

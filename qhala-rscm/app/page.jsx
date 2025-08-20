@@ -3,7 +3,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import qlogo from "@/assets/qlogo.png";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 import { ArrowRight, Zap, Cpu, BarChartBig } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";

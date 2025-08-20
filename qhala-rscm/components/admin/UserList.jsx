@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Image from "next/image";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,7 +11,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/common/Card";
-import Badge from "@/components/common/Badge";
+import { Badge } from "@/components/ui/badge";
 import {
   Edit,
   Trash2,

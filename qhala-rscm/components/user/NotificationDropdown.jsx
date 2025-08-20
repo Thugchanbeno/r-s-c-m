@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import NotificationItem from "@/components/user/NotificationItem";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 

@@ -7,9 +7,9 @@ import {
   CardContent,
   CardDescription,
 } from "@/components/common/Card";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import Badge from "@/components/common/Badge";
+import { Badge } from "@/components/ui/badge";
 import {
   AlertCircle,
   CheckCircle,

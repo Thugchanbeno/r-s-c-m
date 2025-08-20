@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle } from "lucide-react";
 import { toast } from "react-toastify";
 

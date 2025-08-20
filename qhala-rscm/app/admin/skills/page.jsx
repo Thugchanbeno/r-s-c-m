@@ -2,7 +2,7 @@
 import { useState, useCallback } from "react";
 import SkillTaxonomyList from "@/components/user/SkillTaxonomyList";
 import SkillForm from "@/components/admin/SkillForm";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 import Modal from "@/components/common/Modal";
 import { PlusCircle } from "lucide-react";
 import LoadingSpinner from "@/components/common/LoadingSpinner";

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import LoadingSpinner from "@/components/common/LoadingSpinner.jsx";
-import Badge from "@/components/common/Badge";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/common/Card";
 
 const ProjectList = () => {

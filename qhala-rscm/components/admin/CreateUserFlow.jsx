@@ -6,7 +6,7 @@ import { UserPlus } from "lucide-react";
 import { CVUploader } from "@/components/admin/CVUploader";
 import { UserCreationForm } from "@/components/admin/UserCreationForm";
 import { CachedCVs } from "@/components/admin/CachedCVs";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 
 export const CreateUserFlow = ({ onClose, onUserCreated }) => {
   const [view, setView] = useState("selection");

@@ -1,6 +1,6 @@
 "use client";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import Badge from "@/components/common/Badge";
+import { Badge } from "@/components/ui/badge";
 import {
   getSkillLevelColor,
   getSkillLevelName,

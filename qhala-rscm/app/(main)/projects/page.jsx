@@ -1,7 +1,7 @@
 "use client";
 import ProjectList from "@/components/projects/ProjectList.jsx";
 import Link from "next/link";
-import Button from "@/components/common/Button.jsx";
+import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "@/components/common/LoadingSpinner";

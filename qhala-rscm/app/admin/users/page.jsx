@@ -5,7 +5,7 @@ import { UserPlus } from "lucide-react";
 import UserList from "@/components/admin/UserList";
 import Modal from "@/components/common/Modal";
 import EditUserForm from "@/components/admin/UserForm";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 import { CreateUserFlow } from "@/components/admin/CreateUserFlow";
 
 export default function AdminUsersPage() {
