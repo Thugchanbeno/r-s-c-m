@@ -1,4 +1,3 @@
-//app/admin/allocations/page.jsx
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -17,6 +16,8 @@ import {
   Trash2,
   AlertCircle,
   CheckCircle,
+  Calendar,
+  Briefcase,
 } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -27,7 +28,6 @@ import {
 } from "@/lib/animations";
 import {
   getAllocationPercentageColor,
-  // getAvailabilityStyles, // This is for card borders/shadows, not the dot's BG
 } from "@/components/common/CustomColors";
 import { formatDate } from "@/lib/dateUtils";
 import { useAllocations } from "@/lib/hooks/useAllocations";
@@ -194,171 +194,320 @@ const AllocationsListPage = () => {
             initial="hidden"
             animate="visible"
           >
-            <Card className="shadow-md bg-[rgb(var(--card))] rounded-[var(--radius)] overflow-hidden">
+            {/* Desktop Table View */}
+            <Card className="hidden lg:block shadow-md bg-[rgb(var(--card))] rounded-[var(--radius)] overflow-hidden">
               <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-[rgb(var(--border))]">
-                    <thead className="bg-[rgb(var(--muted))]">
-                      <tr>
-                        <th
-                          scope="col"
-                          className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-[rgb(var(--foreground))] sm:pl-6"
-                        >
-                          User
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-3 py-3.5 text-left text-sm font-semibold text-[rgb(var(--foreground))]"
-                        >
-                          Project
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-3 py-3.5 text-left text-sm font-semibold text-[rgb(var(--foreground))]"
-                        >
-                          Role
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-3 py-3.5 text-left text-sm font-semibold text-[rgb(var(--foreground))]"
-                        >
-                          Allocation
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-3 py-3.5 text-left text-sm font-semibold text-[rgb(var(--foreground))]"
-                        >
-                          Dates
-                        </th>
-                        <th
-                          scope="col"
-                          className="relative py-3.5 pl-3 pr-4 sm:pr-6 text-right"
-                        >
-                          <span className="sr-only">Actions</span>
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[rgb(var(--border))] bg-[rgb(var(--card))]">
-                      {allocations.map((alloc) => (
-                        <motion.tr
-                          key={alloc._id}
-                          variants={itemVariants}
-                          className="hover:bg-[rgb(var(--muted))] transition-colors duration-150"
-                        >
-                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                            <div className="flex items-center">
-                              <div className="h-10 w-10 flex-shrink-0 relative mr-3">
-                                {alloc.userId?.avatarUrl ? (
-                                  <Image
-                                    className="h-10 w-10 rounded-full object-cover"
-                                    src={alloc.userId.avatarUrl}
-                                    alt={alloc.userId.name || "User avatar"}
-                                    width={40}
-                                    height={40}
-                                    sizes="40px"
-                                  />
-                                ) : (
-                                  <div className="h-10 w-10 rounded-full bg-[rgb(var(--muted))] flex items-center justify-center text-[rgb(var(--muted-foreground))]">
-                                    <UserCheck size={20} />
-                                  </div>
+                <table className="w-full table-fixed divide-y divide-[rgb(var(--border))]">
+                  <thead className="bg-[rgb(var(--muted))]">
+                    <tr>
+                      <th
+                        scope="col"
+                        className="w-[30%] py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-[rgb(var(--foreground))] sm:pl-6"
+                      >
+                        User
+                      </th>
+                      <th
+                        scope="col"
+                        className="w-[20%] px-3 py-3.5 text-left text-sm font-semibold text-[rgb(var(--foreground))]"
+                      >
+                        Project
+                      </th>
+                      <th
+                        scope="col"
+                        className="w-[15%] px-3 py-3.5 text-left text-sm font-semibold text-[rgb(var(--foreground))]"
+                      >
+                        Role
+                      </th>
+                      <th
+                        scope="col"
+                        className="w-[10%] px-3 py-3.5 text-left text-sm font-semibold text-[rgb(var(--foreground))]"
+                      >
+                        Allocation
+                      </th>
+                      <th
+                        scope="col"
+                        className="w-[15%] px-3 py-3.5 text-left text-sm font-semibold text-[rgb(var(--foreground))]"
+                      >
+                        Dates
+                      </th>
+                      <th
+                        scope="col"
+                        className="w-[10%] py-3.5 pl-3 pr-4 sm:pr-6 text-right text-sm font-semibold text-[rgb(var(--foreground))]"
+                      >
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[rgb(var(--border))] bg-[rgb(var(--card))]">
+                    {allocations.map((alloc) => (
+                      <motion.tr
+                        key={alloc._id}
+                        variants={itemVariants}
+                        className="hover:bg-[rgb(var(--muted))] transition-colors duration-150"
+                      >
+                        <td className="py-4 pl-4 pr-3 text-sm sm:pl-6">
+                          <div className="flex items-center">
+                            <div className="h-8 w-8 flex-shrink-0 relative mr-3">
+                              {alloc.userId?.avatarUrl ? (
+                                <Image
+                                  className="h-8 w-8 rounded-full object-cover"
+                                  src={alloc.userId.avatarUrl}
+                                  alt={alloc.userId.name || "User avatar"}
+                                  width={32}
+                                  height={32}
+                                  sizes="32px"
+                                />
+                              ) : (
+                                <div className="h-8 w-8 rounded-full bg-[rgb(var(--muted))] flex items-center justify-center text-[rgb(var(--muted-foreground))]">
+                                  <UserCheck size={16} />
+                                </div>
+                              )}
+                              <span
+                                className={cn(
+                                  "absolute -bottom-0.5 -right-0.5 block h-2.5 w-2.5 rounded-full ring-2 ring-[rgb(var(--card))]",
+                                  alloc.userId?.availabilityStatus ===
+                                    "available" && "bg-green-500",
+                                  alloc.userId?.availabilityStatus ===
+                                    "unavailable" && "bg-red-500",
+                                  alloc.userId?.availabilityStatus ===
+                                    "on_leave" && "bg-yellow-500",
+                                  !alloc.userId?.availabilityStatus &&
+                                    "bg-gray-300"
                                 )}
-                                <span
-                                  className={cn(
-                                    "absolute -bottom-0.5 -right-0.5 block h-3 w-3 rounded-full ring-2 ring-[rgb(var(--card))]",
-                                    // Corrected: Direct background color for the dot based on status
-                                    alloc.userId?.availabilityStatus ===
-                                      "available" && "bg-green-500",
-                                    alloc.userId?.availabilityStatus ===
-                                      "unavailable" && "bg-red-500",
-                                    alloc.userId?.availabilityStatus ===
-                                      "on_leave" && "bg-yellow-500", // Changed to yellow for 'on_leave'
-                                    !alloc.userId?.availabilityStatus &&
-                                      "bg-gray-300" // Default if status unknown
-                                  )}
-                                  title={`Availability: ${
-                                    alloc.userId?.availabilityStatus?.replace(
-                                      "_",
-                                      " "
-                                    ) || "unknown"
-                                  }`}
-                                ></span>
+                                title={`Availability: ${
+                                  alloc.userId?.availabilityStatus?.replace(
+                                    "_",
+                                    " "
+                                  ) || "unknown"
+                                }`}
+                              ></span>
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="font-medium text-[rgb(var(--foreground))] truncate">
+                                {alloc.userId?.name || "N/A"}
                               </div>
-                              <div>
-                                <div className="font-medium text-[rgb(var(--foreground))]">
-                                  {alloc.userId?.name || "N/A"}
-                                </div>
-                                <div className="text-[rgb(var(--muted-foreground))] text-xs mt-0.5">
-                                  {alloc.userId?.email || ""}
-                                </div>
+                              <div className="text-[rgb(var(--muted-foreground))] text-xs mt-0.5 truncate">
+                                {alloc.userId?.email || ""}
                               </div>
                             </div>
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-[rgb(var(--foreground))]">
+                          </div>
+                        </td>
+                        <td className="px-3 py-4 text-sm text-[rgb(var(--foreground))]">
+                          <div className="truncate" title={alloc.projectId?.name || "N/A"}>
                             {alloc.projectId?.name || "N/A"}
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-[rgb(var(--muted-foreground))]">
+                          </div>
+                        </td>
+                        <td className="px-3 py-4 text-sm text-[rgb(var(--muted-foreground))]">
+                          <div className="truncate" title={alloc.role}>
                             {alloc.role}
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm">
-                            <Badge
-                              size="sm"
-                              pill={true}
-                              className={getAllocationPercentageColor(
-                                alloc.allocationPercentage
-                              )}
+                          </div>
+                        </td>
+                        <td className="px-3 py-4 text-sm">
+                          <Badge
+                            size="sm"
+                            pill={true}
+                            className={getAllocationPercentageColor(
+                              alloc.allocationPercentage
+                            )}
+                          >
+                            {alloc.allocationPercentage}%
+                          </Badge>
+                        </td>
+                        <td className="px-3 py-4 text-sm text-[rgb(var(--muted-foreground))]">
+                          <div className="text-xs">
+                            <div className="truncate">
+                              {formatDate(alloc.startDate)}
+                            </div>
+                            <div className="truncate text-[rgb(var(--muted-foreground))]/80">
+                              {formatDate(alloc.endDate)}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                          <div className="flex items-center justify-end space-x-1">
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => openEditAllocationModal(alloc)}
+                              disabled={isProcessingAction}
+                              className="text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-accent-background))]"
+                              aria-label={`Edit allocation for ${alloc.userId?.name}`}
                             >
-                              {alloc.allocationPercentage}%
-                            </Badge>
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-[rgb(var(--muted-foreground))]">
-                            {formatDate(alloc.startDate)} -{" "}
-                            {formatDate(alloc.endDate)}
-                          </td>
-                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                            <div className="flex items-center justify-end space-x-1">
+                              <Edit size={14} />
+                            </Button>
+                            {confirmDeleteId === alloc._id ? (
+                              <Button
+                                variant="destructive"
+                                size="icon-sm"
+                                onClick={() => handleDeleteClick(alloc._id)}
+                                onMouseLeave={cancelDeleteConfirmation}
+                                disabled={isProcessingAction}
+                                aria-label={`Confirm delete allocation for ${alloc.userId?.name}`}
+                              >
+                                <CheckCircle size={14} />
+                              </Button>
+                            ) : (
                               <Button
                                 variant="ghost"
                                 size="icon-sm"
-                                onClick={() => openEditAllocationModal(alloc)}
+                                onClick={() => handleDeleteClick(alloc._id)}
                                 disabled={isProcessingAction}
-                                className="text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-accent-background))]"
-                                aria-label={`Edit allocation for ${alloc.userId?.name}`}
+                                className="text-[rgb(var(--destructive))] hover:bg-[rgb(var(--destructive))]/10"
+                                aria-label={`Delete allocation for ${alloc.userId?.name}`}
                               >
-                                <Edit size={16} />
+                                <Trash2 size={14} />
                               </Button>
-                              {confirmDeleteId === alloc._id ? (
-                                <Button
-                                  variant="destructive"
-                                  size="icon-sm"
-                                  onClick={() => handleDeleteClick(alloc._id)}
-                                  onMouseLeave={cancelDeleteConfirmation}
-                                  disabled={isProcessingAction}
-                                  aria-label={`Confirm delete allocation for ${alloc.userId?.name}`}
-                                >
-                                  <CheckCircle size={16} />
-                                </Button>
-                              ) : (
-                                <Button
-                                  variant="ghost"
-                                  size="icon-sm"
-                                  onClick={() => handleDeleteClick(alloc._id)}
-                                  disabled={isProcessingAction}
-                                  className="text-[rgb(var(--destructive))] hover:bg-[rgb(var(--destructive))]/10"
-                                  aria-label={`Delete allocation for ${alloc.userId?.name}`}
-                                >
-                                  <Trash2 size={16} />
-                                </Button>
-                              )}
-                            </div>
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                            )}
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
               </CardContent>
             </Card>
+
+            <div className="lg:hidden space-y-4">
+              {allocations.map((alloc) => (
+                <motion.div
+                  key={alloc._id}
+                  variants={itemVariants}
+                >
+                  <Card className="shadow-md bg-[rgb(var(--card))] rounded-[var(--radius)] hover:shadow-lg transition-shadow duration-200">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between mb-4">
+                        {/* User Info */}
+                        <div className="flex items-center flex-1 min-w-0">
+                          <div className="h-12 w-12 flex-shrink-0 relative mr-3">
+                            {alloc.userId?.avatarUrl ? (
+                              <Image
+                                className="h-12 w-12 rounded-full object-cover"
+                                src={alloc.userId.avatarUrl}
+                                alt={alloc.userId.name || "User avatar"}
+                                width={48}
+                                height={48}
+                                sizes="48px"
+                              />
+                            ) : (
+                              <div className="h-12 w-12 rounded-full bg-[rgb(var(--muted))] flex items-center justify-center text-[rgb(var(--muted-foreground))]">
+                                <UserCheck size={24} />
+                              </div>
+                            )}
+                            <span
+                              className={cn(
+                                "absolute -bottom-0.5 -right-0.5 block h-4 w-4 rounded-full ring-2 ring-[rgb(var(--card))]",
+                                alloc.userId?.availabilityStatus ===
+                                  "available" && "bg-green-500",
+                                alloc.userId?.availabilityStatus ===
+                                  "unavailable" && "bg-red-500",
+                                alloc.userId?.availabilityStatus ===
+                                  "on_leave" && "bg-yellow-500",
+                                !alloc.userId?.availabilityStatus &&
+                                  "bg-gray-300"
+                              )}
+                              title={`Availability: ${
+                                alloc.userId?.availabilityStatus?.replace(
+                                  "_",
+                                  " "
+                                ) || "unknown"
+                              }`}
+                            ></span>
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-semibold text-[rgb(var(--foreground))] truncate">
+                              {alloc.userId?.name || "N/A"}
+                            </h3>
+                            <p className="text-sm text-[rgb(var(--muted-foreground))] truncate">
+                              {alloc.userId?.email || ""}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center space-x-1 ml-2">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => openEditAllocationModal(alloc)}
+                            disabled={isProcessingAction}
+                            className="text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-accent-background))]"
+                            aria-label={`Edit allocation for ${alloc.userId?.name}`}
+                          >
+                            <Edit size={16} />
+                          </Button>
+                          {confirmDeleteId === alloc._id ? (
+                            <Button
+                              variant="destructive"
+                              size="icon-sm"
+                              onClick={() => handleDeleteClick(alloc._id)}
+                              onMouseLeave={cancelDeleteConfirmation}
+                              disabled={isProcessingAction}
+                              aria-label={`Confirm delete allocation for ${alloc.userId?.name}`}
+                            >
+                              <CheckCircle size={16} />
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => handleDeleteClick(alloc._id)}
+                              disabled={isProcessingAction}
+                              className="text-[rgb(var(--destructive))] hover:bg-[rgb(var(--destructive))]/10"
+                              aria-label={`Delete allocation for ${alloc.userId?.name}`}
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                        <div className="flex items-center">
+                          <Briefcase size={16} className="text-[rgb(var(--muted-foreground))] mr-2 flex-shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-[rgb(var(--foreground))] truncate">
+                              {alloc.projectId?.name || "N/A"}
+                            </p>
+                            <p className="text-xs text-[rgb(var(--muted-foreground))]">
+                              Project
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center">
+                          <UserCheck size={16} className="text-[rgb(var(--muted-foreground))] mr-2 flex-shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-[rgb(var(--foreground))] truncate">
+                              {alloc.role}
+                            </p>
+                            <p className="text-xs text-[rgb(var(--muted-foreground))]">
+                              Role
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Calendar size={16} className="text-[rgb(var(--muted-foreground))] mr-2" />
+                          <div>
+                            <p className="text-sm text-[rgb(var(--muted-foreground))]">
+                              {formatDate(alloc.startDate)} - {formatDate(alloc.endDate)}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge
+                          size="sm"
+                          pill={true}
+                          className={getAllocationPercentageColor(
+                            alloc.allocationPercentage
+                          )}
+                        >
+                          {alloc.allocationPercentage}%
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
         )}
 

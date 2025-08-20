@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 import User from "./User";
-//include a 4th person when the project creation notification is created.
 
 const NotificationSchema = new Schema(
   {
@@ -11,8 +10,9 @@ const NotificationSchema = new Schema(
       index: true,
     },
     message: { type: String, required: true },
-    link: { type: String, required: false },
+    link: { type: String, required: true },
     isRead: { type: Boolean, default: false, required: true, index: true },
+    readAt: { type: Date, default: null },  
     type: {
       type: String,
       enum: [
@@ -23,7 +23,7 @@ const NotificationSchema = new Schema(
         "system_alert",
         "general_info",
       ],
-      required: false,
+      required: true, 
     },
     relatedResource: {
       type: Schema.Types.ObjectId,
@@ -38,6 +38,9 @@ const NotificationSchema = new Schema(
 );
 
 NotificationSchema.index({ userId: 1, isRead: 1, createdAt: -1 });
+NotificationSchema.index({ userId: 1, isArchived: 1, createdAt: -1 });
+NotificationSchema.index({ userId: 1, type: 1, createdAt: -1 });
+NotificationSchema.index({ message: "text" }); 
 
 export default mongoose.models.Notification ||
   mongoose.model("Notification", NotificationSchema);
