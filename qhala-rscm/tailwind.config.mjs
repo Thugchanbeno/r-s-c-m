@@ -57,7 +57,6 @@ export default {
           DEFAULT: "rgb(var(--card) / <alpha-value>)",
           foreground: "rgb(var(--card-foreground) / <alpha-value>)",
         },
-        // Adding your specific Qhala brand colors for direct use
         "qhala-deep-red": "rgb(var(--qhala-deep-red) / <alpha-value>)",
         "qhala-rich-gold": "rgb(var(--qhala-rich-gold) / <alpha-value>)",
         "qhala-dark-navy": "rgb(var(--qhala-dark-navy) / <alpha-value>)",
@@ -81,6 +80,6 @@ export default {
   plugins: [
     // require('@tailwindcss/forms'),
     // require('@tailwindcss/typography'),
-    // require('tailwindcss-animate'),
+    require('tailwindcss-animate'),
   ],
 };
