@@ -97,6 +97,6 @@ async function runPythonRecommendation({ projectId, exportPaths, topK, retrain }
     setTimeout(() => {
       pythonProcess.kill();
       reject(new Error('Recommendation process timeout'));
-    }, 60000); // 60 seconds timeout
+    }, 60000); 
   });
 }
