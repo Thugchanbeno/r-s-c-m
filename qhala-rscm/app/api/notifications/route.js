@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import connectDB from "@/lib/db";
-import Notifications from "@/models/Notifications";
+import Notification from "@/models/Notifications";
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
@@ -11,39 +11,86 @@ export async function GET(request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const limit = parseInt(searchParams.get("limit") || "10", 10);
-  const page = parseInt(searchParams.get("page") || "1", 10);
-  const skip = (page - 1) * limit;
+  const page = parseInt(searchParams.get("page")) || 1;
+  const limit = parseInt(searchParams.get("limit")) || 20;
+  const status = searchParams.get("status") || "all";
+  const search = searchParams.get("search") || "";
+  const dateRange = searchParams.get("dateRange") || "all";
+  const type = searchParams.get("type") || "all";
 
   try {
     await connectDB();
 
-    const notifications = await Notifications.find({ userId: session.user.id })
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .skip(skip)
-      .lean();
-
-    const totalNotificationss = await Notifications.countDocuments({
+    
+    const query = {
       userId: session.user.id,
-    });
-    const unreadCount = await Notifications.countDocuments({
+    };
+    if (status === "read") {
+      query.isRead = true
+    } else if (status === "unread") {
+      query.isRead = false
+    } else if (status === "all") 
+    if (type !== "all") {
+      query.type = type;
+    }
+
+    if (search) {
+      query.message = { $regex: search, $options: "i" };
+    }
+
+    if (dateRange !== "all") {
+      const now = new Date();
+      let startDate;
+
+      switch (dateRange) {
+        case "today":
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          break;
+        case "week":
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case "month":
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          break;
+        default:
+          startDate = null;
+      }
+
+      if (startDate) {
+        query.createdAt = { $gte: startDate };
+      }
+    }
+
+
+    const skip = (page - 1) * limit;
+    const [notifications, totalCount] = await Promise.all([
+      Notification.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Notification.countDocuments(query),
+    ]);
+    const unreadCount = await Notification.countDocuments({
       userId: session.user.id,
       isRead: false,
+      isArchived: { $ne: true },
     });
+
+    const totalPages = Math.ceil(totalCount / limit);
 
     return NextResponse.json({
       success: true,
       data: notifications,
-      unreadCount: unreadCount,
-      totalNotificationss: totalNotificationss,
       currentPage: page,
-      totalPages: Math.ceil(totalNotificationss / limit),
+      totalPages,
+      totalCount,
+      unreadCount,
     });
   } catch (error) {
-    console.error("API Error fetching notificationss:", error);
+    console.error("API Error fetching notifications:", error);
     return NextResponse.json(
-      { success: false, error: "Server Error fetching notificationss." },
+      { success: false, error: "Server Error fetching notifications." },
       { status: 500 }
     );
   }

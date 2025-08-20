@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import connectDB from "@/lib/db";
-import Notifications from "@/models/Notifications";
+import Notification from "@/models/Notifications";
 import mongoose from "mongoose";
 
 export async function PUT(request, { params }) {
@@ -23,7 +23,7 @@ export async function PUT(request, { params }) {
   try {
     await connectDB();
     const body = await request.json();
-    const notification = await Notifications.findById(notificationId);
+    const notification = await Notification.findById(notificationId);
 
     if (!notification) {
       return NextResponse.json(
@@ -32,7 +32,6 @@ export async function PUT(request, { params }) {
       );
     }
 
-    // Ensure the user is trying to mark their own notification as read
     if (notification.userId.toString() !== session.user.id) {
       return NextResponse.json(
         { success: false, error: "Forbidden: Cannot access this notification" },
@@ -40,7 +39,6 @@ export async function PUT(request, { params }) {
       );
     }
 
-    // If already read, no need to update, just return success
     let updated = false;
     if (
       body.hasOwnProperty("isRead") &&
@@ -48,6 +46,22 @@ export async function PUT(request, { params }) {
       notification.isRead !== body.isRead
     ) {
       notification.isRead = body.isRead;
+      if (body.isRead) {
+        notification.readAt = new Date();
+      }
+      updated = true;
+    }
+
+    // Handle isArchived update
+    if (
+      body.hasOwnProperty("isArchived") &&
+      typeof body.isArchived === "boolean" &&
+      notification.isArchived !== body.isArchived
+    ) {
+      notification.isArchived = body.isArchived;
+      if (body.isArchived) {
+        notification.archivedAt = new Date();
+      }
       updated = true;
     }
 
@@ -56,24 +70,22 @@ export async function PUT(request, { params }) {
       return NextResponse.json({
         success: true,
         data: notification,
-        message: "Notification updated.",
+        message: "Notification updated successfully",
       });
     } else {
-      // No actual changes were made, or no valid update fields provided
       return NextResponse.json({
         success: true,
         data: notification,
-        message: "No changes applied to notification.",
+        message: "No changes applied to notification",
       });
     }
   } catch (error) {
-    console.error(
-      `API Error marking notification ${notificationId} as read:`,
-      error
-    );
+    console.error(`API Error updating notification ${notificationId}:`, error);
     return NextResponse.json(
-      { success: false, error: "Server Error marking notification as read." },
+      { success: false, error: "Server Error updating notification" },
       { status: 500 }
     );
   }
 }
+
+
