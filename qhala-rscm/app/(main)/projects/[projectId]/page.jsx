@@ -9,9 +9,9 @@ import {
   CardContent,
   CardDescription,
 } from "@/components/common/Card";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import Badge from "@/components/common/Badge";
+import { Badge } from "@/components/ui/badge";
 import Modal from "@/components/common/Modal";
 import {
   ArrowLeft,
@@ -397,7 +397,7 @@ const ProjectDetailPage = () => {
                         No Specific Recommendations Found
                       </h4>
                       <p className="text-sm text-[rgb(var(--muted-foreground))]">
-                        The AI couldn't pinpoint specific user recommendations.
+                        The AI couldn&apos;t pinpoint specific user recommendations.
                         You can manually browse and request resources.
                       </p>
                     </div>

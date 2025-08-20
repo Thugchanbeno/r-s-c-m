@@ -2,7 +2,7 @@
 import { Dialog, Transition, TransitionChild } from "@headlessui/react";
 import { Fragment } from "react";
 import { X } from "lucide-react";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export default function Modal({

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Trash2, AlertCircle, ChevronDown, ChevronRight } from "lucide-react";
 import { useSession } from "next-auth/react";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent } from "@/components/common/Card";
 import { motion, AnimatePresence } from "framer-motion";
 

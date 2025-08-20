@@ -9,8 +9,8 @@ import {
   CardDescription,
   CardFooter,
 } from "@/components/common/Card";
-import Button from "@/components/common/Button";
-import Badge from "@/components/common/Badge";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Plus, Users, Calendar } from "lucide-react";
 

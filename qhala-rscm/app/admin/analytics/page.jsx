@@ -1,7 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import SkillDistributionChart from "@/components/admin/SkillDistributionChart";
 import {

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Search, Users as UsersIcon, BellRing, Wrench } from "lucide-react";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 import PendingRequests from "@/components/admin/PendingRequests";
 import {
   Card,

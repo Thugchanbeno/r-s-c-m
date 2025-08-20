@@ -1,5 +1,5 @@
 "use client";
-import Button from "@/components/common/Button.jsx";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,7 +7,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/common/Card.jsx";
-import Badge from "@/components/common/Badge";
+import { Badge } from "@/components/ui/badge";
 import {
   AlertCircle,
   Briefcase,

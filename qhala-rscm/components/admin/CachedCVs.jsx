@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, FileText, BrainCircuit } from "lucide-react";
-import { Input } from "@/components/common/Input";
+import { Input } from "@/components/ui/input";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { ErrorMessage } from "@/components/user/ProfileComponents";
 import { fadeIn, staggerChildren } from "@/lib/animations";

@@ -1,6 +1,6 @@
 "use client";
-import Button from "@/components/common/Button";
-import Badge from "@/components/common/Badge";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardHeader,

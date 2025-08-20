@@ -9,7 +9,7 @@ import {
   CardDescription,
 } from "@/components/common/Card";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import Badge from "@/components/common/Badge";
+import { Badge } from "@/components/ui/badge";
 import {
   Briefcase,
   GraduationCap,

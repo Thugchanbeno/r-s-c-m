@@ -7,7 +7,7 @@ import { ProfileHeader } from "@/components/user/ProfileComponents";
 import { CVUploader } from "@/components/admin/CVUploader";
 import { UserCreationForm } from "@/components/admin/UserCreationForm";
 import { CachedCVs } from "@/components/admin/CachedCVs";
-import Button from "@/components/common/Button";
+import { Button } from "@/components/ui/button";
 import { fadeIn } from "@/lib/animations";
 
 export default function CreateUserPage() {

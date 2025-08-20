@@ -10,7 +10,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/common/Card.jsx";
-import Button from "@/components/common/Button.jsx";
+import { Button } from "@/components/ui/button";
 import {
   Users,
   Wrench,
