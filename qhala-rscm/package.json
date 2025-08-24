@@ -6,7 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate": "node scripts/migration/migrate.js",
+    "migrate:validate": "node scripts/migration/validateMigration.js",
+    "migrate:users": "node scripts/migration/migrateUsers.js",
+    "migrate:userSkills": "node scripts/migration/migrateUserSkills.js",
+    "migrate:skills": "node scripts/migration/migrateSkills.js",
+    "migrate:projects": "node scripts/migration/migrateProjects.js",
+    "migrate:allocations": "node scripts/migration/migrateAllocations.js",
+    "migrate:requests": "node scripts/migration/migrateResourceRequests.js",
+    "migrate:notifications": "node scripts/migration/migrateNotifications.js",
+    "migrate:cv": "node scripts/migration/migrateCvCache.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.2",
@@ -15,11 +25,14 @@
     "chart.js": "^4.4.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "convex": "^1.26.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.1",
     "framer-motion": "^12.10.2",
     "llama-parse": "^0.1.0",
     "llamaindex": "^0.11.23",
     "lucide-react": "^0.506.0",
+    "module-alias": "^2.2.3",
     "mongodb": "^6.16.0",
     "mongoose": "^8.14.0",
     "next": "15.3.1",
@@ -42,5 +55,8 @@
     "eslint-config-next": "15.4.6",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.7"
-  }
+  },
+  "_moduleAliases": {
+  "@": "./"
+}
 }

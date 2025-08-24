@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { departmentEnum, projectStatusEnum } from "@/lib/projectconstants";
+import { departmentEnum, projectStatusEnum } from "../lib/projectconstants.js";
 
 const ProjectSchema = new Schema(
   {

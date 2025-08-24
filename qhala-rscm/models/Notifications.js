@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import User from "./User";
+import User from "./User.js";
 
 const NotificationSchema = new Schema(
   {
