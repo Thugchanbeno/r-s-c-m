@@ -1,20 +1,79 @@
-// convex/projects.js
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { query, mutation } from "./_generated/server";
 
+function requireRole(user, allowed) {
+  if (!user || !allowed.includes(user.role)) {
+    throw new Error("You don’t have permission to perform this action.");
+  }
+}
+
+async function getActor(ctx, email) {
+  if (!email) throw new Error("Unauthorized: missing email");
+  const actor = await ctx.db
+    .query("users")
+    .withIndex("by_email", (q) => q.eq("email", email))
+    .first();
+  if (!actor) throw new Error("User not found");
+  return actor;
+}
+
+// GET /api/projects
+export const getAll = query({
+  args: {
+    email: v.string(),
+    pmId: v.optional(v.id("users")),
+    countOnly: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const actor = await getActor(ctx, args.email);
+
+    let projects = [];
+    if (args.pmId) {
+      if (actor._id !== args.pmId && !["admin", "hr", "pm"].includes(actor.role)) {
+        throw new Error("You can only view your own projects or have admin/hr privileges.");
+      }
+      projects = await ctx.db
+        .query("projects")
+        .withIndex("by_pm", (q) => q.eq("pmId", args.pmId))
+        .collect();
+    } else {
+      requireRole(actor, ["admin", "hr", "pm"]);
+      projects = await ctx.db.query("projects").collect();
+    }
+
+    if (args.countOnly) return { count: projects.length };
+    return projects.sort((a, b) => a.name.localeCompare(b.name));
+  },
+});
+
+// GET /api/projects/[id]
+export const getById = query({
+  args: { id: v.id("projects") },
+  handler: async (ctx, args) => {
+    const project = await ctx.db.get(args.id);
+    if (!project) throw new Error("Project not found.");
+    return project;
+  },
+});
+
+// POST /api/projects
 export const create = mutation({
   args: {
+    email: v.string(),
     name: v.string(),
     description: v.string(),
-    department: v.optional(v.string()), // ✅ optional now
-    function: v.optional(
+    department: v.string(),
+    status: v.optional(
       v.union(
-        v.literal("q-trust"),
-        v.literal("q-lab"),
-        v.literal("consultants"),
-        v.literal("qhala")
+        v.literal("Planning"),
+        v.literal("Active"),
+        v.literal("On Hold"),
+        v.literal("Completed"),
+        v.literal("Cancelled")
       )
     ),
+    startDate: v.optional(v.number()),
+    endDate: v.optional(v.number()),
     requiredSkills: v.optional(
       v.array(
         v.object({
@@ -26,69 +85,32 @@ export const create = mutation({
       )
     ),
     nlpExtractedSkills: v.optional(v.array(v.string())),
-    pmId: v.optional(v.id("users")),
-    startDate: v.optional(v.number()),
-    endDate: v.optional(v.number()),
-    status: v.optional(
-      v.union(
-        v.literal("Planning"),
-        v.literal("Active"),
-        v.literal("On Hold"),
-        v.literal("Completed"),
-        v.literal("Cancelled")
-      )
-    ),
   },
   handler: async (ctx, args) => {
+    const actor = await getActor(ctx, args.email);
+    requireRole(actor, ["pm", "hr", "admin"]);
+
+    if (!args.name || !args.description || !args.department) {
+      throw new Error("Project name, description, and department are required.");
+    }
+
     const now = Date.now();
     return await ctx.db.insert("projects", {
       ...args,
-      department: args.department || "Unassigned", // ✅ default if missing
-      requiredSkills: args.requiredSkills || [],   // ✅ default if missing
+      pmId: actor._id,
       status: args.status || "Planning",
+      requiredSkills: args.requiredSkills || [],
+      nlpExtractedSkills: args.nlpExtractedSkills || [],
       createdAt: now,
       updatedAt: now,
     });
   },
 });
 
-export const getAll = query({
-  args: {
-    pmId: v.optional(v.id("users")),
-    status: v.optional(v.string()),
-    department: v.optional(v.string()),
-    function: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    let query = ctx.db.query("projects");
-
-    if (args.pmId) {
-      query = query.withIndex("by_pm", (q) => q.eq("pmId", args.pmId));
-    } else if (args.status) {
-      query = query.withIndex("by_status", (q) => q.eq("status", args.status));
-    } else if (args.department) {
-      query = query.withIndex("by_department", (q) =>
-        q.eq("department", args.department)
-      );
-    } else if (args.function) {
-      query = query.withIndex("by_function", (q) =>
-        q.eq("function", args.function)
-      );
-    }
-
-    return await query.collect();
-  },
-});
-
-export const getById = query({
-  args: { id: v.id("projects") },
-  handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
-  },
-});
-
+// PUT /api/projects
 export const update = mutation({
   args: {
+    email: v.string(),
     id: v.id("projects"),
     name: v.optional(v.string()),
     description: v.optional(v.string()),
@@ -101,16 +123,6 @@ export const update = mutation({
         v.literal("qhala")
       )
     ),
-    requiredSkills: v.optional(
-      v.array(
-        v.object({
-          skillId: v.id("skills"),
-          skillName: v.string(),
-          proficiencyLevel: v.number(),
-          isRequired: v.boolean(),
-        })
-      )
-    ),
     status: v.optional(
       v.union(
         v.literal("Planning"),
@@ -122,13 +134,220 @@ export const update = mutation({
     ),
     startDate: v.optional(v.number()),
     endDate: v.optional(v.number()),
+    requiredSkills: v.optional(
+      v.array(
+        v.object({
+          skillId: v.id("skills"),
+          skillName: v.string(),
+          proficiencyLevel: v.number(),
+          isRequired: v.boolean(),
+        })
+      )
+    ),
   },
   handler: async (ctx, args) => {
-    const { id, ...updateData } = args;
+    const actor = await getActor(ctx, args.email);
+
+    const project = await ctx.db.get(args.id);
+    if (!project) throw new Error("Project not found.");
+
+    if (project.pmId !== actor._id && !["admin", "hr"].includes(actor.role)) {
+      throw new Error("You can only update your own projects.");
+    }
+
+    const { id, ...updates } = args;
     await ctx.db.patch(id, {
-      ...updateData,
+      ...updates,
       updatedAt: Date.now(),
     });
-    return { success: true };
+
+    return { success: true, message: "Project updated successfully." };
+  },
+});
+
+// NLP skill extraction
+export const extractSkillsFromDescription = mutation({
+  args: {
+    email: v.string(),
+    projectId: v.id("projects"),
+    description: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const actor = await getActor(ctx, args.email);
+    requireRole(actor, ["pm", "hr", "admin"]);
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project) throw new Error("Project not found.");
+
+    const description = args.description || project.description;
+    if (!description) throw new Error("No description provided for skill extraction.");
+
+    try {
+      // TODO: Replace with actual Python microservice call
+      const extractedSkills = [
+        "JavaScript",
+        "React",
+        "Node.js",
+        "Database Design",
+        "API Development",
+      ];
+
+      await ctx.db.patch(args.projectId, {
+        nlpExtractedSkills: extractedSkills,
+        updatedAt: Date.now(),
+      });
+
+      return { success: true, extractedSkills };
+    } catch (error) {
+      throw new Error("Unable to extract skills. Please try again later.");
+    }
+  },
+});
+
+// Utilization report
+export const getUtilizationReport = query({
+  args: { email: v.string(), projectId: v.id("projects") },
+  handler: async (ctx, args) => {
+    const actor = await getActor(ctx, args.email);
+    requireRole(actor, ["pm", "hr", "admin"]);
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project) throw new Error("Project not found.");
+
+    const allocations = await ctx.db
+      .query("allocations")
+      .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
+      .collect();
+
+    const utilizationData = [];
+    let totalAllocatedHours = 0;
+    let totalPossibleHours = 0;
+
+    for (const allocation of allocations) {
+      const user = await ctx.db.get(allocation.userId);
+      if (!user) continue;
+
+      const weeklyHours = user.weeklyHours || 40;
+      const allocatedHours = (allocation.allocationPercentage / 100) * weeklyHours;
+
+      totalAllocatedHours += allocatedHours;
+      totalPossibleHours += weeklyHours;
+
+      utilizationData.push({
+        userId: user._id,
+        userName: user.name,
+        userEmail: user.email,
+        role: allocation.role,
+        allocationPercentage: allocation.allocationPercentage,
+        weeklyHours,
+        allocatedHours,
+        status: allocation.status,
+        startDate: allocation.startDate,
+        endDate: allocation.endDate,
+      });
+    }
+
+    const tasks = await ctx.db
+      .query("tasks")
+      .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
+      .collect();
+
+    const taskStats = {
+      total: tasks.length,
+      completed: tasks.filter((t) => t.status === "completed").length,
+      inProgress: tasks.filter((t) => t.status === "in_progress").length,
+      todo: tasks.filter((t) => t.status === "todo").length,
+      overdue: tasks.filter(
+        (t) => t.dueDate && t.dueDate < Date.now() && t.status !== "completed"
+      ).length,
+    };
+
+    return {
+      project: {
+        id: project._id,
+        name: project.name,
+        status: project.status,
+        startDate: project.startDate,
+        endDate: project.endDate,
+      },
+      utilization: {
+        totalAllocatedHours,
+        totalPossibleHours,
+        utilizationPercentage:
+          totalPossibleHours > 0
+            ? Math.round((totalAllocatedHours / totalPossibleHours) * 100)
+            : 0,
+        teamSize: utilizationData.length,
+        allocations: utilizationData,
+      },
+      tasks: taskStats,
+    };
+  },
+});
+
+// Org-level reporting
+export const getByOrganization = query({
+  args: {
+    email: v.string(),
+    function: v.optional(
+      v.union(
+        v.literal("q-trust"),
+        v.literal("q-lab"),
+        v.literal("consultants"),
+        v.literal("qhala")
+      )
+    ),
+    department: v.optional(v.string()),
+    includeUtilization: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const actor = await getActor(ctx, args.email);
+    requireRole(actor, ["pm", "hr", "admin"]);
+
+    let projects = await ctx.db.query("projects").collect();
+
+    if (args.function) {
+      projects = projects.filter((p) => p.function === args.function);
+    }
+    if (args.department) {
+      projects = projects.filter((p) => p.department === args.department);
+    }
+
+    if (args.includeUtilization) {
+      const projectsWithUtilization = [];
+      for (const project of projects) {
+        const allocations = await ctx.db
+          .query("allocations")
+          .withIndex("by_project", (q) => q.eq("projectId", project._id))
+          .collect();
+
+        let totalAllocatedHours = 0;
+        let teamSize = 0;
+
+        for (const allocation of allocations) {
+          const user = await ctx.db.get(allocation.userId);
+          if (user) {
+            const weeklyHours = user.weeklyHours || 40;
+            totalAllocatedHours +=
+              (allocation.allocationPercentage / 100) * weeklyHours;
+            teamSize++;
+          }
+        }
+
+        projectsWithUtilization.push({
+          ...project,
+          utilization: {
+            totalAllocatedHours,
+            teamSize,
+            activeAllocations: allocations.filter(
+              (a) => a.status === "active"
+            ).length,
+          },
+        });
+      }
+      return projectsWithUtilization;
+    }
+
+    return projects;
   },
 });

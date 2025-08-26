@@ -1,43 +1,32 @@
+import { convex, api } from "@/lib/convexServer";
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/db";
-import Project from "@/models/Project";
-import mongoose from "mongoose";
-import Skill from "@/models/Skills";
-import User from "@/models/User";
 
-export async function GET(request, { params }) {
-  const { projectId } = params;
-
-  if (!mongoose.Types.ObjectId.isValid(projectId)) {
-    return NextResponse.json(
-      { success: false, error: "Invalid Project ID format" },
-      { status: 400 }
-    );
-  }
-
+export async function GET(_req, { params }) {
   try {
-    await connectDB();
-    const project = await Project.findById(projectId).populate(
-      "pmId",
-      "name email"
-    );
-
-    if (!project) {
-      return NextResponse.json(
-        { success: false, error: "Project not found" },
-        { status: 404 }
-      );
-    }
+    const project = await convex.query(api.projects.getById, {
+      id: params.projectId,
+    });
     return NextResponse.json({ success: true, data: project });
   } catch (error) {
-    console.error(`API Error fetching project ${projectId}:`, error);
     return NextResponse.json(
-      { success: false, error: "Server Error fetching project details" },
-      { status: 500 }
+      { success: false, error: error.message || "Unable to fetch project." },
+      { status: 400 }
     );
   }
 }
 
-// You can also add PUT, DELETE handlers here later if needed for updating/deleting projects
-// export async function PUT(request, { params }) { ... }
-// export async function DELETE(request, { params }) { ... }
+export async function PUT(req, { params }) {
+  try {
+    const body = await req.json();
+    const result = await convex.mutation(api.projects.update, {
+      id: params.projectId,
+      ...body,
+    });
+    return NextResponse.json(result);
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: error.message || "Unable to update project." },
+      { status: 400 }
+    );
+  }
+}

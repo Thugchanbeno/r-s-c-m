@@ -1,27 +1,20 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
-import connectDB from "@/lib/db";
-import Notifications from "@/models/Notifications";
+import { convex, api } from "@/lib/convexServer";
+import { 
+  getAuthenticatedEmail, 
+  unauthorizedResponse, 
+  successResponse 
+} from "@/lib/auth-utils";
 
-export async function GET(request) {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
-    return NextResponse.json({ count: 0 });
-  }
-
+// GET /api/notifications/count
+export async function GET() {
   try {
-    await connectDB();
-    const unreadCount = await Notifications.countDocuments({
-      userId: session.user.id,
-      isRead: false,
-    });
-    return NextResponse.json({ success: true, count: unreadCount });
-  } catch (error) {
-    console.error("API Error fetching notification count:", error);
-    return NextResponse.json(
-      { success: false, error: "Server error" },
-      { status: 500 }
-    );
+    const email = await getAuthenticatedEmail();
+    if (!email) return unauthorizedResponse();
+
+    const result = await convex.query(api.notifications.getUnreadCount, { email });
+    return successResponse(result);
+  } catch {
+    // fallback: return 0 if error
+    return successResponse({ count: 0 });
   }
 }

@@ -1,7 +1,7 @@
+
 export const getSkillLevelColor = (level, { isInteractive = false } = {}) => {
   const baseClasses = getBaseColorClasses(level);
 
-  // Add hover and focus effects for interactive elements
   if (isInteractive) {
     const hoverClasses = getHoverColorClasses(level);
     return `${baseClasses} ${hoverClasses} transition-colors duration-200 cursor-pointer`;
@@ -27,7 +27,6 @@ const getBaseColorClasses = (level) => {
   }
 };
 
-// Hover state colors with consistent styling
 const getHoverColorClasses = (level) => {
   switch (level) {
     case 1:
@@ -45,7 +44,6 @@ const getHoverColorClasses = (level) => {
   }
 };
 
-// Get skill level name
 export const getSkillLevelName = (level) => {
   switch (level) {
     case 1:
@@ -62,11 +60,11 @@ export const getSkillLevelName = (level) => {
       return "N/A";
   }
 };
+
 export const getAllocationPercentageColor = (percentage) => {
   if (percentage == null || percentage < 0) {
     return "bg-slate-50 text-slate-700 ring-1 ring-inset ring-slate-200";
   }
-
   if (percentage <= 20) {
     return "bg-green-50 text-green-700 ring-1 ring-inset ring-green-200";
   } else if (percentage <= 40) {
@@ -78,11 +76,10 @@ export const getAllocationPercentageColor = (percentage) => {
   } else if (percentage <= 100) {
     return "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200";
   } else {
-    // Over 100% - distinct "overallocated" style
     return "bg-rose-100 text-rose-700 ring-1 ring-inset ring-rose-300 border-2 border-rose-500";
   }
 };
-// function for User Availability Status Border and Shadow Styles
+
 export const getAvailabilityStyles = (status) => {
   switch (status) {
     case "available":
@@ -96,75 +93,67 @@ export const getAvailabilityStyles = (status) => {
   }
 };
 
+export const getStatusColor = (status) => {
+  const colors = {
+    available: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800",
+    busy: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800",
+    unavailable: "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800",
+    on_leave: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800",
+  };
+  return colors[status] || colors.available;
+};
+
+export const getCapacityColor = (percentage) => {
+  if (percentage > 100) return "bg-purple-500";
+  if (percentage > 80) return "bg-red-500";
+  if (percentage > 60) return "bg-yellow-500";
+  return "bg-green-500";
+};
+
+export const getRequestStatusColor = (status) => {
+  const colors = {
+    pending_lm: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    pending_pm: "bg-blue-100 text-blue-800 border-blue-200",
+    pending_hr: "bg-orange-100 text-orange-800 border-orange-200",
+    approved: "bg-green-100 text-green-800 border-green-200",
+    rejected: "bg-red-100 text-red-800 border-red-200",
+    cancelled: "bg-gray-100 text-gray-800 border-gray-200",
+  };
+  return colors[status] || colors.pending_lm;
+};
+
+export const getStatusBadgeVariant = (status) => {
+  switch (status) {
+    case "Planning":
+      return "primary";
+    case "Active":
+      return "success";
+    case "On Hold":
+      return "warning";
+    case "Completed":
+      return "secondary";
+    case "Cancelled":
+      return "error";
+    default:
+      return "default";
+  }
+};
+
+
 export const getMatchScoreColorClasses = (score, type = "text") => {
   const percentage = Math.max(0, Math.min(1, score)) * 100;
   const colorScale = [
-    {
-      p: 0,
-      text: "text-red-600 dark:text-red-400",
-      bg: "bg-red-500",
-      border: "border-red-500",
-    },
-    {
-      p: 10,
-      text: "text-red-500 dark:text-red-400",
-      bg: "bg-red-400",
-      border: "border-red-400",
-    },
-    {
-      p: 20,
-      text: "text-orange-600 dark:text-orange-400",
-      bg: "bg-orange-500",
-      border: "border-orange-500",
-    },
-    {
-      p: 30,
-      text: "text-orange-500 dark:text-orange-400",
-      bg: "bg-orange-400",
-      border: "border-orange-400",
-    },
-    {
-      p: 40,
-      text: "text-amber-600 dark:text-amber-400",
-      bg: "bg-amber-500",
-      border: "border-amber-500",
-    },
-    {
-      p: 50,
-      text: "text-amber-500 dark:text-amber-400",
-      bg: "bg-amber-400",
-      border: "border-amber-400",
-    },
-    {
-      p: 60,
-      text: "text-yellow-500 dark:text-yellow-300",
-      bg: "bg-yellow-400",
-      border: "border-yellow-400",
-    },
-    {
-      p: 70,
-      text: "text-lime-600 dark:text-lime-400",
-      bg: "bg-lime-500",
-      border: "border-lime-500",
-    },
-    {
-      p: 80,
-      text: "text-lime-500 dark:text-lime-400",
-      bg: "bg-lime-400",
-      border: "border-lime-400",
-    },
-    {
-      p: 90,
-      text: "text-green-600 dark:text-green-400",
-      bg: "bg-green-500",
-      border: "border-green-500",
-    },
-    {
-      p: 100,
-      text: "text-green-500 dark:text-green-400",
-      bg: "bg-green-400",
-      border: "border-green-400",
-    },
+    { p: 0, text: "text-red-600 dark:text-red-400", bg: "bg-red-500", border: "border-red-500" },
+    { p: 10, text: "text-red-500 dark:text-red-400", bg: "bg-red-400", border: "border-red-400" },
+    { p: 20, text: "text-orange-600 dark:text-orange-400", bg: "bg-orange-500", border: "border-orange-500" },
+    { p: 30, text: "text-orange-500 dark:text-orange-400", bg: "bg-orange-400", border: "border-orange-400" },
+    { p: 40, text: "text-amber-600 dark:text-amber-400", bg: "bg-amber-500", border: "border-amber-500" },
+    { p: 50, text: "text-amber-500 dark:text-amber-400", bg: "bg-amber-400", border: "border-amber-400" },
+    { p: 60, text: "text-yellow-500 dark:text-yellow-300", bg: "bg-yellow-400", border: "border-yellow-400" },
+    { p: 70, text: "text-lime-600 dark:text-lime-400", bg: "bg-lime-500", border: "border-lime-500" },
+    { p: 80, text: "text-lime-500 dark:text-lime-400", bg: "bg-lime-400", border: "border-lime-400" },
+    { p: 90, text: "text-green-600 dark:text-green-400", bg: "bg-green-500", border: "border-green-500" },
+    { p: 100, text: "text-green-500 dark:text-green-400", bg: "bg-green-400", border: "border-green-400" },
   ];
 
   let selectedColor = colorScale[0];
@@ -196,7 +185,6 @@ export const getMatchScoreColorClasses = (score, type = "text") => {
 
 export const getScoreRatingText = (score) => {
   const percentage = Math.max(0, Math.min(1, score)) * 100;
-
   if (percentage >= 95) return "Excellent";
   if (percentage >= 90) return "Outstanding";
   if (percentage >= 85) return "Very Good";
@@ -212,22 +200,7 @@ export const getScoreRatingText = (score) => {
   return "Very Poor";
 };
 
-export const getStatusBadgeVariant = (status) => {
-  switch (status) {
-    case "Planning":
-      return "primary";
-    case "Active":
-      return "success";
-    case "On Hold":
-      return "warning";
-    case "Completed":
-      return "secondary";
-    case "Cancelled":
-      return "error";
-    default:
-      return "default";
-  }
-};
+
 export const darkItemStyles = {
   base: "bg-slate-900 text-slate-100 border-slate-700",
   hover: "hover:bg-slate-800 hover:text-[rgb(var(--accent))] hover:shadow-sm",

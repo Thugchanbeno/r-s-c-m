@@ -1,91 +1,26 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
-import connectDB from "@/lib/db";
-import Notification from "@/models/Notifications";
-import mongoose from "mongoose";
+import { convex, api } from "@/lib/convexServer";
+import { 
+  getAuthenticatedEmail, 
+  unauthorizedResponse, 
+  successResponse, 
+  errorResponse 
+} from "@/lib/auth-utils";
 
-export async function PUT(request, { params }) {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
-
-  const { notificationId } = params;
-
-  if (!mongoose.Types.ObjectId.isValid(notificationId)) {
-    return NextResponse.json(
-      { success: false, error: "Invalid Notification ID format" },
-      { status: 400 }
-    );
-  }
-
+// PUT /api/notifications/[notificationId]
+export async function PUT(req, { params }) {
   try {
-    await connectDB();
-    const body = await request.json();
-    const notification = await Notification.findById(notificationId);
+    const email = await getAuthenticatedEmail();
+    if (!email) return unauthorizedResponse();
 
-    if (!notification) {
-      return NextResponse.json(
-        { success: false, error: "Notification not found" },
-        { status: 404 }
-      );
-    }
+    const body = await req.json();
+    await convex.mutation(api.notifications.update, {
+      email,
+      id: params.notificationId,
+      ...body,
+    });
 
-    if (notification.userId.toString() !== session.user.id) {
-      return NextResponse.json(
-        { success: false, error: "Forbidden: Cannot access this notification" },
-        { status: 403 }
-      );
-    }
-
-    let updated = false;
-    if (
-      body.hasOwnProperty("isRead") &&
-      typeof body.isRead === "boolean" &&
-      notification.isRead !== body.isRead
-    ) {
-      notification.isRead = body.isRead;
-      if (body.isRead) {
-        notification.readAt = new Date();
-      }
-      updated = true;
-    }
-
-    // Handle isArchived update
-    if (
-      body.hasOwnProperty("isArchived") &&
-      typeof body.isArchived === "boolean" &&
-      notification.isArchived !== body.isArchived
-    ) {
-      notification.isArchived = body.isArchived;
-      if (body.isArchived) {
-        notification.archivedAt = new Date();
-      }
-      updated = true;
-    }
-
-    if (updated) {
-      await notification.save();
-      return NextResponse.json({
-        success: true,
-        data: notification,
-        message: "Notification updated successfully",
-      });
-    } else {
-      return NextResponse.json({
-        success: true,
-        data: notification,
-        message: "No changes applied to notification",
-      });
-    }
+    return successResponse({ message: "Notification updated successfully" });
   } catch (error) {
-    console.error(`API Error updating notification ${notificationId}:`, error);
-    return NextResponse.json(
-      { success: false, error: "Server Error updating notification" },
-      { status: 500 }
-    );
+    return errorResponse(error.message || "Unable to update notification.", 400);
   }
 }
-
-

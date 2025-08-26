@@ -6,6 +6,7 @@
 
 @layer base {
   :root {
+    /* Qhala Brand Colors */
     --qhala-deep-red: 192 0 0;
     --qhala-rich-gold: 218 165 32;
     --qhala-dark-navy: 0 51 102;
@@ -14,88 +15,110 @@
     --qhala-soft-peach: 255 243 229;
     --qhala-soft-peach-darker: 255 218 185;
 
-    --background: 248 249 250;
-    --foreground: 0 51 102; /* --qhala-dark-navy */
-
+    /* Enhanced Modern Palette */
+    --background: 250 251 252;
+    --foreground: 15 23 42;
+    
     --card: 255 255 255;
-    --card-foreground: 0 51 102;
+    --card-foreground: 15 23 42;
     --popover: 255 255 255;
-    --popover-foreground: 0 51 102;
+    --popover-foreground: 15 23 42;
 
-    --border: 222 226 230;
-    --input: 222 226 230;
+    --border: 226 232 240;
+    --input: 226 232 240;
 
-    --primary: 0 51 102; /* --qhala-dark-navy */
+    --primary: 0 51 102;
     --primary-foreground: 255 255 255;
-    --primary-accent-background: 230 240 247;
+    --primary-accent-background: 239 246 255;
 
-    --secondary: 218 165 32; /* --qhala-rich-gold */
-    --secondary-foreground: 51 51 51; /* --qhala-charcoal-grey */
+    --secondary: 100 116 139;
+    --secondary-foreground: 255 255 255;
 
-    --muted: 241 243 245;
-    --muted-foreground: 108 117 125;
+    --muted: 248 250 252;
+    --muted-foreground: 100 116 139;
 
-    --accent: 255 243 229; /* --qhala-soft-peach */
-    --accent-foreground: 0 51 102; /* --qhala-dark-navy */
+    --accent: 239 246 255;
+    --accent-foreground: 0 51 102;
 
-    --destructive: 192 0 0; /* --qhala-deep-red */
+    --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
 
-    --success: 25 135 84;
+    --success: 34 197 94;
     --success-foreground: 255 255 255;
 
-    --warning: 255 193 7;
-    --warning-foreground: 51 51 51; /* --qhala-charcoal-grey */
+    --warning: 245 158 11;
+    --warning-foreground: 255 255 255;
 
-    --ring: 0 51 102; /* --qhala-dark-navy */
-    --radius: 0.625rem;
+    --info: 59 130 246;
+    --info-foreground: 255 255 255;
 
-    --font-code: "Source Code Pro", ui-monospace, Menlo, Monaco, "Cascadia Mono",
-      "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace",
-      "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
+    --ring: 0 51 102;
+    --radius: 0.75rem;
+
+    /* Status Colors */
+    --status-available: 34 197 94;
+    --status-busy: 245 158 11;
+    --status-unavailable: 100 116 139;
+    --status-on-leave: 168 85 247;
+
+    /* Capacity Colors */
+    --capacity-low: 34 197 94;
+    --capacity-medium: 245 158 11;
+    --capacity-high: 239 68 68;
+    --capacity-over: 147 51 234;
+
+    /* Skill Level Colors */
+    --skill-beginner: 156 163 175;
+    --skill-intermediate: 59 130 246;
+    --skill-advanced: 34 197 94;
+    --skill-expert: 245 158 11;
+    --skill-master: 147 51 234;
   }
 
   .dark {
-    --background: 33 37 41;
-    --foreground: 222 226 230;
+    --background: 2 6 23;
+    --foreground: 248 250 252;
 
-    --card: 49 51 56;
-    --card-foreground: 222 226 230;
-    --popover: 49 51 56;
-    --popover-foreground: 222 226 230;
+    --card: 15 23 42;
+    --card-foreground: 248 250 252;
+    --popover: 15 23 42;
+    --popover-foreground: 248 250 252;
 
-    --border: 73 80 87;
-    --input: 73 80 87;
+    --border: 30 41 59;
+    --input: 30 41 59;
 
-    --primary: 135 206 235; /* --qhala-sky-blue */
-    --primary-foreground: 0 51 102; /* --qhala-dark-navy */
-    --primary-accent-background: 23 71 102;
+    --primary: 135 206 235;
+    --primary-foreground: 15 23 42;
+    --primary-accent-background: 30 58 138;
 
-    --secondary: 221 177 60;
-    --secondary-foreground: 51 51 51; /* --qhala-charcoal-grey */
+    --secondary: 71 85 105;
+    --secondary-foreground: 248 250 252;
 
-    --muted: 54 58 63;
-    --muted-foreground: 140 146 151;
+    --muted: 15 23 42;
+    --muted-foreground: 148 163 184;
 
-    --accent: 255 243 229; /* --qhala-soft-peach */
-    --accent-foreground: 0 51 102; /* --qhala-dark-navy */
+    --accent: 30 58 138;
+    --accent-foreground: 248 250 252;
 
-    --destructive: 200 30 30;
-    --destructive-foreground: 255 255 255;
+    --destructive: 220 38 38;
+    --destructive-foreground: 248 250 252;
 
-    --success: 60 178 104;
-    --success-foreground: 33 37 41;
+    --success: 22 163 74;
+    --success-foreground: 248 250 252;
 
-    --warning: 255 203 47;
-    --warning-foreground: 33 37 41;
+    --warning: 217 119 6;
+    --warning-foreground: 248 250 252;
 
-    --ring: 135 206 235; /* --qhala-sky-blue */
+    --info: 37 99 235;
+    --info-foreground: 248 250 252;
+
+    --ring: 135 206 235;
   }
 
   body {
     background-color: rgb(var(--background));
     color: rgb(var(--foreground));
-    font-family: var(--font-code);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -105,38 +128,52 @@
     outline-offset: 2px;
     box-shadow: 0 0 0 2px rgb(var(--background)), 0 0 0 4px rgb(var(--ring));
   }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgb(var(--muted));
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--muted-foreground) / 0.5);
+  }
 }
 
-@theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+/* Animation utilities */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
 }
