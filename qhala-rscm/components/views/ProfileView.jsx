@@ -1,95 +1,81 @@
 "use client";
-import { Card, CardHeader, CardContent } from "@/components/common/Card";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
-import { useProfileData } from "@/lib/hooks/useProfileData";
-import { cn } from "@/lib/utils";
 
+import { motion } from "framer-motion";
+import { useProfile } from "@/lib/hooks/useProfile";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { Card, CardContent } from "@/components/common/Card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ProfileHeader,
-  UserInfo,
-  ErrorMessage,
-  SectionHeader,
-  CurrentSkillsEditor,
-  CurrentSkillsDisplay,
-  DesiredSkillsEditor,
-  DesiredSkillsDisplay,
-  ProjectsList,
-} from "@/components/user/ProfileComponents";
+  EmploymentDetailsCard,
+  LineManagerCard,
+  LeaveBalanceCard,
+  SkillsSection,
+  ProjectsSection,
+  WorkRequestsSection,
+} from "@/components/profile/profile-components";
+import { Lock, User, Briefcase, Calendar, FileText } from "lucide-react";
 
-const ProfileData = () => {
+export default function ProfilePage() {
   const {
-    session,
-    status,
+    userProfile,
     currentSkills,
     desiredSkills,
-    projects,
-    groupedSkillsTaxonomy,
-    expandedCurrentSkillCategories,
-    toggleCurrentSkillCategory,
-    expandedDesiredSkillCategories,
-    toggleDesiredSkillCategory,
-    isEditingCurrentSkills,
-    setIsEditingCurrentSkills,
-    isEditingDesiredSkills,
-    setIsEditingDesiredSkills,
-    selectedCurrentSkillsMap,
-    selectedDesiredSkillIds,
-    loadingSkills,
-    loadingProjects,
-    loadingTaxonomy,
-    skillsError,
-    projectsError,
+    userAllocations,
+    leaveData,
+    lineManager,
+    recentWorkRequests,
+    pendingSkillVerifications,
+    capacityData,
+    isEditingSkills,
+    setIsEditingSkills,
+    isEditingProfile,
+    setIsEditingProfile,
     isSaving,
-    saveError,
-    setSaveError,
-    handleToggleCurrentSkill,
-    handleSetProficiency,
-    handleToggleDesiredSkill,
+    error,
+    isLoading,
+    isAuthenticated,
     handleSaveSkills,
-    handleCancelEditCurrent,
-    handleCancelEditDesired,
-    totalAllocationSummary,
-    loadingAllocationSummary,
-    allocationSummaryError,
-  } = useProfileData();
+    handleCreateWorkRequest,
+    activeTab,
+    setActiveTab,
+  } = useProfile();
 
-  if (status === "loading") {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <LoadingSpinner size={32} />
-      </div>
-    );
-  }
+if (isLoading) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <LoadingSpinner size={40} />
+      <p className="text-muted-foreground mt-2">Loading your profile...</p>
+    </div>
+  );
+}
 
-  if (status !== "authenticated" || !session?.user) {
+// if (notFound) {
+//   return (
+//     <div className="min-h-screen flex items-center justify-center bg-background">
+//       <Card className="w-full max-w-md">
+//         <CardContent className="p-8 text-center">
+//           <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+//           <h2 className="text-xl font-semibold mb-2">Profile Not Found</h2>
+//           <p className="text-muted-foreground">
+//             We couldn’t find your profile. Please contact HR or try signing out and back in.
+//           </p>
+//         </CardContent>
+//       </Card>
+//     </div>
+//   );
+// }
+
+  if (!isAuthenticated) {
     return (
-      <div className="flex justify-center items-center h-screen bg-background p-4">
-        <Card className="w-full max-w-md text-center">
-          <CardContent className="p-8">
-            <div className="flex flex-col items-center justify-center">
-              <div className="text-primary mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-12 w-12"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  />
-                </svg>
-              </div>
-              <h2 className="mb-2 text-xl font-medium text-foreground">
-                Authentication Required
-              </h2>
-              <p className="text-muted-foreground">
-                Please sign in to view your profile.
-              </p>
-            </div>
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-8 text-center">
+            <Lock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">Authentication Required</h2>
+            <p className="text-muted-foreground">
+              Please sign in to view your profile.
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -97,130 +83,111 @@ const ProfileData = () => {
   }
 
   return (
-    <div
-      className={cn(
-        "animate-fade-in flex-grow p-4 transition-colors duration-300 md:p-6",
-        "bg-muted rounded-lg"
-      )}
-    >
-      <ProfileHeader
-        title="My Profile"
-        description="Manage your profile information and skills."
-      />
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-8"
+        >
+          {/* Profile Header */}
+          <ProfileHeader
+            user={userProfile}
+            capacityData={capacityData}
+            leaveData={leaveData}
+          />
 
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader className="p-0">
-            <UserInfo
-              user={session.user}
-              totalAllocation={totalAllocationSummary}
-              loadingAllocationSummary={loadingAllocationSummary}
-              allocationSummaryError={allocationSummaryError}
-            />
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {saveError &&
-                (isEditingCurrentSkills || isEditingDesiredSkills) && (
-                  <ErrorMessage message={saveError} />
-                )}
-              <div className="space-y-3 ">
-                <SectionHeader
-                  title="Current Skills"
-                  isEditing={isEditingCurrentSkills}
-                  onEditClick={() => {
-                    setIsEditingCurrentSkills(true);
-                    setSaveError(null);
-                  }}
-                  onSaveClick={() => handleSaveSkills("current")}
-                  onCancelClick={handleCancelEditCurrent}
-                  isSaving={isSaving && isEditingCurrentSkills}
-                />
+          {/* Error Display */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="p-4 rounded-lg bg-destructive/10 text-destructive border border-destructive/20"
+            >
+              {error}
+            </motion.div>
+          )}
 
-                {loadingSkills && !isEditingCurrentSkills ? (
-                  <div className="flex justify-center py-4">
-                    <LoadingSpinner size={20} />
-                  </div>
-                ) : skillsError && !isEditingCurrentSkills ? (
-                  <div className="rounded-lg border border-destructive/40 bg-destructive/15 p-3 text-sm text-destructive">
-                    {skillsError}
-                  </div>
-                ) : isEditingCurrentSkills ? (
-                  <CurrentSkillsEditor
-                    groupedSkillsTaxonomy={groupedSkillsTaxonomy}
-                    expandedCategories={expandedCurrentSkillCategories}
-                    toggleCategory={toggleCurrentSkillCategory}
-                    selectedCurrentSkillsMap={selectedCurrentSkillsMap}
-                    handleToggleCurrentSkill={handleToggleCurrentSkill}
-                    handleSetProficiency={handleSetProficiency}
+          {/* Main Content Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="overview" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="employment" className="flex items-center gap-2">
+                <Briefcase className="h-4 w-4" />
+                Employment
+              </TabsTrigger>
+              <TabsTrigger value="leave" className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Leave & Time
+              </TabsTrigger>
+              <TabsTrigger value="requests" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Requests
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Skills Section */}
+                <div className="lg:col-span-2">
+                  <SkillsSection
+                    currentSkills={currentSkills}
+                    desiredSkills={desiredSkills}
+                    pendingVerifications={pendingSkillVerifications}
+                    isEditing={isEditingSkills}
+                    onEdit={() => setIsEditingSkills(true)}
+                    onSave={handleSaveSkills}
+                    onCancel={() => setIsEditingSkills(false)}
                     isSaving={isSaving}
-                    loadingTaxonomy={loadingTaxonomy}
                   />
-                ) : (
-                  <div className="p-4 rounded-[var(--radius)] border border-[rgb(var(--border))]">
-                    <CurrentSkillsDisplay currentSkills={currentSkills} />
-                  </div>
-                )}
-              </div>
-              <div className="space-y-3 p-1">
-                <SectionHeader
-                  title="Desired Skills"
-                  isEditing={isEditingDesiredSkills}
-                  onEditClick={() => {
-                    setIsEditingDesiredSkills(true);
-                    setSaveError(null);
-                  }}
-                  onSaveClick={() => handleSaveSkills("desired")}
-                  onCancelClick={handleCancelEditDesired}
-                  isSaving={isSaving && isEditingDesiredSkills}
-                />
+                </div>
 
-                {loadingSkills && !isEditingDesiredSkills ? (
-                  <div className="flex justify-center py-4">
-                    <LoadingSpinner size={20} />
-                  </div>
-                ) : skillsError && !isEditingDesiredSkills ? (
-                  <p className="text-red-500 text-sm p-2 bg-red-50 rounded-[var(--radius)]">
-                    {skillsError}
-                  </p>
-                ) : isEditingDesiredSkills ? (
-                  <DesiredSkillsEditor
-                    groupedSkillsTaxonomy={groupedSkillsTaxonomy}
-                    expandedCategories={expandedDesiredSkillCategories}
-                    toggleCategory={toggleDesiredSkillCategory}
-                    selectedDesiredSkillIds={selectedDesiredSkillIds}
-                    handleToggleDesiredSkill={handleToggleDesiredSkill}
-                    loadingTaxonomy={loadingTaxonomy}
+                {/* Side Panel */}
+                <div className="space-y-6">
+                  <LineManagerCard lineManager={lineManager} user={userProfile} />
+                  <ProjectsSection
+                    allocations={userAllocations}
+                    isLoading={userAllocations === undefined}
+                    error={null}
                   />
-                ) : (
-                  <div className="p-4 rounded-[var(--radius)] border border-[rgb(var(--border))]">
-                    <DesiredSkillsDisplay desiredSkills={desiredSkills} />
-                  </div>
-                )}
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </TabsContent>
 
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <h3 className="text-lg font-medium text-card-foreground">
-                Allocated Projects
-              </h3>
-            </CardHeader>
-            <CardContent className="p-0">
-              <ProjectsList
-                projects={projects}
-                projectsError={projectsError}
-                loadingProjects={loadingProjects}
+            <TabsContent value="employment" className="space-y-6">
+              <EmploymentDetailsCard
+                user={userProfile}
+                isEditing={isEditingProfile}
+                onEdit={() => setIsEditingProfile(true)}
+                onSave={() => {/* Handle save */}}
+                onCancel={() => setIsEditingProfile(false)}
+                isSaving={isSaving}
               />
-            </CardContent>
-          </Card>
-        </div>
+            </TabsContent>
+
+            <TabsContent value="leave" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <LeaveBalanceCard
+                  leaveData={leaveData}
+                  onRequestLeave={() => {/* Handle leave request */}}
+                />
+                {/* Additional leave-related components can go here */}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="requests" className="space-y-6">
+              <WorkRequestsSection
+                requests={recentWorkRequests}
+                onCreateRequest={handleCreateWorkRequest}
+                isLoading={recentWorkRequests === undefined}
+              />
+            </TabsContent>
+          </Tabs>
+        </motion.div>
       </div>
     </div>
   );
-};
-
-export default ProfileData;
+}

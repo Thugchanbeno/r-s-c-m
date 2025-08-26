@@ -1,97 +1,73 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
-import connectDB from "@/lib/db";
-import Notification from "@/models/Notifications";
+import { convex, api } from "@/lib/convexServer";
+import { 
+  getAuthenticatedEmail, 
+  unauthorizedResponse, 
+  successResponse, 
+  errorResponse 
+} from "@/lib/auth-utils";
 
-export async function GET(request) {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
-
-  const { searchParams } = new URL(request.url);
-  const page = parseInt(searchParams.get("page")) || 1;
-  const limit = parseInt(searchParams.get("limit")) || 20;
-  const status = searchParams.get("status") || "all";
-  const search = searchParams.get("search") || "";
-  const dateRange = searchParams.get("dateRange") || "all";
-  const type = searchParams.get("type") || "all";
-
+// GET /api/notifications
+export async function GET(req) {
   try {
-    await connectDB();
+    const email = await getAuthenticatedEmail();
+    if (!email) return unauthorizedResponse();
 
-    
-    const query = {
-      userId: session.user.id,
-    };
-    if (status === "read") {
-      query.isRead = true
-    } else if (status === "unread") {
-      query.isRead = false
-    } else if (status === "all") 
-    if (type !== "all") {
-      query.type = type;
-    }
+    const { searchParams } = new URL(req.url);
+    const page = Number(searchParams.get("page") || 1);
+    const limit = Number(searchParams.get("limit") || 20);
+    const status = searchParams.get("status") || "all";
+    const type = searchParams.get("type") || "all";
+    const search = searchParams.get("search") || "";
+    const dateRange = searchParams.get("dateRange") || "all";
 
-    if (search) {
-      query.message = { $regex: search, $options: "i" };
-    }
-
-    if (dateRange !== "all") {
-      const now = new Date();
-      let startDate;
-
-      switch (dateRange) {
-        case "today":
-          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-          break;
-        case "week":
-          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          break;
-        case "month":
-          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-          break;
-        default:
-          startDate = null;
-      }
-
-      if (startDate) {
-        query.createdAt = { $gte: startDate };
-      }
-    }
-
-
-    const skip = (page - 1) * limit;
-    const [notifications, totalCount] = await Promise.all([
-      Notification.find(query)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      Notification.countDocuments(query),
-    ]);
-    const unreadCount = await Notification.countDocuments({
-      userId: session.user.id,
-      isRead: false,
-      isArchived: { $ne: true },
+    const data = await convex.query(api.notifications.getAll, {
+      email,
+      page,
+      limit,
+      status,
+      type,
+      search,
+      dateRange,
     });
 
-    const totalPages = Math.ceil(totalCount / limit);
-
-    return NextResponse.json({
-      success: true,
-      data: notifications,
-      currentPage: page,
-      totalPages,
-      totalCount,
-      unreadCount,
-    });
+    return successResponse(data);
   } catch (error) {
-    console.error("API Error fetching notifications:", error);
-    return NextResponse.json(
-      { success: false, error: "Server Error fetching notifications." },
-      { status: 500 }
-    );
+    return errorResponse(error.message || "Unable to fetch notifications.", 400);
+  }
+}
+
+// POST /api/notifications (mark as read)
+export async function POST(req) {
+  try {
+    const email = await getAuthenticatedEmail();
+    if (!email) return unauthorizedResponse();
+
+    const body = await req.json();
+    const result = await convex.mutation(api.notifications.markAsRead, {
+      email,
+      ...body,
+    });
+
+    return successResponse(result);
+  } catch (error) {
+    return errorResponse(error.message || "Unable to mark notifications as read.", 400);
+  }
+}
+
+// DELETE /api/notifications
+export async function DELETE(req) {
+  try {
+    const email = await getAuthenticatedEmail();
+    if (!email) return unauthorizedResponse();
+
+    const body = await req.json();
+    const result = await convex.mutation(api.notifications.remove, {
+      email,
+      ...body,
+    });
+
+    return successResponse(result);
+  } catch (error) {
+    return errorResponse(error.message || "Unable to delete notifications.", 400);
   }
 }

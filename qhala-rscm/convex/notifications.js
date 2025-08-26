@@ -1,109 +1,211 @@
-// convex/notifications.js
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { query, mutation, internalMutation } from "./_generated/server";
 
-export const create = mutation({
-  args: {
-    userId: v.id("users"),
-    message: v.string(),
-    link: v.optional(v.string()),
-    type: v.union(
-      v.literal("new_request"),
-      v.literal("request_approved"),
-      v.literal("request_rejected"),
-      v.literal("new_allocation"),
-      v.literal("task_assigned"),
-      v.literal("task_completed"),
-      v.literal("skill_verification"),
-      v.literal("system_alert"),
-      v.literal("general_info")
-    ),
-    relatedResourceId: v.optional(v.string()),
-    relatedResourceType: v.optional(v.union(
-      v.literal("project"),
-      v.literal("user"),
-      v.literal("resourceRequest"),
-      v.literal("allocation"),
-      v.literal("task"),
-      v.literal("userSkill")
-    )),
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db.insert("notifications", {
-      ...args,
-      isRead: false,
-      createdAt: Date.now(),
-    });
-  },
-});
+async function getActor(ctx, email) {
+  if (!email) throw new Error("Unauthorized: missing email");
+  const actor = await ctx.db
+    .query("users")
+    .withIndex("by_email", (q) => q.eq("email", email))
+    .first();
+  if (!actor) throw new Error("User not found");
+  return actor;
+}
 
-export const getByUserId = query({
+export const getAll = query({
   args: {
-    userId: v.id("users"),
+    email: v.string(),
+    page: v.optional(v.number()),
     limit: v.optional(v.number()),
-    isRead: v.optional(v.boolean()),
+    status: v.optional(v.string()),
+    type: v.optional(v.string()),
+    search: v.optional(v.string()),
+    dateRange: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db
+    const user = await getActor(ctx, args.email);
+
+    let notifications = await ctx.db
       .query("notifications")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId));
-    
-    const notifications = await query.collect();
-    
-    let filtered = notifications;
-    if (args.isRead !== undefined) {
-      filtered = notifications.filter(n => n.isRead === args.isRead);
+      .withIndex("by_user", (ix) => ix.eq("userId", user._id))
+      .collect();
+
+    if (args.status === "read") {
+      notifications = notifications.filter((n) => n.isRead);
+    } else if (args.status === "unread") {
+      notifications = notifications.filter((n) => !n.isRead);
     }
-    
-    // Sort by creation date (newest first)
-    filtered.sort((a, b) => b.createdAt - a.createdAt);
-    
-    if (args.limit) {
-      filtered = filtered.slice(0, args.limit);
+    if (args.type && args.type !== "all") {
+      notifications = notifications.filter((n) => n.type === args.type);
     }
-    
-    return filtered;
+    if (args.search) {
+      const s = args.search.toLowerCase();
+      notifications = notifications.filter((n) =>
+        n.message.toLowerCase().includes(s)
+      );
+    }
+    if (args.dateRange && args.dateRange !== "all") {
+      const now = Date.now();
+      let startDate;
+      if (args.dateRange === "today") {
+        const d = new Date();
+        startDate = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+      } else if (args.dateRange === "week") {
+        startDate = now - 7 * 24 * 60 * 60 * 1000;
+      } else if (args.dateRange === "month") {
+        const d = new Date();
+        startDate = new Date(d.getFullYear(), d.getMonth(), 1).getTime();
+      }
+      if (startDate) {
+        notifications = notifications.filter((n) => n.createdAt >= startDate);
+      }
+    }
+
+    const page = args.page ?? 1;
+    const limit = args.limit ?? 20;
+    const skip = (page - 1) * limit;
+    const paginated = notifications.slice(skip, skip + limit);
+
+    const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+    return {
+      data: paginated,
+      currentPage: page,
+      totalPages: Math.ceil(notifications.length / limit),
+      totalCount: notifications.length,
+      unreadCount,
+    };
   },
 });
 
 export const markAsRead = mutation({
-  args: { id: v.id("notifications") },
+  args: { 
+    email: v.string(),
+    notificationIds: v.optional(v.array(v.id("notifications"))) 
+  },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.id, { isRead: true });
-    return { success: true };
+    const user = await getActor(ctx, args.email);
+
+    let modifiedCount = 0;
+    if (args.notificationIds && args.notificationIds.length > 0) {
+      for (const id of args.notificationIds) {
+        const notif = await ctx.db.get(id);
+        if (notif && notif.userId === user._id && !notif.isRead) {
+          await ctx.db.patch(id, { isRead: true });
+          modifiedCount++;
+        }
+      }
+    } else {
+      const notifs = await ctx.db
+        .query("notifications")
+        .withIndex("by_user", (ix) => ix.eq("userId", user._id))
+        .collect();
+      for (const n of notifs.filter((n) => !n.isRead)) {
+        await ctx.db.patch(n._id, { isRead: true });
+        modifiedCount++;
+      }
+    }
+
+    return { success: true, modifiedCount };
   },
 });
 
-export const markAllAsRead = mutation({
-  args: { userId: v.id("users") },
+export const remove = mutation({
+  args: { 
+    email: v.string(),
+    notificationIds: v.array(v.id("notifications")) 
+  },
   handler: async (ctx, args) => {
-    const unreadNotifications = await ctx.db
-      .query("notifications")
-      .withIndex("by_user_read", (q) => q.eq("userId", args.userId).eq("isRead", false))
-      .collect();
-    
-    for (const notification of unreadNotifications) {
-      await ctx.db.patch(notification._id, { isRead: true });
+    const user = await getActor(ctx, args.email);
+
+    let deletedCount = 0;
+    for (const id of args.notificationIds) {
+      const notif = await ctx.db.get(id);
+      if (notif && notif.userId === user._id) {
+        await ctx.db.delete(id);
+        deletedCount++;
+      }
     }
-    
-    return { success: true };
+    return { success: true, deletedCount };
   },
 });
 
 export const getUnreadCount = query({
-  args: { userId: v.id("users") },
+  args: { email: v.string() },
   handler: async (ctx, args) => {
-    const unreadNotifications = await ctx.db
+    const user = await getActor(ctx, args.email);
+
+    const notifs = await ctx.db
       .query("notifications")
-      .withIndex("by_user_read", (q) => q.eq("userId", args.userId).eq("isRead", false))
+      .withIndex("by_user", (ix) => ix.eq("userId", user._id))
       .collect();
-    
-    return unreadNotifications.length;
+
+    return { count: notifs.filter((n) => !n.isRead).length };
   },
 });
-export const getAll = query({
+
+export const update = mutation({
+  args: {
+    email: v.string(),
+    id: v.id("notifications"),
+    isRead: v.optional(v.boolean()),
+    isArchived: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const user = await getActor(ctx, args.email);
+
+    const notif = await ctx.db.get(args.id);
+    if (!notif) throw new Error("Notification not found");
+    if (notif.userId !== user._id) throw new Error("Forbidden");
+
+    const updates = {};
+    if (args.isRead !== undefined) updates.isRead = args.isRead;
+    if (args.isArchived !== undefined) updates.isArchived = args.isArchived;
+
+    await ctx.db.patch(args.id, updates);
+    return { success: true };
+  },
+});
+
+export const cleanupOld = internalMutation({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("notifications").collect();
+    const ninetyDaysAgo = Date.now() - 90 * 24 * 60 * 60 * 1000;
+    const oldNotifs = await ctx.db
+      .query("notifications")
+      .withIndex("by_created_at", (ix) => ix.lt("createdAt", ninetyDaysAgo))
+      .collect();
+
+    for (const n of oldNotifs) {
+      await ctx.db.delete(n._id);
+    }
+
+    return { success: true, deleted: oldNotifs.length };
+  },
+});
+
+export const updatePreferences = mutation({
+  args: {
+    email: v.string(),
+    preferences: v.object({
+      new_request: v.boolean(),
+      request_approved: v.boolean(),
+      request_rejected: v.boolean(),
+      new_allocation: v.boolean(),
+      task_assigned: v.boolean(),
+      task_completed: v.boolean(),
+      skill_verification: v.boolean(),
+      system_alert: v.boolean(),
+      general_info: v.boolean(),
+    }),
+  },
+  handler: async (ctx, args) => {
+    const user = await getActor(ctx, args.email);
+
+    await ctx.db.patch(user._id, {
+      notificationPreferences: args.preferences,
+      updatedAt: Date.now(),
+    });
+
+    return { success: true };
   },
 });

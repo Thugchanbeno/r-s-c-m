@@ -1,6 +1,5 @@
 import GoogleProvider from "next-auth/providers/google";
-import connectDB from "@/lib/db";
-import User from "@/models/User";
+import { convex, api } from "./convexServer";
 
 if (!process.env.GOOGLE_CLIENT_ID) {
   throw new Error("Missing environment variable: GOOGLE_CLIENT_ID");
@@ -43,34 +42,37 @@ export const authOptions = {
       }
 
       try {
-        await connectDB();
-        let dbUser = await User.findOne({ email: user.email });
+        // Check if user exists in Convex
+        let dbUser = await convex.query(api.users.getUserByEmail, {
+          email: user.email
+        });
 
         if (dbUser) {
+          // Update existing user if needed
           if (
             !dbUser.authProviderId ||
             dbUser.authProviderId === "pending_invite"
           ) {
-            dbUser.authProviderId = user.id || account.providerAccountId;
-            dbUser.name = user.name || dbUser.name;
-            dbUser.avatarUrl = user.image || dbUser.avatarUrl;
-            await dbUser.save();
+            await convex.mutation(api.users.updateUserAuth, {
+              userId: dbUser._id,
+              authProviderId: user.id || account.providerAccountId,
+              name: user.name || dbUser.name,
+              avatarUrl: user.image || dbUser.avatarUrl,
+            });
             console.log(
               `Admin-created user ${dbUser.email} has linked their Google account.`
             );
           }
         } else {
+          // Create new user
           console.log(`User not found (${user.email}). Creating new user...`);
-          dbUser = await User.create({
+          await convex.mutation(api.users.createUserFromAuth, {
             email: user.email,
             name: user.name || "New User",
             avatarUrl: user.image || "",
             authProviderId: user.id || account.providerAccountId,
-            role: "employee",
           });
-          console.log(
-            `New user ${dbUser.email} created with role: ${dbUser.role}`
-          );
+          console.log(`New user ${user.email} created with role: employee`);
         }
         return true;
       } catch (error) {
@@ -84,19 +86,24 @@ export const authOptions = {
         console.log("JWT callback: Initial sign-in");
 
         try {
-          await connectDB();
-          const dbUser = await User.findOne({ email: user.email });
+          // Get user from Convex
+          const dbUser = await convex.query(api.users.getUserByEmail, {
+            email: user.email
+          });
 
           if (dbUser) {
-            token.id = dbUser._id.toString();
+            token.id = dbUser._id;
             token.role = dbUser.role;
             token.email = dbUser.email;
             token.picture = dbUser.avatarUrl || user.image;
             token.name = dbUser.name || user.name;
+            token.department = dbUser.department;
+            token.function = dbUser.function;
+            token.weeklyHours = dbUser.weeklyHours;
 
             console.log("JWT token updated with user data, role:", token.role);
           } else {
-            console.error("JWT Callback: User signed in but not found in DB");
+            console.error("JWT Callback: User signed in but not found in Convex");
           }
         } catch (error) {
           console.error("Error fetching user for JWT:", error);
@@ -113,6 +120,9 @@ export const authOptions = {
         session.user.image = token.picture;
         session.user.name = token.name;
         session.user.email = token.email;
+        session.user.department = token.department;
+        session.user.function = token.function;
+        session.user.weeklyHours = token.weeklyHours;
 
         console.log("Session updated from token, role:", session.user.role);
       }
