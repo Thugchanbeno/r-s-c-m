@@ -13,6 +13,7 @@ import {
   SkillsSection,
   ProjectsSection,
   WorkRequestsSection,
+  OvertimeCard,
 } from "@/components/profile/profile-components";
 import EmployeeDetailsModal from "@/components/profile/modals/employee-details-modal";
 import LeaveRequestModal from "@/components/profile/modals/leave-request-modal";
@@ -36,7 +37,6 @@ export default function ProfilePage() {
     userAllocations,
     recentWorkRequests,
     pendingSkillVerifications,
-    capacityData,
     isSaving,
     error,
     isLoading,
@@ -53,7 +53,6 @@ export default function ProfilePage() {
     setIsCurrentSkillsModalOpen,
     isDesiredSkillsModalOpen,
     setIsDesiredSkillsModalOpen,
-    // 👇 missing setters now included
     setExpandedCurrentSkillCategories,
     setExpandedDesiredSkillCategories,
     setSelectedCurrentSkillsMap,
@@ -61,8 +60,11 @@ export default function ProfilePage() {
     handleSaveProfile,
     handleSaveSkills,
     handleUploadProof,
+    handleUploadCV, // 👈 Make sure this is destructured
     handleAddProofUrl,
     handleRemoveProof,
+    handleCreateLeaveRequest,
+    handleCreateOvertimeRequest,
     allSkills,
   } = useProfile();
 
@@ -103,7 +105,7 @@ export default function ProfilePage() {
         >
           <ProfileHeader
             user={userProfile}
-            capacityData={capacityData}
+            capacityData={userAllocations}
             leaveData={null}
           />
 
@@ -140,6 +142,7 @@ export default function ProfilePage() {
               </TabsTrigger>
             </TabsList>
 
+            {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
@@ -162,6 +165,7 @@ export default function ProfilePage() {
               </div>
             </TabsContent>
 
+            {/* Employment Tab */}
             <TabsContent value="employment" className="space-y-6">
               <EmploymentDetailsCard
                 user={userProfile}
@@ -174,13 +178,20 @@ export default function ProfilePage() {
               />
             </TabsContent>
 
+            {/* Leave & Time Tab */}
             <TabsContent value="leave" className="space-y-6">
-              <LeaveBalanceCard
-                leaveData={null}
-                onRequestLeave={() => setIsLeaveModalOpen(true)}
-              />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <LeaveBalanceCard
+                  leaveData={null}
+                  onRequestLeave={() => setIsLeaveModalOpen(true)}
+                />
+                <OvertimeCard
+                  onRequestOvertime={() => setIsOvertimeModalOpen(true)}
+                />
+              </div>
             </TabsContent>
 
+            {/* Requests Tab */}
             <TabsContent value="requests" className="space-y-6">
               <WorkRequestsSection
                 requests={recentWorkRequests}
@@ -202,6 +213,34 @@ export default function ProfilePage() {
             id: userProfile._id,
             email: userProfile.email,
             ...form,
+          })
+        }
+      />
+
+      <LeaveRequestModal
+        isOpen={isLeaveModalOpen}
+        onClose={() => setIsLeaveModalOpen(false)}
+        isSaving={isSaving}
+        onSave={(form) =>
+          handleCreateLeaveRequest({
+            ...form,
+            startDate: new Date(form.startDate).getTime(),
+            endDate: new Date(form.endDate).getTime(),
+            coveringUserId: form.coveringUserId || undefined,
+          })
+        }
+      />
+
+      <OvertimeRequestModal
+        isOpen={isOvertimeModalOpen}
+        onClose={() => setIsOvertimeModalOpen(false)}
+        isSaving={isSaving}
+        onSave={(form) =>
+          handleCreateOvertimeRequest({
+            ...form,
+            projectId: form.projectId || undefined,
+            overtimeHours: Number(form.overtimeHours),
+            overtimeDate: new Date(form.overtimeDate).getTime(),
           })
         }
       />
@@ -238,6 +277,7 @@ export default function ProfilePage() {
         loadingTaxonomy={!allSkills}
         handleUploadProof={handleUploadProof}
         handleAddProofUrl={handleAddProofUrl}
+        handleUploadCV={handleUploadCV} // 👈 Pass the function here
         handleRemoveProof={handleRemoveProof}
         userSkills={currentSkills}
       />

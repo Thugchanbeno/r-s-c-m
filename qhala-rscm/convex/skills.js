@@ -159,7 +159,9 @@ export const getSuggestions = mutation({
       ];
       return { success: true, suggestions };
     } catch (error) {
-      throw new Error("Unable to get skill suggestions. Please try again later.");
+      throw new Error(
+        "Unable to get skill suggestions. Please try again later."
+      );
     }
   },
 });
@@ -181,9 +183,14 @@ export const verifyUserSkill = mutation({
     const targetUser = await ctx.db.get(userSkill.userId);
     if (!targetUser) throw new Error("Target user not found.");
 
-    if (actor.role !== "line_manager" || targetUser.lineManagerId !== actor._id) {
+    if (
+      actor.role !== "line_manager" ||
+      targetUser.lineManagerId !== actor._id
+    ) {
       if (!["admin", "hr"].includes(actor.role)) {
-        throw new Error("Only the user's line manager, HR, or Admin can verify skills.");
+        throw new Error(
+          "Only the user's line manager, HR, or Admin can verify skills."
+        );
       }
     }
 
@@ -223,7 +230,9 @@ export const getPendingVerifications = query({
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
     if (!["line_manager", "admin", "hr"].includes(actor.role)) {
-      throw new Error("Only Line Managers, HR, or Admin can view pending verifications.");
+      throw new Error(
+        "Only Line Managers, HR, or Admin can view pending verifications."
+      );
     }
 
     let userSkills = await ctx.db.query("userSkills").collect();
@@ -266,13 +275,16 @@ export const uploadProofDocument = mutation({
     userSkillId: v.id("userSkills"),
     fileName: v.string(),
     proofType: v.union(
+      v.literal("cv"),
       v.literal("certification"),
       v.literal("badge"),
       v.literal("document"),
-      v.literal("portfolio")
+      v.literal("portfolio"),
+      v.literal("link")
     ),
     issuer: v.optional(v.string()),
-    documentStorageId: v.id("_storage"),
+    documentStorageId: v.optional(v.id("_storage")),
+    url: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
@@ -282,10 +294,14 @@ export const uploadProofDocument = mutation({
     if (userSkill.userId !== actor._id) {
       throw new Error("You can only upload proof for your own skills.");
     }
+    if (!args.documentStorageId && !args.url) {
+      throw new Error("Either a file or a link must be provided as proof.");
+    }
 
     const now = Date.now();
     const newProofDoc = {
       documentStorageId: args.documentStorageId,
+      url: args.url,
       fileName: args.fileName,
       proofType: args.proofType,
       issuer: args.issuer,
@@ -350,7 +366,11 @@ export const removeProofDocument = mutation({
 
 // Analytics
 export const getSkillAnalytics = query({
-  args: { email: v.string(), skillId: v.optional(v.id("skills")), category: v.optional(v.string()) },
+  args: {
+    email: v.string(),
+    skillId: v.optional(v.id("skills")),
+    category: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
     requireRole(actor, ["admin", "hr", "pm"]);

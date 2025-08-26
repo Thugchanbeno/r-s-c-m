@@ -127,3 +127,26 @@ export const updateForCurrentUser = mutation({
     return result;
   },
 });
+export const createUserSkill = mutation({
+  args: {
+    email: v.string(),
+    skillId: v.id("skills"),
+    isCurrent: v.boolean(),
+    isDesired: v.boolean(),
+    proficiency: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const actor = await getActor(ctx, args.email);
+
+    const now = Date.now();
+    return await ctx.db.insert("userSkills", {
+      userId: actor._id,
+      skillId: args.skillId,
+      isCurrent: args.isCurrent,
+      isDesired: args.isDesired,
+      proficiency: args.proficiency || 1,
+      createdAt: now,
+      updatedAt: now,
+    });
+  },
+});

@@ -8,10 +8,10 @@ export default defineSchema({
     email: v.string(),
     authProviderId: v.optional(v.string()),
     department: v.optional(v.string()),
-    annualLeaveEntitlement: v.optional(v.number()), 
-    annualLeaveUsed: v.optional(v.number()), 
-    leaveYearStartDate: v.optional(v.number()), 
-    compensatoryDaysBalance: v.optional(v.number()), 
+    annualLeaveEntitlement: v.optional(v.number()),
+    annualLeaveUsed: v.optional(v.number()),
+    leaveYearStartDate: v.optional(v.number()),
+    compensatoryDaysBalance: v.optional(v.number()),
     role: v.union(
       v.literal("admin"),
       v.literal("pm"),
@@ -74,31 +74,32 @@ export default defineSchema({
     isCurrent: v.boolean(),
     isDesired: v.boolean(),
     proofDocuments: v.optional(
-    v.array(
-    v.object({
-      documentStorageId: v.optional(v.id("_storage")), 
-      url: v.optional(v.string()),                     
-      fileName: v.optional(v.string()),                
-      proofType: v.union(
-        v.literal("certification"),
-        v.literal("badge"),
-        v.literal("document"),
-        v.literal("portfolio"),
-        v.literal("link") 
-      ),
-      issuer: v.optional(v.string()),
-      verificationStatus: v.union(
-        v.literal("pending"),
-        v.literal("approved"),
-        v.literal("rejected")
-      ),
-      verifiedBy: v.optional(v.id("users")),
-      verifiedAt: v.optional(v.number()),
-      rejectionReason: v.optional(v.string()),
-      uploadedAt: v.number(),
-    })
-  )
-),
+      v.array(
+        v.object({
+          documentStorageId: v.optional(v.id("_storage")),
+          url: v.optional(v.string()),
+          fileName: v.optional(v.string()),
+          proofType: v.union(
+            v.literal("cv"),
+            v.literal("certification"),
+            v.literal("badge"),
+            v.literal("document"),
+            v.literal("portfolio"),
+            v.literal("link")
+          ),
+          issuer: v.optional(v.string()),
+          verificationStatus: v.union(
+            v.literal("pending"),
+            v.literal("approved"),
+            v.literal("rejected")
+          ),
+          verifiedBy: v.optional(v.id("users")),
+          verifiedAt: v.optional(v.number()),
+          rejectionReason: v.optional(v.string()),
+          uploadedAt: v.number(),
+        })
+      )
+    ),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -252,199 +253,211 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_user_read", ["userId", "isRead"])
     .index("by_created_at", ["createdAt"]),
-// CV CACHE
-cvCache: defineTable({
-  fileName: v.string(),
-  rawText: v.string(),
-  extractedEntities: v.optional(v.any()),
-  extractedSkills: v.array(
-    v.object({
-      id: v.optional(v.string()),
-      name: v.string(),
-      category: v.optional(v.string()),
-      similarity: v.optional(v.number()),
-    })
-  ),
-  prepopulatedData: v.optional(
-    v.object({
-      name: v.optional(v.string()),
-      email: v.optional(v.string()),
-      phone: v.optional(v.string()),
-      skills: v.optional(v.array(v.any())),
-      experience: v.optional(v.array(v.any())),
-      education: v.optional(v.array(v.any())),
-    })
-  ),
-  fileStorageId: v.optional(v.id("_storage")),
+  // CV CACHE
+  cvCache: defineTable({
+    fileName: v.string(),
+    rawText: v.string(),
+    extractedEntities: v.optional(v.any()),
+    extractedSkills: v.array(
+      v.object({
+        id: v.optional(v.string()),
+        name: v.string(),
+        category: v.optional(v.string()),
+        similarity: v.optional(v.number()),
+      })
+    ),
+    prepopulatedData: v.optional(
+      v.object({
+        name: v.optional(v.string()),
+        email: v.optional(v.string()),
+        phone: v.optional(v.string()),
+        skills: v.optional(v.array(v.any())),
+        experience: v.optional(v.array(v.any())),
+        education: v.optional(v.array(v.any())),
+      })
+    ),
+    fileStorageId: v.optional(v.id("_storage")),
 
-  createdAt: v.number(),
-})
-  .index("by_created_at", ["createdAt"])
-  .index("by_fileName", ["fileName"]),
+    createdAt: v.number(),
+  })
+    .index("by_created_at", ["createdAt"])
+    .index("by_fileName", ["fileName"]),
 
-// WORK REQUESTS 
-workRequests: defineTable({
-  userId: v.id("users"),
-  requestType: v.union(
-    v.literal("leave"),
-    v.literal("overtime"),
-    v.literal("compensatory_leave")
-  ),
-  leaveType: v.optional(v.union(
-    v.literal("annual"),
-    v.literal("sick"),
-    v.literal("personal"),
-    v.literal("emergency"),
-    v.literal("maternity"),
-    v.literal("paternity")
-  )),
-  startDate: v.optional(v.number()),
-  endDate: v.optional(v.number()),
-  daysRequested: v.optional(v.number()),
-  projectId: v.optional(v.id("projects")),
-  overtimeHours: v.optional(v.number()),
-  overtimeDate: v.optional(v.number()),
-  compensationType: v.optional(v.union(
-    v.literal("time_off"), 
-    v.literal("payment"),  
-    v.literal("both")
-  )),
-  reason: v.string(),
-  status: v.union(
-    v.literal("pending_lm"),
-    v.literal("pending_pm"),
-    v.literal("pending_hr"),
-    v.literal("approved"),
-    v.literal("rejected"),
-    v.literal("cancelled")
-  ),
-  lineManagerApproval: v.optional(
-    v.object({
-      status: v.union(v.literal("pending"), v.literal("approved"), v.literal("rejected")),
-      approvedBy: v.optional(v.id("users")),
-      reason: v.string(),
-      approvedAt: v.optional(v.number()),
-    })
-  ),
-  pmApproval: v.optional(
-    v.object({
-      status: v.union(v.literal("pending"), v.literal("approved"), v.literal("rejected")),
-      approvedBy: v.optional(v.id("users")),
-      reason: v.string(),
-      approvedAt: v.optional(v.number()),
-    })
-  ),
-  hrApproval: v.optional(
-    v.object({
-      status: v.union(v.literal("pending"), v.literal("approved"), v.literal("rejected")),
-      approvedBy: v.optional(v.id("users")),
-      reason: v.string(),
-      approvedAt: v.optional(v.number()),
-    })
-  ),
-  coveringUserId: v.optional(v.id("users")),
-  handoverNotes: v.optional(v.string()),
-  compensationDaysAwarded: v.optional(v.number()),
-  
-  createdAt: v.number(),
-  updatedAt: v.number(),
-})
-  .index("by_user", ["userId"])
-  .index("by_request_type", ["requestType"])
-  .index("by_status", ["status"])
-  .index("by_user_type", ["userId", "requestType"])
-  .index("by_project", ["projectId"])
-  .index("by_covering_user", ["coveringUserId"])
-  .index("by_date_range", ["startDate", "endDate"])
-  .index("by_overtime_date", ["overtimeDate"]),
+  // WORK REQUESTS
+  workRequests: defineTable({
+    userId: v.id("users"),
+    requestType: v.union(
+      v.literal("leave"),
+      v.literal("overtime"),
+      v.literal("compensatory_leave")
+    ),
+    leaveType: v.optional(
+      v.union(
+        v.literal("annual"),
+        v.literal("sick"),
+        v.literal("personal"),
+        v.literal("emergency"),
+        v.literal("maternity"),
+        v.literal("paternity")
+      )
+    ),
+    startDate: v.optional(v.number()),
+    endDate: v.optional(v.number()),
+    daysRequested: v.optional(v.number()),
+    projectId: v.optional(v.id("projects")),
+    overtimeHours: v.optional(v.number()),
+    overtimeDate: v.optional(v.number()),
+    compensationType: v.optional(
+      v.union(v.literal("time_off"), v.literal("payment"), v.literal("both"))
+    ),
+    reason: v.string(),
+    status: v.union(
+      v.literal("pending_lm"),
+      v.literal("pending_pm"),
+      v.literal("pending_hr"),
+      v.literal("approved"),
+      v.literal("rejected"),
+      v.literal("cancelled")
+    ),
+    lineManagerApproval: v.optional(
+      v.object({
+        status: v.union(
+          v.literal("pending"),
+          v.literal("approved"),
+          v.literal("rejected")
+        ),
+        approvedBy: v.optional(v.id("users")),
+        reason: v.string(),
+        approvedAt: v.optional(v.number()),
+      })
+    ),
+    pmApproval: v.optional(
+      v.object({
+        status: v.union(
+          v.literal("pending"),
+          v.literal("approved"),
+          v.literal("rejected")
+        ),
+        approvedBy: v.optional(v.id("users")),
+        reason: v.string(),
+        approvedAt: v.optional(v.number()),
+      })
+    ),
+    hrApproval: v.optional(
+      v.object({
+        status: v.union(
+          v.literal("pending"),
+          v.literal("approved"),
+          v.literal("rejected")
+        ),
+        approvedBy: v.optional(v.id("users")),
+        reason: v.string(),
+        approvedAt: v.optional(v.number()),
+      })
+    ),
+    coveringUserId: v.optional(v.id("users")),
+    handoverNotes: v.optional(v.string()),
+    compensationDaysAwarded: v.optional(v.number()),
 
-// LEAVE BALANCES 
-leaveBalances: defineTable({
-  userId: v.id("users"),
-  leaveYear: v.number(), 
-  annualLeaveEntitlement: v.number(), 
-  annualLeaveUsed: v.number(), 
-  compensatoryDaysBalance: v.number(), 
-  compensatoryDaysUsed: v.number(), 
-  annualLeaveRemaining: v.number(),
-  totalAvailableDays: v.number(), 
-  createdAt: v.number(),
-  updatedAt: v.number(),
-})
-  .index("by_user", ["userId"])
-  .index("by_user_year", ["userId", "leaveYear"])
-  .index("by_year", ["leaveYear"]),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_request_type", ["requestType"])
+    .index("by_status", ["status"])
+    .index("by_user_type", ["userId", "requestType"])
+    .index("by_project", ["projectId"])
+    .index("by_covering_user", ["coveringUserId"])
+    .index("by_date_range", ["startDate", "endDate"])
+    .index("by_overtime_date", ["overtimeDate"]),
 
-// TASKS
-tasks: defineTable({
-  projectId: v.id("projects"),
-  title: v.string(),
-  description: v.optional(v.string()),
-  assignedUserId: v.optional(v.id("users")),
-  createdByUserId: v.id("users"),
-  status: v.union(
-    v.literal("todo"),
-    v.literal("in_progress"),
-    v.literal("review"),
-    v.literal("completed"),
-    v.literal("cancelled")
-  ),
-  priority: v.union(
-    v.literal("low"),
-    v.literal("medium"),
-    v.literal("high"),
-    v.literal("urgent")
-  ),
-  category: v.optional(v.string()), 
-  relatedSkillId: v.optional(v.id("skills")),
-  skillProficiencyGain: v.optional(v.number()), 
-  estimatedHours: v.optional(v.number()),
-  actualHours: v.optional(v.number()),
-  dueDate: v.optional(v.number()),
-  startDate: v.optional(v.number()),
-  completedDate: v.optional(v.number()),
-  dependsOnTaskIds: v.optional(v.array(v.id("tasks"))),
-  notes: v.optional(v.string()),
-  
-  createdAt: v.number(),
-  updatedAt: v.number(),
-})
-  .index("by_project", ["projectId"])
-  .index("by_assigned_user", ["assignedUserId"])
-  .index("by_created_by", ["createdByUserId"])
-  .index("by_status", ["status"])
-  .index("by_priority", ["priority"])
-  .index("by_due_date", ["dueDate"])
-  .index("by_skill", ["relatedSkillId"]),
+  // LEAVE BALANCES
+  leaveBalances: defineTable({
+    userId: v.id("users"),
+    leaveYear: v.number(),
+    annualLeaveEntitlement: v.number(),
+    annualLeaveUsed: v.number(),
+    compensatoryDaysBalance: v.number(),
+    compensatoryDaysUsed: v.number(),
+    annualLeaveRemaining: v.number(),
+    totalAvailableDays: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_year", ["userId", "leaveYear"])
+    .index("by_year", ["leaveYear"]),
 
-// PROJECT FEEDBACK
-projectFeedback: defineTable({
-  projectId: v.id("projects"),
-  userId: v.id("users"),
-  feedbackType: v.union(
-    v.literal("performance"),
-    v.literal("process"),
-    v.literal("resources"),
-    v.literal("skills"),
-    v.literal("general")
-  ),
-  
-  overallRating: v.optional(v.number()),
-  communicationRating: v.optional(v.number()),
-  technicalRating: v.optional(v.number()),
-  timelinessRating: v.optional(v.number()),
-  whatWentWell: v.optional(v.string()),
-  whatCouldImprove: v.optional(v.string()),
-  resourcesNeeded: v.optional(v.string()),
-  skillsToFocus: v.optional(v.array(v.id("skills"))),
-  isAnonymous: v.boolean(),
-  submittedByUserId: v.id("users"), 
-  visibleToRoles: v.array(v.string()), 
-  createdAt: v.number(),
-  updatedAt: v.number(),
-})
-  .index("by_project", ["projectId"])
-  .index("by_user", ["userId"])
-  .index("by_feedback_type", ["feedbackType"])
-  .index("by_submitted_by", ["submittedByUserId"]),
+  // TASKS
+  tasks: defineTable({
+    projectId: v.id("projects"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    assignedUserId: v.optional(v.id("users")),
+    createdByUserId: v.id("users"),
+    status: v.union(
+      v.literal("todo"),
+      v.literal("in_progress"),
+      v.literal("review"),
+      v.literal("completed"),
+      v.literal("cancelled")
+    ),
+    priority: v.union(
+      v.literal("low"),
+      v.literal("medium"),
+      v.literal("high"),
+      v.literal("urgent")
+    ),
+    category: v.optional(v.string()),
+    relatedSkillId: v.optional(v.id("skills")),
+    skillProficiencyGain: v.optional(v.number()),
+    estimatedHours: v.optional(v.number()),
+    actualHours: v.optional(v.number()),
+    dueDate: v.optional(v.number()),
+    startDate: v.optional(v.number()),
+    completedDate: v.optional(v.number()),
+    dependsOnTaskIds: v.optional(v.array(v.id("tasks"))),
+    notes: v.optional(v.string()),
+
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_project", ["projectId"])
+    .index("by_assigned_user", ["assignedUserId"])
+    .index("by_created_by", ["createdByUserId"])
+    .index("by_status", ["status"])
+    .index("by_priority", ["priority"])
+    .index("by_due_date", ["dueDate"])
+    .index("by_skill", ["relatedSkillId"]),
+
+  // PROJECT FEEDBACK
+  projectFeedback: defineTable({
+    projectId: v.id("projects"),
+    userId: v.id("users"),
+    feedbackType: v.union(
+      v.literal("performance"),
+      v.literal("process"),
+      v.literal("resources"),
+      v.literal("skills"),
+      v.literal("general")
+    ),
+
+    overallRating: v.optional(v.number()),
+    communicationRating: v.optional(v.number()),
+    technicalRating: v.optional(v.number()),
+    timelinessRating: v.optional(v.number()),
+    whatWentWell: v.optional(v.string()),
+    whatCouldImprove: v.optional(v.string()),
+    resourcesNeeded: v.optional(v.string()),
+    skillsToFocus: v.optional(v.array(v.id("skills"))),
+    isAnonymous: v.boolean(),
+    submittedByUserId: v.id("users"),
+    visibleToRoles: v.array(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_project", ["projectId"])
+    .index("by_user", ["userId"])
+    .index("by_feedback_type", ["feedbackType"])
+    .index("by_submitted_by", ["submittedByUserId"]),
 });
