@@ -1,59 +1,37 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { toast } from "sonner";
 
 export const useProfile = () => {
   const { user: authUser, isLoading: authLoading, isAuthenticated } = useAuth();
-  
-  // Convex queries - all now use email parameter
+
+  // Queries
   const userProfile = useQuery(
     api.users.getUserByEmail,
     authUser?.email ? { email: authUser.email } : "skip"
   );
-  
+
   const userSkills = useQuery(
-    api.userSkills.getForCurrentUser,   
+    api.userSkills.getForCurrentUser,
     authUser?.email ? { email: authUser.email } : "skip"
   );
-  
-    const allSkills = useQuery(
-    api.skills.getAll,                  
-    {} 
-  );
-   const allocationSummary = useQuery(
-    api.allocations.getSummary,
-    authUser?.email ? { email: authUser.email, scope: "overall" } : "skip"
-  );
-  
+
+  const allSkills = useQuery(api.skills.getAll, {});
+
   const userAllocations = useQuery(
     api.users.getAllocationSummary,
     authUser?.email && userProfile?._id
       ? { email: authUser.email, userId: userProfile._id }
       : "skip"
   );
-  
-  const leaveBalance = useMutation(
-  api.workRequests.getLeaveBalance,   
-  authUser?.email ? { email: authUser.email } : "skip"
-);
-
-  const lineManager = useQuery(
-    api.users.getById,
-    userProfile?.lineManagerId && authUser?.email ? { 
-      email: authUser.email, 
-      id: userProfile.lineManagerId 
-    } : "skip"
-  );
 
   const recentWorkRequests = useQuery(
     api.workRequests.getByUser,
-    authUser?.email ? { 
-      email: authUser.email, 
-      limit: 5 
-    } : "skip"
+    authUser?.email ? { email: authUser.email, limit: 5 } : "skip"
   );
 
   const pendingSkillVerifications = useQuery(
@@ -61,33 +39,41 @@ export const useProfile = () => {
     authUser?.email ? { email: authUser.email } : "skip"
   );
 
-  // Mutations - all now include email parameter
-  const updateUserSkills = useMutation(api.userSkills.updateForCurrentUser);
+  // Mutations
   const updateUserProfile = useMutation(api.users.updateProfile);
-  const createWorkRequest = useMutation(api.workRequests.create);
+  const updateUserSkills = useMutation(api.userSkills.updateForCurrentUser);
   const uploadProofDocument = useMutation(api.skills.uploadProofDocument);
+  const removeProofDocument = useMutation(api.skills.removeProofDocument);
 
-  // Local state
-  const [isEditingSkills, setIsEditingSkills] = useState(false);
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [selectedSkills, setSelectedSkills] = useState(new Map());
-  const [expandedCategories, setExpandedCategories] = useState({});
+  // State
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
-  // Computed values
-  const currentSkills = useMemo(() => {
-    return userSkills?.filter(skill => skill.isCurrent) || [];
-  }, [userSkills]);
+  // Modal states
+  const [isEmploymentModalOpen, setIsEmploymentModalOpen] = useState(false);
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+  const [isOvertimeModalOpen, setIsOvertimeModalOpen] = useState(false);
+  const [isSkillsModalOpen, setIsSkillsModalOpen] = useState(false);
 
-  const desiredSkills = useMemo(() => {
-    return userSkills?.filter(skill => skill.isDesired) || [];
-  }, [userSkills]);
+  // Skills state
+  const [selectedCurrentSkillsMap, setSelectedCurrentSkillsMap] = useState(new Map());
+  const [selectedDesiredSkillIds, setSelectedDesiredSkillIds] = useState(new Set());
+  const [expandedCurrentSkillCategories, setExpandedCurrentSkillCategories] = useState({});
+  const [expandedDesiredSkillCategories, setExpandedDesiredSkillCategories] = useState({});
 
-  const groupedSkills = useMemo(() => {
+  // Derived
+  const currentSkills = useMemo(
+    () => userSkills?.filter((s) => s.isCurrent) || [],
+    [userSkills]
+  );
+  const desiredSkills = useMemo(
+    () => userSkills?.filter((s) => s.isDesired) || [],
+    [userSkills]
+  );
+
+  const groupedSkillsTaxonomy = useMemo(() => {
     if (!allSkills) return {};
-    
     return allSkills.reduce((acc, skill) => {
       const category = skill.category || "Uncategorized";
       if (!acc[category]) acc[category] = [];
@@ -96,170 +82,166 @@ export const useProfile = () => {
     }, {});
   }, [allSkills]);
 
-  const capacityData = useMemo(() => {
-    if (!userAllocations || !userProfile) return null;
-    
-    const weeklyHours = userProfile.weeklyHours || 40;
-    const allocatedHours = userAllocations.totalAllocatedHours || 0;
-    const percentage = Math.round((allocatedHours / weeklyHours) * 100);
-    
-    return {
-      percentage,
-      allocatedHours,
-      weeklyHours,
-      status: percentage > 100 ? 'overallocated' : percentage > 80 ? 'high' : 'normal'
-    };
-  }, [userAllocations, userProfile]);
-
-  const leaveData = useMemo(() => {
-    if (!leaveBalance) return null;
-    
-    const remaining = (leaveBalance.annualLeaveEntitlement || 21) - (leaveBalance.annualLeaveUsed || 0);
-    const compDays = leaveBalance.compensatoryDaysBalance || 0;
-    const totalAvailable = remaining + compDays;
-    
-    return {
-      remaining,
-      used: leaveBalance.annualLeaveUsed || 0,
-      entitlement: leaveBalance.annualLeaveEntitlement || 21,
-      compDays,
-      totalAvailable
-    };
-  }, [leaveBalance]);
-
   // Handlers
+  const handleSaveProfile = useCallback(
+    async (profileData) => {
+      if (!authUser?.email) return;
+      setIsSaving(true);
+      setError(null);
+      try {
+        await updateUserProfile(profileData);
+        toast.success("Profile updated", {
+          description: "Employment details saved successfully.",
+        });
+        setIsEmploymentModalOpen(false);
+      } catch (err) {
+        setError(err.message);
+        toast.error("Update failed", { description: err.message });
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [updateUserProfile, authUser?.email]
+  );
+
   const handleSaveSkills = useCallback(async () => {
     if (!authUser?.email) return;
-    
     setIsSaving(true);
     setError(null);
-    
     try {
-      const currentSkills = Array.from(selectedSkills.entries())
-        .filter(([_, data]) => data.isCurrent)
-        .map(([skillId, data]) => ({ skillId, proficiency: data.proficiency }));
-      
-      const desiredSkillIds = Array.from(selectedSkills.entries())
-        .filter(([_, data]) => data.isDesired)
-        .map(([skillId]) => skillId);
-
       await updateUserSkills({
         email: authUser.email,
-        currentSkills,
-        desiredSkillIds
+        currentSkills: Array.from(selectedCurrentSkillsMap.entries()).map(
+          ([skillId, proficiency]) => ({ skillId, proficiency })
+        ),
+        desiredSkillIds: Array.from(selectedDesiredSkillIds),
       });
-      
-      setIsEditingSkills(false);
+      toast.success("Skills updated", {
+        description: "Your skills were saved successfully.",
+      });
+      setIsSkillsModalOpen(false);
     } catch (err) {
       setError(err.message);
+      toast.error("Update failed", { description: err.message });
     } finally {
       setIsSaving(false);
     }
-  }, [selectedSkills, updateUserSkills, authUser?.email]);
+  }, [
+    updateUserSkills,
+    authUser?.email,
+    selectedCurrentSkillsMap,
+    selectedDesiredSkillIds,
+  ]);
 
-  const handleSaveProfile = useCallback(async (profileData) => {
-    if (!authUser?.email) return;
-    
-    setIsSaving(true);
-    setError(null);
-    
-    try {
-      await updateUserProfile({
-        email: authUser.email,
-        ...profileData
-      });
-      
-      setIsEditingProfile(false);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsSaving(false);
-    }
-  }, [updateUserProfile, authUser?.email]);
+  // Proof handling
+  const handleUploadProof = useCallback(
+    async (userSkillId) => {
+      if (!authUser?.email) return;
+      try {
+        // TODO: integrate file picker (e.g. input[type=file])
+        // For now, assume file is already uploaded to Convex storage
+        const fakeStorageId = "some-storage-id"; // replace with actual upload flow
+        await uploadProofDocument({
+          email: authUser.email,
+          userSkillId,
+          fileName: "certificate.pdf",
+          proofType: "certification",
+          documentStorageId: fakeStorageId,
+        });
+        toast.success("Proof uploaded", {
+          description: "Your proof document was uploaded successfully.",
+        });
+      } catch (err) {
+        toast.error("Upload failed", { description: err.message });
+      }
+    },
+    [uploadProofDocument, authUser?.email]
+  );
 
-  const handleCreateWorkRequest = useCallback(async (requestData) => {
-    if (!authUser?.email) return;
-    
-    setIsSaving(true);
-    setError(null);
-    
-    try {
-      await createWorkRequest({
-        email: authUser.email,
-        ...requestData
-      });
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsSaving(false);
-    }
-  }, [createWorkRequest, authUser?.email]);
+  const handleAddProofUrl = useCallback(
+    async (userSkillId, url) => {
+      if (!authUser?.email) return;
+      try {
+        await uploadProofDocument({
+          email: authUser.email,
+          userSkillId,
+          fileName: url,
+          proofType: "link",
+          url,
+        });
+        toast.success("Proof link added", {
+          description: "Your proof link was added successfully.",
+        });
+      } catch (err) {
+        toast.error("Failed to add link", { description: err.message });
+      }
+    },
+    [uploadProofDocument, authUser?.email]
+  );
 
-  const handleUploadProof = useCallback(async (userSkillId, proofData) => {
-    if (!authUser?.email) return;
-    
-    setIsSaving(true);
-    setError(null);
-    
-    try {
-      await uploadProofDocument({
-        email: authUser.email,
-        userSkillId,
-        ...proofData
-      });
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsSaving(false);
-    }
-  }, [uploadProofDocument, authUser?.email]);
-
-  const toggleSkillCategory = useCallback((category) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [category]: !prev[category]
-    }));
-  }, []);
+  const handleRemoveProof = useCallback(
+    async (userSkillId, documentStorageId) => {
+      if (!authUser?.email) return;
+      try {
+        await removeProofDocument({
+          email: authUser.email,
+          userSkillId,
+          documentStorageId,
+        });
+        toast.success("Proof removed", {
+          description: "The proof document was removed.",
+        });
+      } catch (err) {
+        toast.error("Failed to remove proof", { description: err.message });
+      }
+    },
+    [removeProofDocument, authUser?.email]
+  );
 
   return {
     // Data
     userProfile,
     currentSkills,
     desiredSkills,
+    groupedSkillsTaxonomy,
     allSkills,
-    groupedSkills,
-    allocationSummary,
+    expandedCurrentSkillCategories,
+    expandedDesiredSkillCategories,
+    selectedCurrentSkillsMap,
+    selectedDesiredSkillIds,
     userAllocations,
-    leaveBalance,
-    leaveData,
-    lineManager,
     recentWorkRequests,
     pendingSkillVerifications,
-    capacityData,
-    
+
     // State
-    isEditingSkills,
-    setIsEditingSkills,
-    isEditingProfile,
-    setIsEditingProfile,
-    selectedSkills,
-    setSelectedSkills,
-    expandedCategories,
     isSaving,
     error,
-    setError,
-    activeTab,
-    setActiveTab,
-    
-    // Loading states
     isLoading: authLoading || userProfile === undefined,
     isAuthenticated,
-    
+    activeTab,
+    setActiveTab,
+
+    // Modal states
+    isEmploymentModalOpen,
+    setIsEmploymentModalOpen,
+    isLeaveModalOpen,
+    setIsLeaveModalOpen,
+    isOvertimeModalOpen,
+    setIsOvertimeModalOpen,
+    isSkillsModalOpen,
+    setIsSkillsModalOpen,
+
+    // Setters
+    setExpandedCurrentSkillCategories,
+    setExpandedDesiredSkillCategories,
+    setSelectedCurrentSkillsMap,
+    setSelectedDesiredSkillIds,
+
     // Handlers
-    handleSaveSkills,
     handleSaveProfile,
-    handleCreateWorkRequest,
+    handleSaveSkills,
     handleUploadProof,
-    toggleSkillCategory,
+    handleAddProofUrl,
+    handleRemoveProof,
   };
 };

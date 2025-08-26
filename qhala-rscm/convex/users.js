@@ -7,7 +7,7 @@ function requireRole(user, allowed) {
   }
 }
 
-// Helper: get actor by email
+
 async function getActor(ctx, email) {
   if (!email) throw new Error("Unauthorized: missing email");
   const actor = await ctx.db
@@ -18,10 +18,9 @@ async function getActor(ctx, email) {
   return actor;
 }
 
-// GET /api/users
 export const getAll = query({
   args: {
-    email: v.string(), // ✅ pass from NextAuth session
+    email: v.string(), 
     search: v.optional(v.string()),
     skillName: v.optional(v.string()),
     countOnly: v.optional(v.boolean()),
@@ -79,7 +78,7 @@ export const getById = query({
 
 export const create = mutation({
   args: {
-    email: v.string(), // ✅ actor email
+    email: v.string(), 
     name: v.string(),
     newUserEmail: v.string(),
     role: v.string(),
@@ -137,12 +136,25 @@ export const updateProfile = mutation({
     availabilityStatus: v.optional(
       v.union(v.literal("available"), v.literal("unavailable"), v.literal("on_leave"))
     ),
+      employeeType: v.optional(
+      v.union(
+        v.literal("permanent"),
+        v.literal("consultancy"),
+        v.literal("internship"),
+        v.literal("temporary")
+      )
+    ),
+    weeklyHours: v.optional(v.number()),
+    contractStartDate: v.optional(v.number()),
+    contractEndDate: v.optional(v.number()),
+    paymentTerms: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
     requireRole(actor, ["hr", "admin"]);
+    const { id, email, ...updates } = args;
 
-    await ctx.db.patch(args.id, { ...args, updatedAt: Date.now() });
+    await ctx.db.patch(args.id, { ...updates, updatedAt: Date.now() });
     return { success: true };
   },
 });

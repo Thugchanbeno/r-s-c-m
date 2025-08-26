@@ -14,57 +14,61 @@ import {
   ProjectsSection,
   WorkRequestsSection,
 } from "@/components/profile/profile-components";
+import EmployeeDetailsModal from "@/components/profile/modals/employee-details-modal";
+import LeaveRequestModal from "@/components/profile/modals/leave-request-modal";
+import OvertimeRequestModal from "@/components/profile/modals/overtime-request-modal";
+import SkillsEditorModal from "@/components/profile/modals/skills-editor-modal";
 import { Lock, User, Briefcase, Calendar, FileText } from "lucide-react";
 
 export default function ProfilePage() {
   const {
     userProfile,
+    allSkills,
     currentSkills,
     desiredSkills,
+    groupedSkillsTaxonomy,
+    expandedCurrentSkillCategories,
+    expandedDesiredSkillCategories,
+    selectedCurrentSkillsMap,
+    selectedDesiredSkillIds,
     userAllocations,
     leaveData,
     lineManager,
     recentWorkRequests,
     pendingSkillVerifications,
     capacityData,
-    isEditingSkills,
-    setIsEditingSkills,
-    isEditingProfile,
-    setIsEditingProfile,
     isSaving,
     error,
     isLoading,
     isAuthenticated,
-    handleSaveSkills,
-    handleCreateWorkRequest,
     activeTab,
     setActiveTab,
+    isEmploymentModalOpen,
+    setIsEmploymentModalOpen,
+    isLeaveModalOpen,
+    setIsLeaveModalOpen,
+    isOvertimeModalOpen,
+    setIsOvertimeModalOpen,
+    isSkillsModalOpen,
+    setIsSkillsModalOpen,
+    handleSaveProfile,
+    handleSaveSkills,
+    handleCreateLeaveRequest,
+    handleCreateOvertimeRequest,
+    setExpandedDesiredSkillCategories,
+    setSelectedCurrentSkillsMap,
+    setSelectedDesiredSkillIds,
+    setExpandedCurrentSkillCategories,
   } = useProfile();
 
-if (isLoading) {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <LoadingSpinner size={40} />
-      <p className="text-muted-foreground mt-2">Loading your profile...</p>
-    </div>
-  );
-}
-
-// if (notFound) {
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-background">
-//       <Card className="w-full max-w-md">
-//         <CardContent className="p-8 text-center">
-//           <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-//           <h2 className="text-xl font-semibold mb-2">Profile Not Found</h2>
-//           <p className="text-muted-foreground">
-//             We couldn’t find your profile. Please contact HR or try signing out and back in.
-//           </p>
-//         </CardContent>
-//       </Card>
-//     </div>
-//   );
-// }
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+        <LoadingSpinner size={40} />
+        <p className="text-muted-foreground mt-2">Loading your profile...</p>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
@@ -90,14 +94,12 @@ if (isLoading) {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-8"
         >
-          {/* Profile Header */}
           <ProfileHeader
             user={userProfile}
             capacityData={capacityData}
             leaveData={leaveData}
           />
 
-          {/* Error Display */}
           {error && (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -108,44 +110,33 @@ if (isLoading) {
             </motion.div>
           )}
 
-          {/* Main Content Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="overview" className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                Overview
+                <User className="h-4 w-4" /> Overview
               </TabsTrigger>
               <TabsTrigger value="employment" className="flex items-center gap-2">
-                <Briefcase className="h-4 w-4" />
-                Employment
+                <Briefcase className="h-4 w-4" /> Employment
               </TabsTrigger>
               <TabsTrigger value="leave" className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                Leave & Time
+                <Calendar className="h-4 w-4" /> Leave & Time
               </TabsTrigger>
               <TabsTrigger value="requests" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Requests
+                <FileText className="h-4 w-4" /> Requests
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Skills Section */}
                 <div className="lg:col-span-2">
                   <SkillsSection
                     currentSkills={currentSkills}
                     desiredSkills={desiredSkills}
                     pendingVerifications={pendingSkillVerifications}
-                    isEditing={isEditingSkills}
-                    onEdit={() => setIsEditingSkills(true)}
-                    onSave={handleSaveSkills}
-                    onCancel={() => setIsEditingSkills(false)}
-                    isSaving={isSaving}
+                    isEditing={false}
+                    onEdit={() => setIsSkillsModalOpen(true)}
                   />
                 </div>
-
-                {/* Side Panel */}
                 <div className="space-y-6">
                   <LineManagerCard lineManager={lineManager} user={userProfile} />
                   <ProjectsSection
@@ -160,11 +151,12 @@ if (isLoading) {
             <TabsContent value="employment" className="space-y-6">
               <EmploymentDetailsCard
                 user={userProfile}
-                isEditing={isEditingProfile}
-                onEdit={() => setIsEditingProfile(true)}
-                onSave={() => {/* Handle save */}}
-                onCancel={() => setIsEditingProfile(false)}
-                isSaving={isSaving}
+                isEditing={false}
+                onEdit={() => {
+                  if (["admin", "hr"].includes(userProfile?.role)) {
+                    setIsEmploymentModalOpen(true);
+                  }
+                }}
               />
             </TabsContent>
 
@@ -172,22 +164,120 @@ if (isLoading) {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <LeaveBalanceCard
                   leaveData={leaveData}
-                  onRequestLeave={() => {/* Handle leave request */}}
+                  onRequestLeave={() => setIsLeaveModalOpen(true)}
                 />
-                {/* Additional leave-related components can go here */}
+                <Card>
+                  <CardContent className="p-4">
+                    <button
+                      onClick={() => setIsOvertimeModalOpen(true)}
+                      className="w-full py-2 px-4 bg-primary text-white rounded-md"
+                    >
+                      Request Overtime
+                    </button>
+                  </CardContent>
+                </Card>
               </div>
             </TabsContent>
 
             <TabsContent value="requests" className="space-y-6">
               <WorkRequestsSection
                 requests={recentWorkRequests}
-                onCreateRequest={handleCreateWorkRequest}
                 isLoading={recentWorkRequests === undefined}
               />
             </TabsContent>
           </Tabs>
         </motion.div>
       </div>
+
+      {/* Modals */}
+      <EmployeeDetailsModal
+        isOpen={isEmploymentModalOpen}
+        onClose={() => setIsEmploymentModalOpen(false)}
+        defaultValues={userProfile}
+        isSaving={isSaving}
+        onSave={(form) =>
+          handleSaveProfile({
+            id: userProfile._id,
+            email: userProfile.email,
+            ...form,
+          })
+        }
+      />
+
+      <LeaveRequestModal
+        isOpen={isLeaveModalOpen}
+        onClose={() => setIsLeaveModalOpen(false)}
+        isSaving={isSaving}
+        onSave={(form) =>
+          handleCreateLeaveRequest({
+            ...form,
+            startDate: new Date(form.startDate).getTime(),
+            endDate: new Date(form.endDate).getTime(),
+            coveringUserId: form.coveringUserId || undefined,
+          })
+        }
+      />
+
+      <OvertimeRequestModal
+        isOpen={isOvertimeModalOpen}
+        onClose={() => setIsOvertimeModalOpen(false)}
+        isSaving={isSaving}
+        onSave={(form) =>
+          handleCreateOvertimeRequest({
+            ...form,
+            overtimeHours: Number(form.overtimeHours),
+            overtimeDate: new Date(form.overtimeDate).getTime(),
+          })
+        }
+      />
+
+      <SkillsEditorModal
+        isOpen={isSkillsModalOpen}
+        onClose={() => setIsSkillsModalOpen(false)}
+        isSaving={isSaving}
+        onSave={handleSaveSkills}
+        groupedSkillsTaxonomy={groupedSkillsTaxonomy}
+        expandedCurrentSkillCategories={expandedCurrentSkillCategories}
+        toggleCurrentSkillCategory={(cat) =>
+          setExpandedCurrentSkillCategories((prev) => ({
+            ...prev,
+            [cat]: !prev[cat],
+          }))
+        }
+        expandedDesiredSkillCategories={expandedDesiredSkillCategories}
+        toggleDesiredSkillCategory={(cat) =>
+          setExpandedDesiredSkillCategories((prev) => ({
+            ...prev,
+            [cat]: !prev[cat],
+          }))
+        }
+        selectedCurrentSkillsMap={selectedCurrentSkillsMap}
+        handleToggleCurrentSkill={(id) =>
+          setSelectedCurrentSkillsMap((prev) => {
+            const newMap = new Map(prev);
+            if (newMap.has(id)) newMap.delete(id);
+            else newMap.set(id, 3);
+            return newMap;
+          })
+        }
+        handleSetProficiency={(id, level) =>
+          setSelectedCurrentSkillsMap((prev) => {
+            const newMap = new Map(prev);
+            newMap.set(id, level);
+            return newMap;
+          })
+        }
+        selectedDesiredSkillIds={selectedDesiredSkillIds}
+        handleToggleDesiredSkill={(id) =>
+          setSelectedDesiredSkillIds((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(id)) newSet.delete(id);
+            else newSet.add(id);
+            return newSet;
+          })
+        }
+        loadingTaxonomy={!allSkills}
+      />
     </div>
   );
 }
