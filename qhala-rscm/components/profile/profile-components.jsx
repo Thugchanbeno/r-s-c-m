@@ -362,61 +362,6 @@ export const LineManagerCard = ({ lineManager }) => (
   </Card>
 );
 
-export const LeaveBalanceCard = ({ leaveData, onRequestLeave }) => (
-  <Card className="overflow-hidden">
-    <CardHeader className="pb-4">
-      <div className="flex items-center justify-between">
-        <CardTitle className="flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-primary" />
-          Leave Balance
-        </CardTitle>
-        <Button size="sm" onClick={onRequestLeave}>
-          <Plus className="h-4 w-4 mr-2" />
-          Request Leave
-        </Button>
-      </div>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="text-center p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
-          <div className="text-2xl font-bold text-green-700 dark:text-green-400">
-            {leaveData?.remaining || 0}
-          </div>
-          <div className="text-sm text-green-600 dark:text-green-500">
-            Annual Leave
-          </div>
-        </div>
-        <div className="text-center p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-          <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
-            {leaveData?.compDays || 0}
-          </div>
-          <div className="text-sm text-blue-600 dark:text-blue-500">
-            Comp Days
-          </div>
-        </div>
-      </div>
-      <div className="space-y-2">
-        <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Used this year</span>
-          <span className="font-medium">{leaveData?.used || 0} days</span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Total entitlement</span>
-          <span className="font-medium">
-            {leaveData?.entitlement || 21} days
-          </span>
-        </div>
-        <Progress
-          value={
-            ((leaveData?.used || 0) / (leaveData?.entitlement || 21)) * 100
-          }
-          className="h-2"
-        />
-      </div>
-    </CardContent>
-  </Card>
-);
-
 export const SkillsSection = ({
   currentSkills,
   desiredSkills,
@@ -622,11 +567,130 @@ export const WorkRequestsSection = ({ requests, isLoading }) => (
     </CardContent>
   </Card>
 );
+// LeaveBalanceCard.jsx
+export const LeaveBalanceCard = ({
+  leaveData,
+  onRequestLeave,
+  requests = [],
+}) => (
+  <Card className="overflow-hidden">
+    <CardHeader className="flex items-center justify-between">
+      <CardTitle className="flex items-center gap-2">
+        <Calendar className="h-5 w-5 text-primary" />
+        Leave Balance
+      </CardTitle>
+      <Button size="sm" onClick={onRequestLeave}>
+        Request Leave
+      </Button>
+    </CardHeader>
+    <CardContent className="space-y-4">
+      {/* Balance */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="text-center p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
+          <div className="text-2xl font-bold text-green-700 dark:text-green-400">
+            {leaveData?.remaining || 0}
+          </div>
+          <div className="text-sm text-green-600 dark:text-green-500">
+            Annual Leave
+          </div>
+        </div>
+        <div className="text-center p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+          <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
+            {leaveData?.compDays || 0}
+          </div>
+          <div className="text-sm text-blue-600 dark:text-blue-500">
+            Comp Days
+          </div>
+        </div>
+      </div>
+
+      {/* History */}
+      <div>
+        <h4 className="font-medium mb-2">Leave History</h4>
+        {requests.filter((r) => r.requestType === "leave").length > 0 ? (
+          <ul className="space-y-2">
+            {requests
+              .filter((r) => r.requestType === "leave")
+              .map((req) => (
+                <li key={req._id} className="p-2 border rounded-md text-sm">
+                  <div className="flex justify-between">
+                    <span className="capitalize">{req.leaveType} Leave</span>
+                    <span className="text-xs">{req.status}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {req.startDate &&
+                      new Date(req.startDate).toLocaleDateString()}{" "}
+                    -{" "}
+                    {req.endDate && new Date(req.endDate).toLocaleDateString()}
+                  </p>
+                </li>
+              ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-muted-foreground italic">
+            No leave requests yet.
+          </p>
+        )}
+      </div>
+    </CardContent>
+  </Card>
+);
+
+// OvertimeCard.jsx
+export const OvertimeCard = ({ onRequestOvertime, requests = [] }) => (
+  <Card className="overflow-hidden">
+    <CardHeader className="flex items-center justify-between">
+      <CardTitle className="flex items-center gap-2">
+        <Clock className="h-5 w-5 text-primary" />
+        Overtime
+      </CardTitle>
+      <Button size="sm" onClick={onRequestOvertime}>
+        Request Overtime
+      </Button>
+    </CardHeader>
+    <CardContent className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        Approved overtime can be compensated as <b>time off</b> or{" "}
+        <b>payment</b>.
+      </p>
+
+      {/* History */}
+      <div>
+        <h4 className="font-medium mb-2">Overtime History</h4>
+        {requests.filter((r) => r.requestType === "overtime").length > 0 ? (
+          <ul className="space-y-2">
+            {requests
+              .filter((r) => r.requestType === "overtime")
+              .map((req) => (
+                <li key={req._id} className="p-2 border rounded-md text-sm">
+                  <div className="flex justify-between">
+                    <span>
+                      {req.overtimeHours}h ({req.compensationType})
+                    </span>
+                    <span className="text-xs">{req.status}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {req.overtimeDate &&
+                      new Date(req.overtimeDate).toLocaleDateString()}
+                  </p>
+                </li>
+              ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-muted-foreground italic">
+            No overtime requests yet.
+          </p>
+        )}
+      </div>
+    </CardContent>
+  </Card>
+);
 
 export default {
   ProfileHeader,
   EmploymentDetailsCard,
   LineManagerCard,
+  OvertimeCard,
   LeaveBalanceCard,
   SkillsSection,
   ProjectsSection,

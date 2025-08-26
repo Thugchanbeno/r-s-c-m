@@ -22,6 +22,8 @@ export const useProfile = () => {
 
   const allSkills = useQuery(api.skills.getAll, {});
 
+  const createUserSkill = useMutation(api.userSkills.createUserSkill);
+
   const userAllocations = useQuery(
     api.users.getAllocationSummary,
     authUser?.email && userProfile?._id
@@ -31,7 +33,7 @@ export const useProfile = () => {
 
   const recentWorkRequests = useQuery(
     api.workRequests.getByUser,
-    authUser?.email ? { email: authUser.email, limit: 5 } : "skip"
+    authUser?.email ? { email: authUser.email, limit: 10 } : "skip"
   );
 
   const pendingSkillVerifications = useQuery(
@@ -44,6 +46,11 @@ export const useProfile = () => {
   const updateUserSkills = useMutation(api.userSkills.updateForCurrentUser);
   const uploadProofDocument = useMutation(api.skills.uploadProofDocument);
   const removeProofDocument = useMutation(api.skills.removeProofDocument);
+  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
+  const createLeaveRequest = useMutation(api.workRequests.createLeaveRequest);
+  const createOvertimeRequest = useMutation(
+    api.workRequests.createOvertimeRequest
+  );
 
   // State
   const [isSaving, setIsSaving] = useState(false);
@@ -80,6 +87,7 @@ export const useProfile = () => {
     () => userSkills?.filter((s) => s.isDesired) || [],
     [userSkills]
   );
+  const isOnboarding = currentSkills.length === 0;
 
   const groupedSkillsTaxonomy = useMemo(() => {
     if (!allSkills) return {};
@@ -91,7 +99,161 @@ export const useProfile = () => {
     }, {});
   }, [allSkills]);
 
-  // Handlers
+  // File upload handlers
+  const handleUploadProof = useCallback(
+    async (skillId, file, proofType) => {
+      if (!authUser?.email) {
+        toast.error("Authentication required");
+        return;
+      }
+
+      try {
+        // Step 1: Generate upload URL
+        const uploadUrl = await generateUploadUrl({ email: authUser.email });
+
+        // Step 2: Upload file to Convex storage
+        const response = await fetch(uploadUrl, {
+          method: "POST",
+          headers: { "Content-Type": file.type },
+          body: file,
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Upload failed: ${response.status} ${response.statusText}`
+          );
+        }
+
+        const { storageId } = await response.json();
+
+        // Step 3: Find or create userSkill record
+        let userSkillId;
+        const existing = userSkills?.find((us) => us.skillId === skillId);
+        if (existing) {
+          userSkillId = existing._id;
+        } else {
+          // Create a new userSkill entry if it doesn’t exist yet
+          userSkillId = await createUserSkill({
+            email: authUser.email,
+            skillId,
+            isCurrent: true,
+            isDesired: false,
+            proficiency: 1,
+          });
+        }
+
+        // Step 4: Save proof document reference
+        await uploadProofDocument({
+          email: authUser.email,
+          userSkillId, // ✅ now a userSkillId
+          fileName: file.name,
+          proofType,
+          documentStorageId: storageId,
+        });
+
+        toast.success("Proof uploaded successfully!");
+      } catch (err) {
+        console.error("Upload error:", err);
+        toast.error("Upload failed", { description: err.message });
+      }
+    },
+    [generateUploadUrl, uploadProofDocument, authUser?.email, userSkills]
+  );
+
+  const handleUploadCV = useCallback(
+    async (file) => {
+      if (!authUser?.email) {
+        toast.error("Authentication required");
+        return;
+      }
+
+      try {
+        console.log("Starting CV upload:", file.name);
+
+        // Generate upload URL
+        const uploadUrl = await generateUploadUrl({ email: authUser.email });
+        console.log("Got upload URL for CV:", uploadUrl);
+
+        // Upload CV file to Convex storage
+        const response = await fetch(uploadUrl, {
+          method: "POST",
+          headers: { "Content-Type": file.type },
+          body: file,
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Upload failed: ${response.status} ${response.statusText}`
+          );
+        }
+
+        const result = await response.json();
+        console.log("CV upload result:", result);
+
+        if (!result.storageId) {
+          throw new Error("No storage ID returned from upload");
+        }
+
+        // Just log the storage ID for now - NLP processing will be added later
+        console.log(
+          "CV uploaded successfully with storageId:",
+          result.storageId
+        );
+
+        toast.success("CV uploaded successfully!", {
+          description:
+            "You can now add skills manually while we process your CV.",
+        });
+
+        return true; // Return success status
+      } catch (err) {
+        console.error("CV upload error:", err);
+        toast.error("CV upload failed", {
+          description: err.message || "Unknown error occurred",
+        });
+        return false;
+      }
+    },
+    [generateUploadUrl, authUser?.email]
+  );
+
+  const handleAddProofUrl = useCallback(
+    async (skillId, url) => {
+      if (!authUser?.email) return;
+
+      try {
+        // Find or create userSkill
+        let userSkillId;
+        const existing = userSkills?.find((us) => us.skillId === skillId);
+        if (existing) {
+          userSkillId = existing._id;
+        } else {
+          userSkillId = await createUserSkill({
+            email: authUser.email,
+            skillId,
+            isCurrent: true,
+            isDesired: false,
+            proficiency: 1,
+          });
+        }
+
+        // Save proof as link
+        await uploadProofDocument({
+          email: authUser.email,
+          userSkillId, // ✅ correct ID
+          fileName: url,
+          proofType: "link",
+          url,
+        });
+
+        toast.success("Proof link added successfully!");
+      } catch (err) {
+        toast.error("Failed to add link", { description: err.message });
+      }
+    },
+    [uploadProofDocument, createUserSkill, userSkills, authUser?.email]
+  );
+  // Other handlers
   const handleSaveProfile = useCallback(
     async (profileData) => {
       if (!authUser?.email) return;
@@ -143,51 +305,6 @@ export const useProfile = () => {
     selectedDesiredSkillIds,
   ]);
 
-  // Proof handling
-  const handleUploadProof = useCallback(
-    async (userSkillId) => {
-      if (!authUser?.email) return;
-      try {
-        // TODO: integrate file picker
-        const fakeStorageId = "some-storage-id"; // placeholder
-        await uploadProofDocument({
-          email: authUser.email,
-          userSkillId,
-          fileName: "certificate.pdf",
-          proofType: "certification",
-          documentStorageId: fakeStorageId,
-        });
-        toast.success("Proof uploaded", {
-          description: "Your proof document was uploaded successfully.",
-        });
-      } catch (err) {
-        toast.error("Upload failed", { description: err.message });
-      }
-    },
-    [uploadProofDocument, authUser?.email]
-  );
-
-  const handleAddProofUrl = useCallback(
-    async (userSkillId, url) => {
-      if (!authUser?.email) return;
-      try {
-        await uploadProofDocument({
-          email: authUser.email,
-          userSkillId,
-          fileName: url,
-          proofType: "link",
-          url,
-        });
-        toast.success("Proof link added", {
-          description: "Your proof link was added successfully.",
-        });
-      } catch (err) {
-        toast.error("Failed to add link", { description: err.message });
-      }
-    },
-    [uploadProofDocument, authUser?.email]
-  );
-
   const handleRemoveProof = useCallback(
     async (userSkillId, documentStorageId) => {
       if (!authUser?.email) return;
@@ -207,6 +324,48 @@ export const useProfile = () => {
     [removeProofDocument, authUser?.email]
   );
 
+  const handleCreateLeaveRequest = useCallback(
+    async (form) => {
+      if (!authUser?.email) return;
+      setIsSaving(true);
+      setError(null);
+      try {
+        await createLeaveRequest({ email: authUser.email, ...form });
+        toast.success("Leave request submitted", {
+          description: "Your leave request has been sent for approval.",
+        });
+        setIsLeaveModalOpen(false);
+      } catch (err) {
+        setError(err.message);
+        toast.error("Request failed", { description: err.message });
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [createLeaveRequest, authUser?.email]
+  );
+
+  const handleCreateOvertimeRequest = useCallback(
+    async (form) => {
+      if (!authUser?.email) return;
+      setIsSaving(true);
+      setError(null);
+      try {
+        await createOvertimeRequest({ email: authUser.email, ...form });
+        toast.success("Overtime request submitted", {
+          description: "Your overtime request has been sent for approval.",
+        });
+        setIsOvertimeModalOpen(false);
+      } catch (err) {
+        setError(err.message);
+        toast.error("Request failed", { description: err.message });
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [createOvertimeRequest, authUser?.email]
+  );
+
   return {
     // Data
     userProfile,
@@ -221,6 +380,7 @@ export const useProfile = () => {
     userAllocations,
     recentWorkRequests,
     pendingSkillVerifications,
+    isOnboarding,
 
     // State
     isSaving,
@@ -252,7 +412,10 @@ export const useProfile = () => {
     handleSaveProfile,
     handleSaveSkills,
     handleUploadProof,
+    handleUploadCV,
     handleAddProofUrl,
     handleRemoveProof,
+    handleCreateLeaveRequest,
+    handleCreateOvertimeRequest,
   };
 };

@@ -2,7 +2,7 @@
 import AuthProvider from "@/components/auth/AuthProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import ConvexClientProvider from "@/lib/convex";
-import { ToastContainer } from "react-toastify";
+import { Toaster } from "sonner";
 import "react-toastify/dist/ReactToastify.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "./globals.css";
@@ -32,18 +32,7 @@ export default function RootLayout({ children }) {
           <ThemeProvider>
             <AuthProvider>
               {children}
-              <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-              />
+              <Toaster position="top-right" richColors />
             </AuthProvider>
           </ThemeProvider>
         </ConvexClientProvider>
