@@ -54,13 +54,22 @@ export const useProfile = () => {
   const [isEmploymentModalOpen, setIsEmploymentModalOpen] = useState(false);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [isOvertimeModalOpen, setIsOvertimeModalOpen] = useState(false);
-  const [isSkillsModalOpen, setIsSkillsModalOpen] = useState(false);
+  const [isCurrentSkillsModalOpen, setIsCurrentSkillsModalOpen] =
+    useState(false);
+  const [isDesiredSkillsModalOpen, setIsDesiredSkillsModalOpen] =
+    useState(false);
 
   // Skills state
-  const [selectedCurrentSkillsMap, setSelectedCurrentSkillsMap] = useState(new Map());
-  const [selectedDesiredSkillIds, setSelectedDesiredSkillIds] = useState(new Set());
-  const [expandedCurrentSkillCategories, setExpandedCurrentSkillCategories] = useState({});
-  const [expandedDesiredSkillCategories, setExpandedDesiredSkillCategories] = useState({});
+  const [selectedCurrentSkillsMap, setSelectedCurrentSkillsMap] = useState(
+    new Map()
+  );
+  const [selectedDesiredSkillIds, setSelectedDesiredSkillIds] = useState(
+    new Set()
+  );
+  const [expandedCurrentSkillCategories, setExpandedCurrentSkillCategories] =
+    useState({});
+  const [expandedDesiredSkillCategories, setExpandedDesiredSkillCategories] =
+    useState({});
 
   // Derived
   const currentSkills = useMemo(
@@ -119,7 +128,8 @@ export const useProfile = () => {
       toast.success("Skills updated", {
         description: "Your skills were saved successfully.",
       });
-      setIsSkillsModalOpen(false);
+      setIsCurrentSkillsModalOpen(false);
+      setIsDesiredSkillsModalOpen(false);
     } catch (err) {
       setError(err.message);
       toast.error("Update failed", { description: err.message });
@@ -138,9 +148,8 @@ export const useProfile = () => {
     async (userSkillId) => {
       if (!authUser?.email) return;
       try {
-        // TODO: integrate file picker (e.g. input[type=file])
-        // For now, assume file is already uploaded to Convex storage
-        const fakeStorageId = "some-storage-id"; // replace with actual upload flow
+        // TODO: integrate file picker
+        const fakeStorageId = "some-storage-id"; // placeholder
         await uploadProofDocument({
           email: authUser.email,
           userSkillId,
@@ -228,8 +237,10 @@ export const useProfile = () => {
     setIsLeaveModalOpen,
     isOvertimeModalOpen,
     setIsOvertimeModalOpen,
-    isSkillsModalOpen,
-    setIsSkillsModalOpen,
+    isCurrentSkillsModalOpen,
+    setIsCurrentSkillsModalOpen,
+    isDesiredSkillsModalOpen,
+    setIsDesiredSkillsModalOpen,
 
     // Setters
     setExpandedCurrentSkillCategories,

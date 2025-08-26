@@ -17,13 +17,15 @@ import {
 import EmployeeDetailsModal from "@/components/profile/modals/employee-details-modal";
 import LeaveRequestModal from "@/components/profile/modals/leave-request-modal";
 import OvertimeRequestModal from "@/components/profile/modals/overtime-request-modal";
-import SkillsEditorModal from "@/components/profile/modals/skills-editor-modal";
+import {
+  CurrentSkillsModal,
+  DesiredSkillsModal,
+} from "@/components/profile/modals/skills-editor-modal";
 import { Lock, User, Briefcase, Calendar, FileText } from "lucide-react";
 
 export default function ProfilePage() {
   const {
     userProfile,
-    allSkills,
     currentSkills,
     desiredSkills,
     groupedSkillsTaxonomy,
@@ -32,8 +34,6 @@ export default function ProfilePage() {
     selectedCurrentSkillsMap,
     selectedDesiredSkillIds,
     userAllocations,
-    leaveData,
-    lineManager,
     recentWorkRequests,
     pendingSkillVerifications,
     capacityData,
@@ -49,16 +49,21 @@ export default function ProfilePage() {
     setIsLeaveModalOpen,
     isOvertimeModalOpen,
     setIsOvertimeModalOpen,
-    isSkillsModalOpen,
-    setIsSkillsModalOpen,
-    handleSaveProfile,
-    handleSaveSkills,
-    handleCreateLeaveRequest,
-    handleCreateOvertimeRequest,
+    isCurrentSkillsModalOpen,
+    setIsCurrentSkillsModalOpen,
+    isDesiredSkillsModalOpen,
+    setIsDesiredSkillsModalOpen,
+    // 👇 missing setters now included
+    setExpandedCurrentSkillCategories,
     setExpandedDesiredSkillCategories,
     setSelectedCurrentSkillsMap,
     setSelectedDesiredSkillIds,
-    setExpandedCurrentSkillCategories,
+    handleSaveProfile,
+    handleSaveSkills,
+    handleUploadProof,
+    handleAddProofUrl,
+    handleRemoveProof,
+    allSkills,
   } = useProfile();
 
   if (isLoading) {
@@ -76,7 +81,9 @@ export default function ProfilePage() {
         <Card className="w-full max-w-md">
           <CardContent className="p-8 text-center">
             <Lock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Authentication Required</h2>
+            <h2 className="text-xl font-semibold mb-2">
+              Authentication Required
+            </h2>
             <p className="text-muted-foreground">
               Please sign in to view your profile.
             </p>
@@ -97,7 +104,7 @@ export default function ProfilePage() {
           <ProfileHeader
             user={userProfile}
             capacityData={capacityData}
-            leaveData={leaveData}
+            leaveData={null}
           />
 
           {error && (
@@ -110,12 +117,19 @@ export default function ProfilePage() {
             </motion.div>
           )}
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="space-y-6"
+          >
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <User className="h-4 w-4" /> Overview
               </TabsTrigger>
-              <TabsTrigger value="employment" className="flex items-center gap-2">
+              <TabsTrigger
+                value="employment"
+                className="flex items-center gap-2"
+              >
                 <Briefcase className="h-4 w-4" /> Employment
               </TabsTrigger>
               <TabsTrigger value="leave" className="flex items-center gap-2">
@@ -128,17 +142,17 @@ export default function ProfilePage() {
 
             <TabsContent value="overview" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
+                <div className="lg:col-span-2 space-y-6">
                   <SkillsSection
                     currentSkills={currentSkills}
                     desiredSkills={desiredSkills}
                     pendingVerifications={pendingSkillVerifications}
-                    isEditing={false}
-                    onEdit={() => setIsSkillsModalOpen(true)}
+                    onEditCurrent={() => setIsCurrentSkillsModalOpen(true)}
+                    onEditDesired={() => setIsDesiredSkillsModalOpen(true)}
                   />
                 </div>
                 <div className="space-y-6">
-                  <LineManagerCard lineManager={lineManager} user={userProfile} />
+                  <LineManagerCard lineManager={null} user={userProfile} />
                   <ProjectsSection
                     allocations={userAllocations}
                     isLoading={userAllocations === undefined}
@@ -161,22 +175,10 @@ export default function ProfilePage() {
             </TabsContent>
 
             <TabsContent value="leave" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <LeaveBalanceCard
-                  leaveData={leaveData}
-                  onRequestLeave={() => setIsLeaveModalOpen(true)}
-                />
-                <Card>
-                  <CardContent className="p-4">
-                    <button
-                      onClick={() => setIsOvertimeModalOpen(true)}
-                      className="w-full py-2 px-4 bg-primary text-white rounded-md"
-                    >
-                      Request Overtime
-                    </button>
-                  </CardContent>
-                </Card>
-              </div>
+              <LeaveBalanceCard
+                leaveData={null}
+                onRequestLeave={() => setIsLeaveModalOpen(true)}
+              />
             </TabsContent>
 
             <TabsContent value="requests" className="space-y-6">
@@ -204,49 +206,15 @@ export default function ProfilePage() {
         }
       />
 
-      <LeaveRequestModal
-        isOpen={isLeaveModalOpen}
-        onClose={() => setIsLeaveModalOpen(false)}
-        isSaving={isSaving}
-        onSave={(form) =>
-          handleCreateLeaveRequest({
-            ...form,
-            startDate: new Date(form.startDate).getTime(),
-            endDate: new Date(form.endDate).getTime(),
-            coveringUserId: form.coveringUserId || undefined,
-          })
-        }
-      />
-
-      <OvertimeRequestModal
-        isOpen={isOvertimeModalOpen}
-        onClose={() => setIsOvertimeModalOpen(false)}
-        isSaving={isSaving}
-        onSave={(form) =>
-          handleCreateOvertimeRequest({
-            ...form,
-            overtimeHours: Number(form.overtimeHours),
-            overtimeDate: new Date(form.overtimeDate).getTime(),
-          })
-        }
-      />
-
-      <SkillsEditorModal
-        isOpen={isSkillsModalOpen}
-        onClose={() => setIsSkillsModalOpen(false)}
+      <CurrentSkillsModal
+        isOpen={isCurrentSkillsModalOpen}
+        onClose={() => setIsCurrentSkillsModalOpen(false)}
         isSaving={isSaving}
         onSave={handleSaveSkills}
         groupedSkillsTaxonomy={groupedSkillsTaxonomy}
         expandedCurrentSkillCategories={expandedCurrentSkillCategories}
         toggleCurrentSkillCategory={(cat) =>
           setExpandedCurrentSkillCategories((prev) => ({
-            ...prev,
-            [cat]: !prev[cat],
-          }))
-        }
-        expandedDesiredSkillCategories={expandedDesiredSkillCategories}
-        toggleDesiredSkillCategory={(cat) =>
-          setExpandedDesiredSkillCategories((prev) => ({
             ...prev,
             [cat]: !prev[cat],
           }))
@@ -266,6 +234,26 @@ export default function ProfilePage() {
             newMap.set(id, level);
             return newMap;
           })
+        }
+        loadingTaxonomy={!allSkills}
+        handleUploadProof={handleUploadProof}
+        handleAddProofUrl={handleAddProofUrl}
+        handleRemoveProof={handleRemoveProof}
+        userSkills={currentSkills}
+      />
+
+      <DesiredSkillsModal
+        isOpen={isDesiredSkillsModalOpen}
+        onClose={() => setIsDesiredSkillsModalOpen(false)}
+        isSaving={isSaving}
+        onSave={handleSaveSkills}
+        groupedSkillsTaxonomy={groupedSkillsTaxonomy}
+        expandedDesiredSkillCategories={expandedDesiredSkillCategories}
+        toggleDesiredSkillCategory={(cat) =>
+          setExpandedDesiredSkillCategories((prev) => ({
+            ...prev,
+            [cat]: !prev[cat],
+          }))
         }
         selectedDesiredSkillIds={selectedDesiredSkillIds}
         handleToggleDesiredSkill={(id) =>
