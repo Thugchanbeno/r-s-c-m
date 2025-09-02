@@ -126,6 +126,7 @@ export default defineSchema({
           skillName: v.string(),
           proficiencyLevel: v.number(),
           isRequired: v.boolean(),
+          category: v.optional(v.string()),
         })
       )
     ),

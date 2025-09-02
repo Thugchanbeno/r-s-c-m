@@ -1,3 +1,4 @@
+// components/projects/SkillSelector.jsx
 "use client";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Badge } from "@/components/ui/badge";
@@ -5,8 +6,6 @@ import {
   getSkillLevelColor,
   getSkillLevelName,
   darkItemStyles,
-  darkItemSelectedStyles,
-  proficiencySelectedStyles,
 } from "@/components/common/CustomColors";
 import {
   Check,
@@ -16,8 +15,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSkillSelector } from "@/lib/hooks/useSkillSelector";
-import { cn } from "@/lib/utils"; // Ensure cn is imported
+import { useSkills } from "@/lib/hooks/useSkills";
+import { cn } from "@/lib/utils";
 
 const fadeIn = {
   hidden: { opacity: 0, y: -10 },
@@ -42,7 +41,7 @@ const SkillSelector = ({
     toggleCategory,
     skillsByCategory,
     sortedCategories,
-  } = useSkillSelector(initialSelectedSkills, nlpSuggestedSkills, onChange);
+  } = useSkills(initialSelectedSkills, nlpSuggestedSkills, onChange);
 
   const inputClasses =
     "block w-full rounded-md bg-background text-foreground shadow-sm sm:text-sm p-2.5 transition-all duration-200 placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:ring-offset-background";
@@ -77,6 +76,7 @@ const SkillSelector = ({
         <p className="text-sm text-muted-foreground">Loading skills...</p>
       </div>
     );
+
   if (errorSkills)
     return (
       <div className="rounded-md border border-destructive/40 bg-destructive/15 p-3 text-sm text-destructive">
@@ -86,6 +86,7 @@ const SkillSelector = ({
 
   return (
     <div className="space-y-3 p-1">
+      {/* Search */}
       <input
         type="text"
         placeholder="Search skills or categories..."
@@ -93,6 +94,8 @@ const SkillSelector = ({
         onChange={(e) => setSearchTerm(e.target.value)}
         className={inputClasses}
       />
+
+      {/* Selected Skills */}
       {selectedSkillsMap.size > 0 && (
         <div className="space-y-2 rounded-md shadow-sm hover:shadow-md bg-primary-accent-background/50 p-3">
           <h4 className="text-xs font-semibold uppercase text-primary">
@@ -112,7 +115,6 @@ const SkillSelector = ({
                       "flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md",
                       getSkillLevelColor(sSkill.proficiencyLevel)
                     )}
-                    pill={false}
                     size="sm"
                   >
                     <span>
@@ -122,12 +124,10 @@ const SkillSelector = ({
                           ({proficiencyName})
                         </span>
                       )}
-                      {sSkill.isRequired ? (
+                      {sSkill.isRequired && (
                         <span className="ml-1 font-bold text-destructive">
                           *
                         </span>
-                      ) : (
-                        ""
                       )}
                     </span>
                     <button
@@ -150,8 +150,10 @@ const SkillSelector = ({
           </div>
         </div>
       )}
+
+      {/* Skills by Category */}
       <div className="max-h-[300px] space-y-1.5 overflow-y-auto pr-1">
-        {sortedCategories.length === 0 && !loadingSkills && (
+        {sortedCategories.length === 0 && (
           <p className="py-4 text-center text-sm text-muted-foreground">
             No skills match your search or available.
           </p>
@@ -178,15 +180,9 @@ const SkillSelector = ({
             >
               <h4 className="text-md font-semibold">{category}</h4>
               {expandedCategories[category] ? (
-                <ChevronDown
-                  size={20}
-                  className="text-muted-foreground group-hover:text-[rgb(var(--accent-foreground))]"
-                />
+                <ChevronDown size={20} className="text-muted-foreground" />
               ) : (
-                <ChevronRight
-                  size={20}
-                  className="text-muted-foreground group-hover:text-[rgb(var(--accent-foreground))]"
-                />
+                <ChevronRight size={20} className="text-muted-foreground" />
               )}
             </button>
             <AnimatePresence>
@@ -284,7 +280,7 @@ const SkillSelector = ({
                                 >
                                   {[1, 2, 3, 4, 5].map((lvl) => (
                                     <option key={lvl} value={lvl}>
-                                      {getSkillLevelName(lvl)}{" "}
+                                      {getSkillLevelName(lvl)}
                                     </option>
                                   ))}
                                 </select>

@@ -17,6 +17,7 @@ async function getActor(ctx, email) {
   return actor;
 }
 
+// --- GET ALL TASKS ---
 export const getAll = query({
   args: {
     email: v.string(),
@@ -40,20 +41,26 @@ export const getAll = query({
     } else if (args.assignedUserId) {
       tasks = await ctx.db
         .query("tasks")
-        .withIndex("by_assigned_user", (q) => q.eq("assignedUserId", args.assignedUserId))
+        .withIndex("by_assigned_user", (q) =>
+          q.eq("assignedUserId", args.assignedUserId)
+        )
         .collect();
     } else {
       tasks = await ctx.db.query("tasks").collect();
     }
 
+    // Permission filtering
     if (!["admin", "hr"].includes(actor.role)) {
       const filteredTasks = [];
       for (const task of tasks) {
-        if (task.assignedUserId === actor._id || task.createdByUserId === actor._id) {
+        if (
+          task.assignedUserId === actor._id ||
+          task.createdByUserId === actor._id
+        ) {
           filteredTasks.push(task);
           continue;
         }
-        
+
         if (actor.role === "pm") {
           const project = await ctx.db.get(task.projectId);
           if (project && project.pmId === actor._id) {
@@ -64,19 +71,25 @@ export const getAll = query({
       tasks = filteredTasks;
     }
 
+    // Filters
     if (args.status) {
-      tasks = tasks.filter(t => t.status === args.status);
+      tasks = tasks.filter((t) => t.status === args.status);
     }
     if (args.priority) {
-      tasks = tasks.filter(t => t.priority === args.priority);
+      tasks = tasks.filter((t) => t.priority === args.priority);
     }
 
+    // Enrichment
     const enrichedTasks = [];
     for (const task of tasks) {
-      const assignedUser = task.assignedUserId ? await ctx.db.get(task.assignedUserId) : null;
+      const assignedUser = task.assignedUserId
+        ? await ctx.db.get(task.assignedUserId)
+        : null;
       const createdByUser = await ctx.db.get(task.createdByUserId);
       const project = await ctx.db.get(task.projectId);
-      const relatedSkill = task.relatedSkillId ? await ctx.db.get(task.relatedSkillId) : null;
+      const relatedSkill = task.relatedSkillId
+        ? await ctx.db.get(task.relatedSkillId)
+        : null;
 
       enrichedTasks.push({
         ...task,
@@ -89,11 +102,12 @@ export const getAll = query({
 
     const skip = args.skip ?? 0;
     const limit = args.limit ?? 50;
-    
+
     return enrichedTasks.slice(skip, skip + limit);
   },
 });
 
+// --- CREATE TASK ---
 export const create = mutation({
   args: {
     email: v.string(),
@@ -101,7 +115,21 @@ export const create = mutation({
     title: v.string(),
     description: v.optional(v.string()),
     assignedUserId: v.optional(v.id("users")),
-    priority: v.union(v.literal("low"), v.literal("medium"), v.literal("high"), v.literal("urgent")),
+    priority: v.union(
+      v.literal("low"),
+      v.literal("medium"),
+      v.literal("high"),
+      v.literal("urgent")
+    ),
+    status: v.optional(
+      v.union(
+        v.literal("todo"),
+        v.literal("in_progress"),
+        v.literal("review"),
+        v.literal("completed"),
+        v.literal("cancelled")
+      )
+    ),
     category: v.optional(v.string()),
     relatedSkillId: v.optional(v.id("skills")),
     skillProficiencyGain: v.optional(v.number()),
@@ -111,34 +139,37 @@ export const create = mutation({
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const actor = await getActor(ctx, args.email);
+    const { email, ...taskData } = args; // ✅ strip email
+    const actor = await getActor(ctx, email);
 
-    const project = await ctx.db.get(args.projectId);
+    const project = await ctx.db.get(taskData.projectId);
     if (!project) throw new Error("Project not found.");
 
-    const canCreate = 
+    const canCreate =
       project.pmId === actor._id ||
-      args.assignedUserId === actor._id ||
+      taskData.assignedUserId === actor._id ||
       ["admin", "hr"].includes(actor.role);
 
     if (!canCreate) {
-      throw new Error("You don't have permission to create tasks for this project.");
+      throw new Error(
+        "You don't have permission to create tasks for this project."
+      );
     }
 
     const now = Date.now();
     const taskId = await ctx.db.insert("tasks", {
-      ...args,
+      ...taskData,
       createdByUserId: actor._id,
-      status: "todo",
+      status: taskData.status || "todo",
       startDate: now,
       createdAt: now,
       updatedAt: now,
     });
 
-    if (args.assignedUserId && args.assignedUserId !== actor._id) {
+    if (taskData.assignedUserId && taskData.assignedUserId !== actor._id) {
       await ctx.db.insert("notifications", {
-        userId: args.assignedUserId,
-        message: `You have been assigned a new task: "${args.title}" in project "${project.name}"`,
+        userId: taskData.assignedUserId,
+        message: `You have been assigned a new task: "${taskData.title}" in project "${project.name}"`,
         type: "task_assigned",
         isRead: false,
         relatedResourceId: taskId,
@@ -151,6 +182,7 @@ export const create = mutation({
   },
 });
 
+// --- UPDATE TASK ---
 export const update = mutation({
   args: {
     email: v.string(),
@@ -158,27 +190,37 @@ export const update = mutation({
     title: v.optional(v.string()),
     description: v.optional(v.string()),
     assignedUserId: v.optional(v.id("users")),
-    status: v.optional(v.union(
-      v.literal("todo"),
-      v.literal("in_progress"),
-      v.literal("review"),
-      v.literal("completed"),
-      v.literal("cancelled")
-    )),
-    priority: v.optional(v.union(v.literal("low"), v.literal("medium"), v.literal("high"), v.literal("urgent"))),
+    status: v.optional(
+      v.union(
+        v.literal("todo"),
+        v.literal("in_progress"),
+        v.literal("review"),
+        v.literal("completed"),
+        v.literal("cancelled")
+      )
+    ),
+    priority: v.optional(
+      v.union(
+        v.literal("low"),
+        v.literal("medium"),
+        v.literal("high"),
+        v.literal("urgent")
+      )
+    ),
     actualHours: v.optional(v.number()),
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const actor = await getActor(ctx, args.email);
+    const { email, id, ...updates } = args; // ✅ strip email
+    const actor = await getActor(ctx, email);
 
-    const task = await ctx.db.get(args.id);
+    const task = await ctx.db.get(id);
     if (!task) throw new Error("Task not found.");
 
     const project = await ctx.db.get(task.projectId);
     if (!project) throw new Error("Project not found.");
 
-    const canUpdate = 
+    const canUpdate =
       task.assignedUserId === actor._id ||
       task.createdByUserId === actor._id ||
       project.pmId === actor._id ||
@@ -189,13 +231,21 @@ export const update = mutation({
     }
 
     const now = Date.now();
-    const { id, email, ...updates } = args;
 
-    if (args.status === "completed" && task.status !== "completed") {
+    if (updates.status === "completed" && task.status !== "completed") {
       updates.completedDate = now;
-      
-      if (task.relatedSkillId && task.skillProficiencyGain && task.assignedUserId) {
-        await awardSkillProficiency(ctx, task.assignedUserId, task.relatedSkillId, task.skillProficiencyGain);
+
+      if (
+        task.relatedSkillId &&
+        task.skillProficiencyGain &&
+        task.assignedUserId
+      ) {
+        await awardSkillProficiency(
+          ctx,
+          task.assignedUserId,
+          task.relatedSkillId,
+          task.skillProficiencyGain
+        );
       }
 
       if (project.pmId && project.pmId !== actor._id) {
@@ -204,7 +254,7 @@ export const update = mutation({
           message: `Task "${task.title}" has been completed by ${actor.name}`,
           type: "task_completed",
           isRead: false,
-          relatedResourceId: args.id,
+          relatedResourceId: id,
           relatedResourceType: "task",
           createdAt: now,
         });
@@ -220,23 +270,34 @@ export const update = mutation({
   },
 });
 
-async function awardSkillProficiency(ctx, userId, skillId, points) {
-  const userSkill = await ctx.db
-    .query("userSkills")
-    .withIndex("by_user_skill", (q) => q.eq("userId", userId).eq("skillId", skillId))
-    .first();
+// --- DELETE TASK ---
+export const remove = mutation({
+  args: { email: v.string(), id: v.id("tasks") },
+  handler: async (ctx, args) => {
+    const { email, id } = args;
+    const actor = await getActor(ctx, email);
 
-  if (userSkill) {
-    const currentProficiency = userSkill.proficiency || 1;
-    const newProficiency = Math.min(5, currentProficiency + (points / 10));
-    
-    await ctx.db.patch(userSkill._id, {
-      proficiency: newProficiency,
-      updatedAt: Date.now(),
-    });
-  }
-}
+    const task = await ctx.db.get(id);
+    if (!task) throw new Error("Task not found.");
 
+    const project = await ctx.db.get(task.projectId);
+    if (!project) throw new Error("Project not found.");
+
+    const canDelete =
+      task.createdByUserId === actor._id ||
+      project.pmId === actor._id ||
+      ["admin", "hr"].includes(actor.role);
+
+    if (!canDelete) {
+      throw new Error("You don't have permission to delete this task.");
+    }
+
+    await ctx.db.delete(id);
+    return { success: true, message: "Task deleted successfully." };
+  },
+});
+
+// --- GET TASK BY ID ---
 export const getById = query({
   args: { email: v.string(), id: v.id("tasks") },
   handler: async (ctx, args) => {
@@ -245,10 +306,14 @@ export const getById = query({
     const task = await ctx.db.get(args.id);
     if (!task) throw new Error("Task not found.");
 
-    const assignedUser = task.assignedUserId ? await ctx.db.get(task.assignedUserId) : null;
+    const assignedUser = task.assignedUserId
+      ? await ctx.db.get(task.assignedUserId)
+      : null;
     const createdByUser = await ctx.db.get(task.createdByUserId);
     const project = await ctx.db.get(task.projectId);
-    const relatedSkill = task.relatedSkillId ? await ctx.db.get(task.relatedSkillId) : null;
+    const relatedSkill = task.relatedSkillId
+      ? await ctx.db.get(task.relatedSkillId)
+      : null;
 
     return {
       ...task,
@@ -260,27 +325,22 @@ export const getById = query({
   },
 });
 
-export const remove = mutation({
-  args: { email: v.string(), id: v.id("tasks") },
-  handler: async (ctx, args) => {
-    const actor = await getActor(ctx, args.email);
+// --- Helper: Award skill proficiency ---
+async function awardSkillProficiency(ctx, userId, skillId, points) {
+  const userSkill = await ctx.db
+    .query("userSkills")
+    .withIndex("by_user_skill", (q) =>
+      q.eq("userId", userId).eq("skillId", skillId)
+    )
+    .first();
 
-    const task = await ctx.db.get(args.id);
-    if (!task) throw new Error("Task not found.");
+  if (userSkill) {
+    const currentProficiency = userSkill.proficiency || 1;
+    const newProficiency = Math.min(5, currentProficiency + points / 10);
 
-    const project = await ctx.db.get(task.projectId);
-    if (!project) throw new Error("Project not found.");
-
-    const canDelete = 
-      task.createdByUserId === actor._id ||
-      project.pmId === actor._id ||
-      ["admin", "hr"].includes(actor.role);
-
-    if (!canDelete) {
-      throw new Error("You don't have permission to delete this task.");
-    }
-
-    await ctx.db.delete(args.id);
-    return { success: true, message: "Task deleted successfully." };
-  },
-});
+    await ctx.db.patch(userSkill._id, {
+      proficiency: newProficiency,
+      updatedAt: Date.now(),
+    });
+  }
+}
