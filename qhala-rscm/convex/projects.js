@@ -18,10 +18,11 @@ async function getActor(ctx, email) {
 }
 
 // GET /api/projects
+// convex/projects.js - Update the getAll function
 export const getAll = query({
   args: {
     email: v.string(),
-    pmId: v.optional(v.id("users")),
+    pmId: v.optional(v.id("users")), // ✅ Make pmId optional
     countOnly: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
@@ -29,14 +30,21 @@ export const getAll = query({
 
     let projects = [];
     if (args.pmId) {
-      if (actor._id !== args.pmId && !["admin", "hr", "pm"].includes(actor.role)) {
-        throw new Error("You can only view your own projects or have admin/hr privileges.");
+      // Only check permissions if pmId is provided
+      if (
+        actor._id !== args.pmId &&
+        !["admin", "hr", "pm"].includes(actor.role)
+      ) {
+        throw new Error(
+          "You can only view your own projects or have admin/hr privileges."
+        );
       }
       projects = await ctx.db
         .query("projects")
         .withIndex("by_pm", (q) => q.eq("pmId", args.pmId))
         .collect();
     } else {
+      // Show all projects if user has permission
       requireRole(actor, ["admin", "hr", "pm"]);
       projects = await ctx.db.query("projects").collect();
     }
@@ -81,6 +89,7 @@ export const create = mutation({
           skillName: v.string(),
           proficiencyLevel: v.number(),
           isRequired: v.boolean(),
+          category: v.optional(v.string()),
         })
       )
     ),
@@ -91,12 +100,15 @@ export const create = mutation({
     requireRole(actor, ["pm", "hr", "admin"]);
 
     if (!args.name || !args.description || !args.department) {
-      throw new Error("Project name, description, and department are required.");
+      throw new Error(
+        "Project name, description, and department are required."
+      );
     }
 
     const now = Date.now();
+    const { email, ...updates } = args;
     return await ctx.db.insert("projects", {
-      ...args,
+      ...updates,
       pmId: actor._id,
       status: args.status || "Planning",
       requiredSkills: args.requiredSkills || [],
@@ -165,41 +177,105 @@ export const update = mutation({
   },
 });
 
-// NLP skill extraction
 export const extractSkillsFromDescription = mutation({
   args: {
     email: v.string(),
+    projectId: v.optional(v.id("projects")),
+    description: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const actor = await getActor(ctx, args.email);
+    requireRole(actor, ["pm", "hr", "admin"]);
+
+    if (!args.description || args.description.trim() === "") {
+      throw new Error("Description is required.");
+    }
+
+    const nlpServiceUrl = `${
+      process.env.NLP_API_URL || "http://localhost:8000"
+    }/extract-skills`;
+
+    try {
+      const response = await fetch(nlpServiceUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: args.projectId || undefined,
+          text: args.description,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.detail || result.error || "NLP service request failed"
+        );
+      }
+
+      const extractedSkills = result.extracted_skills || [];
+
+      // Optionally persist to project
+      if (args.projectId) {
+        await ctx.db.patch(args.projectId, {
+          nlpExtractedSkills: extractedSkills.map((s) => s.name || s),
+          updatedAt: Date.now(),
+        });
+      }
+
+      return { success: true, extractedSkills };
+    } catch (err) {
+      console.error("Skill extraction error:", err);
+      throw new Error("Failed to extract skills from description.");
+    }
+  },
+});
+
+// --- RECOMMENDATIONS ---
+export const getRecommendations = query({
+  args: {
+    email: v.string(),
     projectId: v.id("projects"),
-    description: v.optional(v.string()),
+    limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
     requireRole(actor, ["pm", "hr", "admin"]);
 
     const project = await ctx.db.get(args.projectId);
-    if (!project) throw new Error("Project not found.");
+    if (!project) throw new Error("Project not found");
 
-    const description = args.description || project.description;
-    if (!description) throw new Error("No description provided for skill extraction.");
+    const nlpServiceUrl = `${
+      process.env.NLP_API_URL || "http://localhost:8000"
+    }/recommend/users-for-project`;
 
     try {
-      // TODO: Replace with actual Python microservice call
-      const extractedSkills = [
-        "JavaScript",
-        "React",
-        "Node.js",
-        "Database Design",
-        "API Development",
-      ];
-
-      await ctx.db.patch(args.projectId, {
-        nlpExtractedSkills: extractedSkills,
-        updatedAt: Date.now(),
+      const response = await fetch(nlpServiceUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: args.projectId,
+          requiredSkills: project.requiredSkills || [],
+          limit: args.limit || 10,
+        }),
       });
 
-      return { success: true, extractedSkills };
-    } catch (error) {
-      throw new Error("Unable to extract skills. Please try again later.");
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.detail || result.error || "Recommendation service failed"
+        );
+      }
+
+      if (!Array.isArray(result.recommendations)) {
+        throw new Error("Invalid recommendation data format.");
+      }
+
+      return { success: true, users: result.recommendations };
+    } catch (err) {
+      console.error("Recommendation error:", err);
+      throw new Error("Failed to fetch recommendations.");
     }
   },
 });
@@ -228,7 +304,8 @@ export const getUtilizationReport = query({
       if (!user) continue;
 
       const weeklyHours = user.weeklyHours || 40;
-      const allocatedHours = (allocation.allocationPercentage / 100) * weeklyHours;
+      const allocatedHours =
+        (allocation.allocationPercentage / 100) * weeklyHours;
 
       totalAllocatedHours += allocatedHours;
       totalPossibleHours += weeklyHours;
@@ -339,9 +416,8 @@ export const getByOrganization = query({
           utilization: {
             totalAllocatedHours,
             teamSize,
-            activeAllocations: allocations.filter(
-              (a) => a.status === "active"
-            ).length,
+            activeAllocations: allocations.filter((a) => a.status === "active")
+              .length,
           },
         });
       }

@@ -1,99 +1,68 @@
-import { useState, useEffect, useCallback } from "react";
-import { useSession } from "next-auth/react";
-import { toast } from "react-toastify";
+// lib/hooks/useProjectDetailsData.js
+"use client";
+import { useState, useCallback } from "react";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { useTasks } from "@/lib/hooks/useTasks";
+import { toast } from "sonner";
 
 export const useProjectDetailsData = (projectId) => {
-  const { data: session } = useSession();
+  const { user } = useAuth();
 
-  const [project, setProject] = useState(null);
-  const [allocations, setAllocations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // --- Convex Queries ---
+  const project = useQuery(
+    api.projects.getById,
+    projectId ? { id: projectId } : "skip"
+  );
 
-  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
-  const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
-  const [userToRequest, setUserToRequest] = useState(null);
+  const allocations = useQuery(
+    api.allocations.getAll,
+    user?.email && projectId ? { email: user.email, projectId } : "skip"
+  );
 
+  const utilization = useQuery(
+    api.projects.getUtilizationReport,
+    user?.email && projectId ? { email: user.email, projectId } : "skip"
+  );
+
+  // --- Tasks (CRUD via useTasks) ---
+  const { tasks, handleCreateTask, handleUpdateTask, handleDeleteTask } =
+    useTasks(projectId);
+
+  // --- Local State for Recommendations & Resource Requests ---
   const [recommendedUsers, setRecommendedUsers] = useState([]);
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
   const [recommendationError, setRecommendationError] = useState(null);
   const [showRecommendations, setShowRecommendations] = useState(false);
 
-  const fetchProjectData = useCallback(async () => {
-    if (!projectId) {
-      setError("Project ID is missing.");
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const [projectResponse, allocationsResponse] = await Promise.all([
-        fetch(`/api/projects/${projectId}`),
-        fetch(`/api/allocations?projectId=${projectId}`),
-      ]);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
+  const [userToRequest, setUserToRequest] = useState(null);
 
-      if (!projectResponse.ok) {
-        const errData = await projectResponse.json().catch(() => ({}));
-        throw new Error(
-          errData.error ||
-            `Failed to fetch project: ${projectResponse.statusText} (${projectResponse.status})`
-        );
-      }
-      const projectResult = await projectResponse.json();
-      if (projectResult.success && projectResult.data) {
-        setProject(projectResult.data);
-      } else {
-        throw new Error(
-          projectResult.error || "Invalid project data received."
-        );
-      }
+  // --- Convex Mutations ---
+  const createResourceRequest = useMutation(api.resourceRequests.create);
 
-      if (!allocationsResponse.ok) {
-        const errData = await allocationsResponse.json().catch(() => ({}));
-        throw new Error(
-          errData.error ||
-            `Failed to fetch allocations: ${allocationsResponse.statusText} (${allocationsResponse.status})`
-        );
-      }
-      const allocationsResult = await allocationsResponse.json();
-      if (allocationsResult.success && Array.isArray(allocationsResult.data)) {
-        setAllocations(allocationsResult.data);
-      } else {
-        throw new Error(
-          allocationsResult.error || "Invalid allocations data received."
-        );
-      }
-    } catch (err) {
-      console.error("Error fetching project details:", err);
-      setError(err.message || "Could not load project details.");
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId]);
-
-  useEffect(() => {
-    if (projectId) {
-      fetchProjectData();
-    }
-  }, [projectId, fetchProjectData]);
-
+  // --- Handlers ---
   const handleFetchRecommendations = useCallback(async () => {
-    if (!projectId) return;
+    if (!user?.email || !projectId) return;
     setLoadingRecommendations(true);
     setRecommendationError(null);
-    setRecommendedUsers([]);
     setShowRecommendations(true);
 
     try {
-      const response = await fetch(
-        `/api/recommendations/users?projectId=${projectId}&limit=5`
-      );
+      const response = await fetch("/api/ai/get-recommendations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId, limit: 5 }),
+      });
+
       const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || "Failed to fetch recommendations.");
+      if (!response.ok || result.error) {
+        throw new Error(result.error || "Failed to fetch recommendations");
       }
-      setRecommendedUsers(result.data || []);
+
+      setRecommendedUsers(result.data || result.users || []);
     } catch (err) {
       console.error("Error fetching recommendations:", err);
       setRecommendationError(err.message);
@@ -101,7 +70,7 @@ export const useProjectDetailsData = (projectId) => {
     } finally {
       setLoadingRecommendations(false);
     }
-  }, [projectId]);
+  }, [user?.email, projectId]);
 
   const handleInitiateResourceRequest = useCallback((user) => {
     setUserToRequest(user);
@@ -115,73 +84,85 @@ export const useProjectDetailsData = (projectId) => {
   }, []);
 
   const handleSubmitResourceRequest = useCallback(
-    async (formDataFromForm) => {
-      if (!userToRequest || !project) {
-        toast.error("User or project data is missing for the request.");
+    async (formData) => {
+      if (!user?.email || !projectId || !userToRequest) {
+        toast.error("Missing data for resource request.");
         return;
       }
       setIsSubmittingRequest(true);
 
-      const payload = {
-        projectId: project._id,
-        requestedUserId: userToRequest._id,
-        requestedRole: formDataFromForm.requestedRole,
-        requestedPercentage: formDataFromForm.requestedPercentage,
-        requestedStartDate: formDataFromForm.requestedStartDate,
-        requestedEndDate: formDataFromForm.requestedEndDate,
-        pmNotes: formDataFromForm.pmNotes,
-        // requestedByPmId will be set on the backend using session
-      };
-
       try {
-        const response = await fetch("/api/resourcerequests", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+        await createResourceRequest({
+          projectId,
+          requestedUserId: userToRequest._id,
+          requestedRole: formData.requestedRole,
+          requestedPercentage: formData.requestedPercentage,
+          requestedStartDate: formData.requestedStartDate,
+          requestedEndDate: formData.requestedEndDate,
+          pmNotes: formData.pmNotes,
         });
-        const result = await response.json();
-        if (!response.ok || !result.success) {
-          throw new Error(result.error || "Failed to submit request");
-        }
+
         toast.success(
           `Request for ${userToRequest.name} submitted successfully!`
         );
         handleCloseRequestModal();
-      } catch (error) {
-        console.error("Error submitting resource request:", error);
-        toast.error(`Error: ${error.message || "Could not submit request."}`);
+      } catch (err) {
+        console.error("Error submitting resource request:", err);
+        toast.error(err.message || "Failed to submit request.");
       } finally {
         setIsSubmittingRequest(false);
       }
     },
-    [userToRequest, project, handleCloseRequestModal]
+    [
+      user?.email,
+      projectId,
+      userToRequest,
+      createResourceRequest,
+      handleCloseRequestModal,
+    ]
   );
 
+  // --- Derived State ---
+  const loading =
+    project === undefined ||
+    allocations === undefined ||
+    utilization === undefined;
+
   const canManageTeam =
-    session?.user &&
+    user &&
     project &&
-    (session.user.id === project.pmId?._id ||
-      session.user.role === "admin" ||
-      session.user.role === "hr");
+    (project.pmId === user._id || ["admin", "hr"].includes(user.role));
 
   return {
+    // Project Data
     project,
-    allocations,
+    allocations: allocations?.data || [],
+    utilization: utilization?.utilization,
     loading,
-    error,
-    isRequestModalOpen,
-    isSubmittingRequest,
-    userToRequest,
+    error: null, // Convex handles errors internally
+
+    // Tasks
+    tasks,
+    onCreateTask: handleCreateTask,
+    onUpdateTask: handleUpdateTask,
+    onDeleteTask: handleDeleteTask,
+
+    // Recommendations
     recommendedUsers,
     loadingRecommendations,
     recommendationError,
     showRecommendations,
-    session,
-    canManageTeam,
-    fetchProjectData,
     handleFetchRecommendations,
+
+    // Resource Requests
+    isRequestModalOpen,
+    isSubmittingRequest,
+    userToRequest,
     handleInitiateResourceRequest,
     handleCloseRequestModal,
     handleSubmitResourceRequest,
+
+    // Permissions
+    canManageTeam,
   };
 };

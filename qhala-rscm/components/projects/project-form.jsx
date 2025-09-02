@@ -1,184 +1,649 @@
+// components/projects/project-form.jsx
 "use client";
-
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-} from "@/components/common/Card";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  AlertCircle,
+  Briefcase,
+  ListChecks,
+  Sparkles,
+  CalendarDays,
+  ChevronDown,
+  Zap,
+  ChevronRight,
+  CheckCircle2,
+} from "lucide-react";
+import SkillSelector from "@/components/projects/SkillSelector";
 import QuickAsk from "@/components/projects/quick-ask";
-import SkillSelector from "@/components/projects/skill-selector";
-import TaskManager from "@/components/projects/task-manager";
+import { TaskManagerLocal } from "@/components/projects/task-manager";
 import { departmentEnum, projectStatusEnum } from "@/lib/projectconstants";
-import { CalendarDays, Briefcase, Building2 } from "lucide-react";
+import { getStatusBadgeVariant } from "@/components/common/CustomColors";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { formatDatePickerDate, parseDatePickerDate } from "@/lib/dateUtils";
+import { cn } from "@/lib/utils";
+import { useAI } from "@/lib/hooks/useAI";
+import { useProjects } from "@/lib/hooks/useProjects";
+import { toast } from "sonner";
 
 const ProjectForm = ({
-  formData,
-  onChange,
-  onSubmit,
-  onAnalyze,
-  nlpSuggestedSkills,
-  onQuickAskSelect,
-  onSkillsChange,
-  onTasksChange,
-  loading,
+  initialData = null,
+  isEditMode = false,
+  projectId = null,
 }) => {
+  const router = useRouter();
+  const { handleCreateProject } = useProjects();
+
+  // Form state with description persistence
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    startDate: "",
+    endDate: "",
+    status: projectStatusEnum[0],
+    department: departmentEnum.includes("Unassigned")
+      ? "Unassigned"
+      : departmentEnum[0],
+    requiredSkills: [],
+    nlpExtractedSkills: [],
+    tasks: [], // Local tasks
+  });
+
+  // AI state
+  const {
+    quickAskQuery,
+    setQuickAskQuery,
+    quickAskSuggestions,
+    quickAskLoading,
+    quickAskError,
+    showQuickAskSuggestions,
+    handleQuickAskSearch,
+    handleQuickAskClear,
+  } = useAI();
+
+  // UI state
+  const [activeTab, setActiveTab] = useState("project");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const [isProcessingDescription, setIsProcessingDescription] = useState(false);
+  const [nlpSuggestedSkills, setNlpSuggestedSkills] = useState([]);
+  const [nlpError, setNlpError] = useState(null);
+  const [descriptionProcessed, setDescriptionProcessed] = useState(false);
+
+  // Initialize form data
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        name: initialData.name || "",
+        description: initialData.description || "",
+        startDate: initialData.startDate
+          ? formatDatePickerDate(new Date(initialData.startDate))
+          : "",
+        endDate: initialData.endDate
+          ? formatDatePickerDate(new Date(initialData.endDate))
+          : "",
+        status: initialData.status || projectStatusEnum[0],
+        department: initialData.department || departmentEnum[0],
+        requiredSkills: initialData.requiredSkills || [],
+        nlpExtractedSkills: initialData.nlpExtractedSkills || [],
+        tasks: [],
+      });
+    }
+  }, [initialData]);
+
+  const inputClasses =
+    "w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary";
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleDateChange = (field, date) => {
+    setFormData((prev) => ({ ...prev, [field]: formatDatePickerDate(date) }));
+  };
+
+  const handleProcessDescription = async () => {
+    if (!formData.description.trim()) {
+      toast.error("Please enter a project description first");
+      return;
+    }
+
+    setIsProcessingDescription(true);
+    setNlpError(null);
+
+    try {
+      // Call AI service for skill extraction
+      const response = await fetch("/api/ai/extract-skills", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: formData.description }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to analyze description");
+      }
+
+      setNlpSuggestedSkills(result.data || []);
+      setDescriptionProcessed(true);
+      toast.success("Description analyzed successfully!");
+    } catch (err) {
+      setNlpError(err.message);
+      toast.error("Failed to analyze description");
+    } finally {
+      setIsProcessingDescription(false);
+    }
+  };
+
+  const handleRequiredSkillsChange = (updatedRequiredSkills) => {
+    setFormData((prev) => ({ ...prev, requiredSkills: updatedRequiredSkills }));
+  };
+
+  const handleQuickAskSkillSelected = (skill) => {
+    const newSkill = {
+      skillId: skill.id,
+      skillName: skill.name,
+      proficiencyLevel: 3,
+      isRequired: true,
+      category: skill.category,
+    };
+
+    setFormData((prev) => ({
+      ...prev,
+      requiredSkills: [...prev.requiredSkills, newSkill],
+    }));
+    toast.success(`Added ${skill.name} to required skills`);
+  };
+
+  const handleTasksChange = (updatedTasks) => {
+    setFormData((prev) => ({ ...prev, tasks: updatedTasks }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const projectData = {
+        name: formData.name,
+        description: formData.description,
+        department: formData.department,
+        status: formData.status,
+        startDate: formData.startDate
+          ? parseDatePickerDate(formData.startDate)?.getTime()
+          : null,
+        endDate: formData.endDate
+          ? parseDatePickerDate(formData.endDate)?.getTime()
+          : null,
+        requiredSkills: formData.requiredSkills,
+        nlpExtractedSkills: formData.nlpExtractedSkills,
+      };
+
+      const projectId = await handleCreateProject({
+        projectData,
+        tasks: formData.tasks,
+      });
+
+      // Redirect to project details
+      router.push(`/projects/${projectId}`);
+    } catch (err) {
+      setSubmitError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const tabs = [
+    {
+      id: "project",
+      label: "Project Details",
+      icon: Briefcase,
+      completed: formData.name && formData.description && formData.department,
+    },
+    {
+      id: "skills",
+      label: "Skills & AI",
+      icon: Sparkles,
+      completed: formData.requiredSkills.length > 0,
+    },
+    {
+      id: "tasks",
+      label: "Tasks",
+      icon: ListChecks,
+      completed: formData.tasks.length > 0,
+    },
+  ];
+
   return (
-    <Card className="animate-fade-in overflow-hidden shadow-xl">
-      <CardHeader className="bg-gradient-to-br from-primary/10 via-blue-50 to-purple-50 p-4">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-primary md:text-xl">
-          <Briefcase size={20} />
-          {formData._id ? "Edit Project" : "Create Project"}
-        </CardTitle>
-        <CardDescription>
-          {formData._id
-            ? "Update project details, required skills, and tasks."
-            : "Define your project, required skills, and initial tasks."}
-        </CardDescription>
-      </CardHeader>
-
-      <CardContent className="p-5 md:p-6">
-        <form onSubmit={onSubmit} className="space-y-6">
-          {/* Project Overview */}
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="max-w-6xl mx-auto space-y-6 p-6">
+      {/* Header */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex justify-between items-start">
             <div>
-              <label className="text-sm font-medium">Project Name*</label>
-              <Input
-                name="name"
-                value={formData.name}
-                onChange={onChange}
-                required
-              />
+              <h1 className="text-2xl font-bold">
+                {isEditMode ? "Edit Project" : "Create New Project"}
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                {isEditMode
+                  ? "Update project details and requirements"
+                  : "Set up your project with AI-powered insights"}
+              </p>
             </div>
-            <div>
-              <label className="text-sm font-medium flex items-center gap-1">
-                <Building2 size={14} /> Department*
-              </label>
-              <select
-                name="department"
-                value={formData.department}
-                onChange={onChange}
-                className="w-full rounded-md border p-2"
-              >
-                {departmentEnum.map((dept) => (
-                  <option key={dept} value={dept}>
-                    {dept}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Status*</label>
-              <select
-                name="status"
-                value={formData.status}
-                onChange={onChange}
-                className="w-full rounded-md border p-2"
-              >
-                {projectStatusEnum.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="text-sm font-medium flex items-center gap-1">
-                <CalendarDays size={14} /> Start Date
-              </label>
-              <Input
-                type="date"
-                name="startDate"
-                value={formData.startDate}
-                onChange={onChange}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium flex items-center gap-1">
-                <CalendarDays size={14} /> End Date
-              </label>
-              <Input
-                type="date"
-                name="endDate"
-                value={formData.endDate}
-                onChange={onChange}
-              />
-            </div>
-          </section>
-
-          {/* Description + AI Analysis */}
-          <section>
-            <label className="text-sm font-medium">Description*</label>
-            <Textarea
-              name="description"
-              value={formData.description}
-              onChange={onChange}
-              required
-              rows={3}
-            />
             <Button
-              type="button"
               variant="outline"
-              onClick={onAnalyze}
-              className="mt-2"
+              onClick={() => router.push("/projects")}
+              disabled={isSubmitting}
             >
-              Analyze with AI
-            </Button>
-            {nlpSuggestedSkills?.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2">
-                {nlpSuggestedSkills.map((s, idx) => (
-                  <span
-                    key={idx}
-                    className="px-2 py-1 text-xs rounded bg-primary/10 text-primary"
-                  >
-                    {s.name}
-                  </span>
-                ))}
-              </div>
-            )}
-          </section>
-
-          {/* Quick Ask */}
-          <section>
-            <h3 className="text-sm font-semibold mb-2">
-              Quick Ask (AI Skill Suggestion)
-            </h3>
-            <QuickAsk onSkillSelected={onQuickAskSelect} />
-          </section>
-
-          {/* Required Skills */}
-          <section>
-            <h3 className="text-sm font-semibold mb-2">Required Skills*</h3>
-            <SkillSelector
-              initialSelectedSkills={formData.requiredSkills}
-              nlpSuggestedSkills={nlpSuggestedSkills}
-              onChange={onSkillsChange}
-            />
-          </section>
-
-          {/* Initial Tasks */}
-          <section>
-            <h3 className="text-sm font-semibold mb-2">Initial Tasks</h3>
-            <TaskManager
-              tasks={formData.tasks}
-              onTasksChange={onTasksChange}
-              canEdit
-            />
-          </section>
-
-          {/* Actions */}
-          <div className="flex justify-end gap-2">
-            <Button type="submit" disabled={loading} isLoading={loading}>
-              {formData._id ? "Save Changes" : "Create Project"}
+              Cancel
             </Button>
           </div>
-        </form>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {/* Tab Navigation */}
+      <Card>
+        <CardContent className="p-0">
+          <div className="flex border-b">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "flex items-center gap-2 px-6 py-4 border-b-2 transition-colors",
+                  activeTab === tab.id
+                    ? "border-primary text-primary bg-primary/5"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <tab.icon size={16} />
+                <span className="font-medium">{tab.label}</span>
+                {tab.completed && (
+                  <CheckCircle2 size={14} className="text-emerald-500" />
+                )}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Error Display */}
+        {submitError && (
+          <Card className="border-destructive/20 bg-destructive/5">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <AlertCircle size={16} className="text-destructive" />
+                <div>
+                  <h4 className="font-medium text-destructive">
+                    Error occurred
+                  </h4>
+                  <p className="text-sm text-destructive/80">{submitError}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Project Details Tab */}
+        {activeTab === "project" && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Briefcase size={18} />
+                Project Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Project Name */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Project Name*</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  placeholder="E.g., Q4 Marketing Campaign"
+                  className={inputClasses}
+                />
+              </div>
+
+              {/* Department and Status */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Department*</label>
+                  <div className="relative">
+                    <select
+                      name="department"
+                      value={formData.department}
+                      onChange={handleChange}
+                      required
+                      className={cn(inputClasses, "appearance-none pr-8")}
+                    >
+                      {departmentEnum.map((dept) => (
+                        <option key={dept} value={dept}>
+                          {dept}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      size={16}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Status*</label>
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <select
+                        name="status"
+                        value={formData.status}
+                        onChange={handleChange}
+                        required
+                        className={cn(inputClasses, "appearance-none pr-8")}
+                      >
+                        {projectStatusEnum.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={16}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none"
+                      />
+                    </div>
+                    <Badge
+                      variant={getStatusBadgeVariant(formData.status)}
+                      className="w-fit"
+                    >
+                      {formData.status}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dates */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Start Date</label>
+                  <div className="relative">
+                    <DatePicker
+                      selected={parseDatePickerDate(formData.startDate)}
+                      onChange={(date) => handleDateChange("startDate", date)}
+                      dateFormat="yyyy-MM-dd"
+                      placeholderText="Select start date"
+                      className={inputClasses}
+                      isClearable
+                    />
+                    <CalendarDays
+                      size={16}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">End Date</label>
+                  <div className="relative">
+                    <DatePicker
+                      selected={parseDatePickerDate(formData.endDate)}
+                      onChange={(date) => handleDateChange("endDate", date)}
+                      dateFormat="yyyy-MM-dd"
+                      placeholderText="Select end date"
+                      className={inputClasses}
+                      isClearable
+                      minDate={parseDatePickerDate(formData.startDate)}
+                    />
+                    <CalendarDays
+                      size={16}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Project Description*
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  required
+                  placeholder="Describe your project scope, objectives, and key deliverables..."
+                  rows={4}
+                  className={cn(inputClasses, "resize-none")}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Detailed descriptions help AI provide better skill
+                  recommendations
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Skills & AI Tab */}
+        {activeTab === "skills" && (
+          <div className="space-y-6">
+            {/* Show Current Description */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles size={18} />
+                  Smart Description Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Show the description being analyzed */}
+                <div className="p-4 bg-muted/50 rounded-lg border">
+                  <h4 className="font-medium mb-2 text-sm">
+                    Current Description:
+                  </h4>
+                  <p className="text-sm text-muted-foreground italic">
+                    {formData.description ||
+                      "No description provided yet. Go back to Project Details to add one."}
+                  </p>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleProcessDescription}
+                  disabled={
+                    isProcessingDescription || !formData.description.trim()
+                  }
+                  className="w-full gap-2 border-dashed"
+                >
+                  {isProcessingDescription && (
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  )}
+                  <Sparkles size={16} />
+                  {descriptionProcessed && nlpSuggestedSkills.length > 0
+                    ? "Re-analyze Description"
+                    : "Analyze Description for Skills"}
+                </Button>
+
+                {nlpError && (
+                  <Card className="border-destructive/20 bg-destructive/5">
+                    <CardContent className="p-3">
+                      <p className="text-sm text-destructive flex items-center gap-2">
+                        <AlertCircle size={14} />
+                        {nlpError}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {descriptionProcessed && nlpSuggestedSkills.length > 0 && (
+                  <Card className="border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/20">
+                    <CardContent className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
+                        <Sparkles size={14} />
+                        AI-Detected Skills
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {nlpSuggestedSkills.map((skill) => (
+                          <Badge
+                            key={skill.id}
+                            variant="outline"
+                            className="bg-background border-emerald-200 text-emerald-700 dark:border-emerald-700 dark:text-emerald-300 cursor-pointer hover:bg-emerald-50"
+                            onClick={() => handleQuickAskSkillSelected(skill)}
+                          >
+                            {skill.name}
+                            <span className="ml-1 text-xs">+</span>
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Quick Ask - Made smaller and less prominent */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Zap size={16} />
+                  Quick Skill Discovery
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <QuickAsk
+                  query={quickAskQuery}
+                  onQueryChange={setQuickAskQuery}
+                  onSearch={handleQuickAskSearch}
+                  onClear={handleQuickAskClear}
+                  suggestions={quickAskSuggestions}
+                  loading={quickAskLoading}
+                  error={quickAskError}
+                  showSuggestions={showQuickAskSuggestions}
+                  onSkillSelected={handleQuickAskSkillSelected}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Skill Selector */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ListChecks size={18} />
+                  Define Required Skills*
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <SkillSelector
+                  initialSelectedSkills={formData.requiredSkills}
+                  nlpSuggestedSkills={nlpSuggestedSkills}
+                  onChange={handleRequiredSkillsChange}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Tasks Tab */}
+        {activeTab === "tasks" && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ListChecks size={18} />
+                Task Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TaskManagerLocal
+                initialTasks={formData.tasks}
+                onTasksChange={handleTasksChange}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Footer Actions */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                {activeTab !== "project" && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() =>
+                      setActiveTab(
+                        activeTab === "skills" ? "project" : "skills"
+                      )
+                    }
+                  >
+                    <ChevronRight size={16} className="mr-1 rotate-180" />
+                    Back
+                  </Button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3">
+                {/* Progress */}
+                <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>
+                    Step {tabs.findIndex((t) => t.id === activeTab) + 1} of{" "}
+                    {tabs.length}
+                  </span>
+                  <div className="flex gap-1">
+                    {tabs.map((tab, index) => (
+                      <div
+                        key={tab.id}
+                        className={cn(
+                          "w-2 h-2 rounded-full",
+                          index <= tabs.findIndex((t) => t.id === activeTab)
+                            ? "bg-primary"
+                            : "bg-muted"
+                        )}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {activeTab !== "tasks" ? (
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      setActiveTab(activeTab === "project" ? "skills" : "tasks")
+                    }
+                  >
+                    Continue
+                    <ChevronRight size={16} className="ml-1" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting || isProcessingDescription}
+                  >
+                    {isSubmitting && (
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    )}
+                    {isEditMode ? "Save Changes" : "Create Project"}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </form>
+    </div>
   );
 };
 
