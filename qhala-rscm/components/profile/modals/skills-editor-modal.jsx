@@ -91,7 +91,6 @@ export function CurrentSkillsModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogOverlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
-      {/* 👇 only change: max-w-7xl → max-w-4xl */}
       <DialogContent
         size="4xl"
         className="max-w-6xl w-full max-h-[90vh] overflow-y-auto rounded-lg bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 shadow-2xl border border-neutral-200 dark:border-neutral-800 p-6"
@@ -292,7 +291,6 @@ export function DesiredSkillsModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogOverlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
-      {/* 👇 only change: max-w-4xl */}
       <DialogContent
         size="4xl"
         className=" w-full max-h-[90vh] overflow-y-auto rounded-lg bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 shadow-2xl border border-neutral-200 dark:border-neutral-800 p-6"

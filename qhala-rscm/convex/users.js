@@ -7,7 +7,6 @@ function requireRole(user, allowed) {
   }
 }
 
-
 async function getActor(ctx, email) {
   if (!email) throw new Error("Unauthorized: missing email");
   const actor = await ctx.db
@@ -17,10 +16,10 @@ async function getActor(ctx, email) {
   if (!actor) throw new Error("User not found");
   return actor;
 }
-
+// GET /api/users
 export const getAll = query({
   args: {
-    email: v.string(), 
+    email: v.string(),
     search: v.optional(v.string()),
     skillName: v.optional(v.string()),
     countOnly: v.optional(v.boolean()),
@@ -69,6 +68,7 @@ export const getAll = query({
   },
 });
 
+// GET /api/users/[id]
 export const getById = query({
   args: { id: v.id("users") },
   handler: async (ctx, args) => {
@@ -76,15 +76,20 @@ export const getById = query({
   },
 });
 
+// POST /api/users
 export const create = mutation({
   args: {
-    email: v.string(), 
+    email: v.string(),
     name: v.string(),
     newUserEmail: v.string(),
     role: v.string(),
     department: v.optional(v.string()),
     availabilityStatus: v.optional(
-      v.union(v.literal("available"), v.literal("unavailable"), v.literal("on_leave"))
+      v.union(
+        v.literal("available"),
+        v.literal("unavailable"),
+        v.literal("on_leave")
+      )
     ),
     skills: v.optional(v.array(v.id("skills"))),
   },
@@ -126,7 +131,7 @@ export const create = mutation({
     return userId;
   },
 });
-
+// UPDATE /api/users/[id]
 export const updateProfile = mutation({
   args: {
     email: v.string(),
@@ -134,9 +139,13 @@ export const updateProfile = mutation({
     role: v.optional(v.string()),
     department: v.optional(v.string()),
     availabilityStatus: v.optional(
-      v.union(v.literal("available"), v.literal("unavailable"), v.literal("on_leave"))
+      v.union(
+        v.literal("available"),
+        v.literal("unavailable"),
+        v.literal("on_leave")
+      )
     ),
-      employeeType: v.optional(
+    employeeType: v.optional(
       v.union(
         v.literal("permanent"),
         v.literal("consultancy"),
@@ -158,14 +167,16 @@ export const updateProfile = mutation({
     return { success: true };
   },
 });
-
+// GET /api/users/[userId]/allocations/summary
 export const getAllocationSummary = query({
   args: { email: v.string(), userId: v.id("users") },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
 
     if (actor._id !== args.userId && !["admin", "hr"].includes(actor.role)) {
-      throw new Error("You don’t have permission to view this user’s allocations.");
+      throw new Error(
+        "You don’t have permission to view this user’s allocations."
+      );
     }
 
     const user = await ctx.db.get(args.userId);
@@ -181,8 +192,7 @@ export const getAllocationSummary = query({
 
     const active = allocations.filter(
       (a) =>
-        (!a.startDate || a.startDate <= now) &&
-        (!a.endDate || a.endDate >= now)
+        (!a.startDate || a.startDate <= now) && (!a.endDate || a.endDate >= now)
     );
 
     let totalAllocatedHours = 0;
@@ -205,7 +215,7 @@ export const getAllocationSummary = query({
     };
   },
 });
-
+// PATCH /api/users/[id]/status
 export const updateStatus = mutation({
   args: {
     email: v.string(),
@@ -222,7 +232,9 @@ export const updateStatus = mutation({
     const isSelf = actor._id === args.id;
     const canEditOthers = ["admin", "hr", "line_manager"].includes(actor.role);
     if (!isSelf && !canEditOthers) {
-      throw new Error("You don’t have permission to update this user’s status.");
+      throw new Error(
+        "You don’t have permission to update this user’s status."
+      );
     }
 
     await ctx.db.patch(args.id, {
@@ -232,7 +244,7 @@ export const updateStatus = mutation({
     return { success: true, message: "Status updated successfully." };
   },
 });
-
+// Self-Onboarding
 export const selfOnboard = mutation({
   args: {
     name: v.string(),
@@ -274,9 +286,13 @@ export const selfOnboard = mutation({
     });
   },
 });
-
+// Assign Line Manager
 export const assignLineManager = mutation({
-  args: { email: v.string(), userId: v.id("users"), lineManagerId: v.id("users") },
+  args: {
+    email: v.string(),
+    userId: v.id("users"),
+    lineManagerId: v.id("users"),
+  },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
     requireRole(actor, ["admin", "hr"]);
@@ -296,7 +312,7 @@ export const assignLineManager = mutation({
     return { success: true, message: "Line manager assigned successfully." };
   },
 });
-
+// Auth Integration
 export const getUserByEmail = query({
   args: { email: v.string() },
   handler: async (ctx, args) => {
@@ -306,7 +322,7 @@ export const getUserByEmail = query({
       .first();
   },
 });
-
+// Create User from Auth
 export const createUserFromAuth = mutation({
   args: {
     email: v.string(),
@@ -333,7 +349,7 @@ export const createUserFromAuth = mutation({
     });
   },
 });
-
+// Update User Auth
 export const updateUserAuth = mutation({
   args: {
     userId: v.id("users"),
@@ -351,7 +367,7 @@ export const updateUserAuth = mutation({
     return await ctx.db.patch(args.userId, updates);
   },
 });
-
+// Get Current User
 export const getCurrentUser = query({
   args: { email: v.string() },
   handler: async (ctx, args) => {

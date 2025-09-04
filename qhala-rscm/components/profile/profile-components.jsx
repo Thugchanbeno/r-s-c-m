@@ -1,5 +1,4 @@
 "use client";
-
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,13 +21,7 @@ import {
   Clock,
   Users,
 } from "lucide-react";
-
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/common/Card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -43,7 +36,6 @@ import {
 } from "@/components/ui/select";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { cn } from "@/lib/utils";
-
 import {
   getSkillLevelColor,
   getSkillLevelName,
@@ -567,7 +559,7 @@ export const WorkRequestsSection = ({ requests, isLoading }) => (
     </CardContent>
   </Card>
 );
-// LeaveBalanceCard.jsx
+
 export const LeaveBalanceCard = ({
   leaveData,
   onRequestLeave,
@@ -636,7 +628,6 @@ export const LeaveBalanceCard = ({
   </Card>
 );
 
-// OvertimeCard.jsx
 export const OvertimeCard = ({ onRequestOvertime, requests = [] }) => (
   <Card className="overflow-hidden">
     <CardHeader className="flex items-center justify-between">

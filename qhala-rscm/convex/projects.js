@@ -3,7 +3,7 @@ import { query, mutation } from "./_generated/server";
 
 function requireRole(user, allowed) {
   if (!user || !allowed.includes(user.role)) {
-    throw new Error("You don’t have permission to perform this action.");
+    throw new Error("You don't have permission to perform this action.");
   }
 }
 
@@ -247,7 +247,7 @@ export const extractSkillsFromDescription = mutation({
   },
 });
 
-// --- RECOMMENDATIONS ---
+// Recommendations
 export const getRecommendations = query({
   args: {
     email: v.string(),

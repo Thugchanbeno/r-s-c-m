@@ -86,6 +86,7 @@ export const TaskManagerLocal = ({ initialTasks = [], onTasksChange }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
+  //temporarily creates a task assigning it a temporary ID before full project creation(all CRUD on these tasks will need to account for the temporary ID)
   const handleAddTask = (task) => {
     const newTask = {
       ...task,
@@ -313,7 +314,6 @@ const TaskManagerUI = ({
   );
 };
 
-// Improved TaskCard with better design
 const TaskCard = ({
   task,
   onEdit,

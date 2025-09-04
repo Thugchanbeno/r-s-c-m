@@ -1,4 +1,4 @@
-// components/projects/ProjectList.jsx
+// components/projects/project-list.jsx
 "use client";
 import { useState } from "react";
 import Link from "next/link";
@@ -36,7 +36,6 @@ const ProjectList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
-  // ✅ Use the hook here instead of receiving props
   const { projects, loading, authUser } = useProjects(null, filters);
   const router = useRouter();
 

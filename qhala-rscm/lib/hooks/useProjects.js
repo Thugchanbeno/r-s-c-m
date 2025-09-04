@@ -9,7 +9,6 @@ import { toast } from "sonner";
 export const useProjects = (pmId = null, filters = {}) => {
   const { user } = useAuth();
 
-  // ✅ Only include pmId if it's a valid users/ ID
   const queryArgs = user?.email
     ? {
         email: user.email,
@@ -93,7 +92,7 @@ export const useProjects = (pmId = null, filters = {}) => {
     try {
       const result = await extractSkills({
         email: user.email,
-        projectId: projectId || undefined, // ✅ don’t pass null
+        projectId: projectId || undefined,
         description,
       });
       return result.extractedSkills || [];
