@@ -15,6 +15,8 @@ import {
   Zap,
   ChevronRight,
   CheckCircle2,
+  Clock,
+  Target,
 } from "lucide-react";
 import SkillSelector from "@/components/projects/SkillSelector";
 import QuickAsk from "@/components/projects/quick-ask";
@@ -49,7 +51,7 @@ const ProjectForm = ({
       : departmentEnum[0],
     requiredSkills: [],
     nlpExtractedSkills: [],
-    tasks: [], // Local tasks
+    tasks: [],
   });
 
   // AI state
@@ -72,6 +74,19 @@ const ProjectForm = ({
   const [nlpSuggestedSkills, setNlpSuggestedSkills] = useState([]);
   const [nlpError, setNlpError] = useState(null);
   const [descriptionProcessed, setDescriptionProcessed] = useState(false);
+
+  // Double-click confirmation state
+  const [createConfirmation, setCreateConfirmation] = useState(false);
+
+  // Reset confirmation after timeout
+  useEffect(() => {
+    if (createConfirmation) {
+      const timer = setTimeout(() => {
+        setCreateConfirmation(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [createConfirmation]);
 
   // Initialize form data
   useEffect(() => {
@@ -116,7 +131,6 @@ const ProjectForm = ({
     setNlpError(null);
 
     try {
-      // Call AI service for skill extraction
       const response = await fetch("/api/ai/extract-skills", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -164,8 +178,7 @@ const ProjectForm = ({
     setFormData((prev) => ({ ...prev, tasks: updatedTasks }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleCreateProjectSubmit = async () => {
     setIsSubmitting(true);
     setSubmitError(null);
 
@@ -184,19 +197,41 @@ const ProjectForm = ({
         requiredSkills: formData.requiredSkills,
         nlpExtractedSkills: formData.nlpExtractedSkills,
       };
-
-      const projectId = await handleCreateProject({
+      const tasksData = formData.tasks.map((task) => ({
+        title: task.title,
+        description: task.description || "",
+        priority: task.priority || "medium",
+        status: task.status || "todo",
+        estimatedHours: task.estimatedHours || null,
+        dueDate: task.dueDate || null,
+        // Remove any local _id fields
+      }));
+      const newProjectId = await handleCreateProject({
         projectData,
-        tasks: formData.tasks,
+        tasks: tasksData,
       });
 
-      // Redirect to project details
-      router.push(`/projects/${projectId}`);
+      toast.success("Project created successfully!");
+      router.push(`/projects/${newProjectId}`);
     } catch (err) {
+      console.error("Project creation error:", err);
       setSubmitError(err.message);
+      toast.error("Failed to create project: " + err.message);
     } finally {
       setIsSubmitting(false);
+      setCreateConfirmation(false);
     }
+  };
+
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
+
+    if (!createConfirmation) {
+      setCreateConfirmation(true);
+      return;
+    }
+
+    await handleCreateProjectSubmit();
   };
 
   const tabs = [
@@ -205,27 +240,34 @@ const ProjectForm = ({
       label: "Project Details",
       icon: Briefcase,
       completed: formData.name && formData.description && formData.department,
+      description: "Basic project information",
     },
     {
       id: "skills",
       label: "Skills & AI",
       icon: Sparkles,
       completed: formData.requiredSkills.length > 0,
+      description: "Define required skills",
     },
     {
       id: "tasks",
       label: "Tasks",
       icon: ListChecks,
-      completed: formData.tasks.length > 0,
+      completed: formData.tasks && formData.tasks.length > 0,
+      description: "Add project tasks",
     },
   ];
 
+  const currentTabIndex = tabs.findIndex((t) => t.id === activeTab);
+  const completedTabs = tabs.filter((tab) => tab.completed).length;
+  const progressPercentage = Math.round((completedTabs / tabs.length) * 100);
+
   return (
     <div className="max-w-6xl mx-auto space-y-6 p-6">
-      {/* Header */}
+      {/* Header with Progress */}
       <Card>
         <CardContent className="p-6">
-          <div className="flex justify-between items-start">
+          <div className="flex justify-between items-start mb-6">
             <div>
               <h1 className="text-2xl font-bold">
                 {isEditMode ? "Edit Project" : "Create New Project"}
@@ -244,6 +286,26 @@ const ProjectForm = ({
               Cancel
             </Button>
           </div>
+
+          {/* Progress Indicator */}
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium">Overall Progress</span>
+              <span className="text-sm text-muted-foreground">
+                {completedTabs} of {tabs.length} sections completed
+              </span>
+            </div>
+            <div className="w-full bg-muted rounded-full h-2">
+              <div
+                className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Getting Started</span>
+              <span>Ready to Create</span>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -251,22 +313,37 @@ const ProjectForm = ({
       <Card>
         <CardContent className="p-0">
           <div className="flex border-b">
-            {tabs.map((tab) => (
+            {tabs.map((tab, index) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "flex items-center gap-2 px-6 py-4 border-b-2 transition-colors",
+                  "flex-1 flex flex-col items-center gap-2 px-6 py-4 border-b-2 transition-all duration-200",
                   activeTab === tab.id
                     ? "border-primary text-primary bg-primary/5"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
-                <tab.icon size={16} />
-                <span className="font-medium">{tab.label}</span>
-                {tab.completed && (
-                  <CheckCircle2 size={14} className="text-emerald-500" />
-                )}
+                <div className="flex items-center gap-2">
+                  <div
+                    className={cn(
+                      "p-1.5 rounded-full transition-colors",
+                      tab.completed
+                        ? "bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400"
+                        : activeTab === tab.id
+                          ? "bg-primary/10 text-primary"
+                          : "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    {tab.completed ? (
+                      <CheckCircle2 size={16} />
+                    ) : (
+                      <tab.icon size={16} />
+                    )}
+                  </div>
+                  <span className="font-medium">{tab.label}</span>
+                </div>
+                <span className="text-xs text-center">{tab.description}</span>
               </button>
             ))}
           </div>
@@ -304,7 +381,7 @@ const ProjectForm = ({
             <CardContent className="space-y-4">
               {/* Project Name */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Project Name*</label>
+                <label className="text-sm font-medium">Project Name</label>
                 <input
                   type="text"
                   name="name"
@@ -319,10 +396,10 @@ const ProjectForm = ({
               {/* Department and Status */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Department*</label>
+                  <label className="text-sm font-medium">Department</label>
                   <div className="relative">
                     <select
-                      name="department"
+                      name="Department"
                       value={formData.department}
                       onChange={handleChange}
                       required
@@ -346,7 +423,7 @@ const ProjectForm = ({
                   <div className="space-y-2">
                     <div className="relative">
                       <select
-                        name="status"
+                        name="Status"
                         value={formData.status}
                         onChange={handleChange}
                         required
@@ -381,7 +458,7 @@ const ProjectForm = ({
                     <DatePicker
                       selected={parseDatePickerDate(formData.startDate)}
                       onChange={(date) => handleDateChange("startDate", date)}
-                      dateFormat="yyyy-MM-dd"
+                      dateFormat="YYYY-MM-DD"
                       placeholderText="Select start date"
                       className={inputClasses}
                       isClearable
@@ -399,7 +476,7 @@ const ProjectForm = ({
                     <DatePicker
                       selected={parseDatePickerDate(formData.endDate)}
                       onChange={(date) => handleDateChange("endDate", date)}
-                      dateFormat="yyyy-MM-dd"
+                      dateFormat="YYYY-MM-DD"
                       placeholderText="Select end date"
                       className={inputClasses}
                       isClearable
@@ -419,7 +496,7 @@ const ProjectForm = ({
                   Project Description*
                 </label>
                 <textarea
-                  name="description"
+                  name="Description"
                   value={formData.description}
                   onChange={handleChange}
                   required
@@ -514,7 +591,7 @@ const ProjectForm = ({
               </CardContent>
             </Card>
 
-            {/* Quick Ask - Made smaller and less prominent */}
+            {/* Quick Ask */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -541,7 +618,7 @@ const ProjectForm = ({
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <ListChecks size={18} />
+                  <Target size={18} />
                   Define Required Skills*
                 </CardTitle>
               </CardHeader>
@@ -563,11 +640,14 @@ const ProjectForm = ({
               <CardTitle className="flex items-center gap-2">
                 <ListChecks size={18} />
                 Task Management
+                <Badge variant="secondary">
+                  {formData.tasks?.length || 0} tasks
+                </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <TaskManagerLocal
-                initialTasks={formData.tasks}
+                initialTasks={formData.tasks || []}
                 onTasksChange={handleTasksChange}
               />
             </CardContent>
@@ -583,11 +663,11 @@ const ProjectForm = ({
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() =>
-                      setActiveTab(
-                        activeTab === "skills" ? "project" : "skills"
-                      )
-                    }
+                    onClick={() => {
+                      const prevTabIndex = Math.max(0, currentTabIndex - 1);
+                      setActiveTab(tabs[prevTabIndex].id);
+                    }}
+                    disabled={isSubmitting}
                   >
                     <ChevronRight size={16} className="mr-1 rotate-180" />
                     Back
@@ -595,48 +675,84 @@ const ProjectForm = ({
                 )}
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 {/* Progress */}
-                <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="hidden sm:flex items-center gap-3 text-sm text-muted-foreground">
                   <span>
-                    Step {tabs.findIndex((t) => t.id === activeTab) + 1} of{" "}
-                    {tabs.length}
+                    Step {currentTabIndex + 1} of {tabs.length}
                   </span>
                   <div className="flex gap-1">
                     {tabs.map((tab, index) => (
                       <div
                         key={tab.id}
                         className={cn(
-                          "w-2 h-2 rounded-full",
-                          index <= tabs.findIndex((t) => t.id === activeTab)
-                            ? "bg-primary"
-                            : "bg-muted"
+                          "w-2 h-2 rounded-full transition-all duration-200",
+                          index < currentTabIndex
+                            ? "bg-green-500"
+                            : index === currentTabIndex
+                              ? "bg-primary"
+                              : "bg-muted"
                         )}
                       />
                     ))}
                   </div>
+                  <span className="text-xs">
+                    {progressPercentage}% complete
+                  </span>
                 </div>
 
+                {/* Action Buttons */}
                 {activeTab !== "tasks" ? (
                   <Button
                     type="button"
-                    onClick={() =>
-                      setActiveTab(activeTab === "project" ? "skills" : "tasks")
-                    }
+                    onClick={() => {
+                      const nextTabIndex = Math.min(
+                        tabs.length - 1,
+                        currentTabIndex + 1
+                      );
+                      setActiveTab(tabs[nextTabIndex].id);
+                    }}
+                    disabled={isSubmitting}
                   >
                     Continue
                     <ChevronRight size={16} className="ml-1" />
                   </Button>
                 ) : (
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting || isProcessingDescription}
-                  >
-                    {isSubmitting && (
-                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  <div className="flex items-center gap-3">
+                    {/* Confirmation Status */}
+                    {createConfirmation && (
+                      <div className="flex items-center gap-2 text-sm animate-pulse">
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                        <span className="text-green-500 dark:text-green-400">
+                          Click again to confirm creation
+                        </span>
+                        <Clock size={12} className="text-green-500" />
+                      </div>
                     )}
-                    {isEditMode ? "Save Changes" : "Create Project"}
-                  </Button>
+
+                    <Button
+                      type="button"
+                      onClick={handleSubmit}
+                      disabled={isSubmitting || isProcessingDescription}
+                      className={cn(
+                        "transition-all duration-300 min-w-[140px]",
+                        createConfirmation &&
+                          "bg-green-500 hover:bg-green-600 scale-105 shadow-lg"
+                      )}
+                    >
+                      {isSubmitting && (
+                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      )}
+                      {createConfirmation ? (
+                        <>
+                          <CheckCircle2 size={16} className="mr-2" />
+                          Confirm Creation
+                        </>
+                      ) : (
+                        <>{isEditMode ? "Save Changes" : "Create Project"}</>
+                      )}
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>

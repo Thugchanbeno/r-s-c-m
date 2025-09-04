@@ -199,6 +199,8 @@ export const update = mutation({
         v.literal("cancelled")
       )
     ),
+    dueDate: v.optional(v.number()),
+    estimatedHours: v.optional(v.number()),
     priority: v.optional(
       v.union(
         v.literal("low"),
@@ -211,7 +213,7 @@ export const update = mutation({
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { email, id, ...updates } = args; // ✅ strip email
+    const { email, id, dueDate, ...updates } = args; // ✅ strip email
     const actor = await getActor(ctx, email);
 
     const task = await ctx.db.get(id);
