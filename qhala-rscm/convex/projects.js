@@ -18,11 +18,20 @@ async function getActor(ctx, email) {
 }
 
 // GET /api/projects
-// convex/projects.js - Update the getAll function
 export const getAll = query({
   args: {
     email: v.string(),
-    pmId: v.optional(v.id("users")), // ✅ Make pmId optional
+    pmId: v.optional(v.id("users")),
+    department: v.optional(v.string()),
+    status: v.optional(
+      v.union(
+        v.literal("Planning"),
+        v.literal("Active"),
+        v.literal("On Hold"),
+        v.literal("Completed"),
+        v.literal("Cancelled")
+      )
+    ),
     countOnly: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
@@ -30,7 +39,6 @@ export const getAll = query({
 
     let projects = [];
     if (args.pmId) {
-      // Only check permissions if pmId is provided
       if (
         actor._id !== args.pmId &&
         !["admin", "hr", "pm"].includes(actor.role)
@@ -44,12 +52,20 @@ export const getAll = query({
         .withIndex("by_pm", (q) => q.eq("pmId", args.pmId))
         .collect();
     } else {
-      // Show all projects if user has permission
       requireRole(actor, ["admin", "hr", "pm"]);
       projects = await ctx.db.query("projects").collect();
     }
+    if (args.department) {
+      projects = projects.filter(
+        (p) => p.department === args.department && p.department !== "Unassigned"
+      );
+    }
+    if (args.status) {
+      projects = projects.filter((p) => p.status === args.status);
+    }
 
     if (args.countOnly) return { count: projects.length };
+
     return projects.sort((a, b) => a.name.localeCompare(b.name));
   },
 });
