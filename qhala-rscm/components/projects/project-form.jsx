@@ -18,7 +18,7 @@ import {
   Clock,
   Target,
 } from "lucide-react";
-import SkillSelector from "@/components/projects/SkillSelector";
+import SkillSelector from "@/components/projects/skill-selector";
 import QuickAsk from "@/components/projects/quick-ask";
 import { TaskManagerLocal } from "@/components/projects/task-manager";
 import { departmentEnum, projectStatusEnum } from "@/lib/projectconstants";

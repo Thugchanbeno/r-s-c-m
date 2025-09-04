@@ -108,10 +108,8 @@ export const useProfile = () => {
       }
 
       try {
-        // Step 1: Generate upload URL
         const uploadUrl = await generateUploadUrl({ email: authUser.email });
 
-        // Step 2: Upload file to Convex storage
         const response = await fetch(uploadUrl, {
           method: "POST",
           headers: { "Content-Type": file.type },
@@ -126,13 +124,11 @@ export const useProfile = () => {
 
         const { storageId } = await response.json();
 
-        // Step 3: Find or create userSkill record
         let userSkillId;
         const existing = userSkills?.find((us) => us.skillId === skillId);
         if (existing) {
           userSkillId = existing._id;
         } else {
-          // Create a new userSkill entry if it doesn’t exist yet
           userSkillId = await createUserSkill({
             email: authUser.email,
             skillId,
@@ -142,10 +138,9 @@ export const useProfile = () => {
           });
         }
 
-        // Step 4: Save proof document reference
         await uploadProofDocument({
           email: authUser.email,
-          userSkillId, // ✅ now a userSkillId
+          userSkillId,
           fileName: file.name,
           proofType,
           documentStorageId: storageId,
@@ -168,13 +163,8 @@ export const useProfile = () => {
       }
 
       try {
-        console.log("Starting CV upload:", file.name);
-
-        // Generate upload URL
         const uploadUrl = await generateUploadUrl({ email: authUser.email });
-        console.log("Got upload URL for CV:", uploadUrl);
 
-        // Upload CV file to Convex storage
         const response = await fetch(uploadUrl, {
           method: "POST",
           headers: { "Content-Type": file.type },
@@ -188,24 +178,16 @@ export const useProfile = () => {
         }
 
         const result = await response.json();
-        console.log("CV upload result:", result);
 
         if (!result.storageId) {
           throw new Error("No storage ID returned from upload");
         }
-
-        // Just log the storage ID for now - NLP processing will be added later
-        console.log(
-          "CV uploaded successfully with storageId:",
-          result.storageId
-        );
-
         toast.success("CV uploaded successfully!", {
           description:
             "You can now add skills manually while we process your CV.",
         });
 
-        return true; // Return success status
+        return true;
       } catch (err) {
         console.error("CV upload error:", err);
         toast.error("CV upload failed", {
@@ -222,7 +204,6 @@ export const useProfile = () => {
       if (!authUser?.email) return;
 
       try {
-        // Find or create userSkill
         let userSkillId;
         const existing = userSkills?.find((us) => us.skillId === skillId);
         if (existing) {
@@ -236,11 +217,9 @@ export const useProfile = () => {
             proficiency: 1,
           });
         }
-
-        // Save proof as link
         await uploadProofDocument({
           email: authUser.email,
-          userSkillId, // ✅ correct ID
+          userSkillId,
           fileName: url,
           proofType: "link",
           url,
@@ -253,7 +232,7 @@ export const useProfile = () => {
     },
     [uploadProofDocument, createUserSkill, userSkills, authUser?.email]
   );
-  // Other handlers
+
   const handleSaveProfile = useCallback(
     async (profileData) => {
       if (!authUser?.email) return;

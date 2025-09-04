@@ -18,7 +18,7 @@ import {
   CalendarDays,
   ChevronDown,
 } from "lucide-react";
-import SkillSelector from "@/components/projects/SkillSelector";
+import SkillSelector from "@/components/projects/skill-selector";
 import { departmentEnum, projectStatusEnum } from "@/lib/projectconstants";
 import { useProjectFormData } from "@/lib/hooks/useProjectFormData";
 import { getStatusBadgeVariant } from "@/components/common/CustomColors";

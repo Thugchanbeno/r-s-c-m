@@ -34,7 +34,7 @@ export const useTasks = (projectId = null, filters = {}) => {
   const handleCreateTask = async (data) => {
     if (!user?.email) return;
     try {
-      await createTask({ email: user.email, ...data }); // ✅ email only for actor lookup
+      await createTask({ email: user.email, ...data });
       toast.success("Task created successfully!");
     } catch (err) {
       console.error("Task creation error:", err);
@@ -45,7 +45,7 @@ export const useTasks = (projectId = null, filters = {}) => {
   const handleUpdateTask = async (id, updates) => {
     if (!user?.email) return;
     try {
-      await updateTask({ email: user.email, id, ...updates }); // ✅ email only for actor lookup
+      await updateTask({ email: user.email, id, ...updates });
       toast.success("Task updated successfully!");
     } catch (err) {
       console.error("Task update error:", err);
@@ -56,7 +56,7 @@ export const useTasks = (projectId = null, filters = {}) => {
   const handleDeleteTask = async (id) => {
     if (!user?.email) return;
     try {
-      await deleteTask({ email: user.email, id }); // ✅ email only for actor lookup
+      await deleteTask({ email: user.email, id });
       toast.success("Task deleted successfully!");
     } catch (err) {
       console.error("Task delete error:", err);

@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import {
   Dialog,
@@ -82,9 +81,7 @@ export default function EmployeeDetailsModal({
               type="date"
               value={
                 form.contractStartDate
-                  ? new Date(form.contractStartDate)
-                      .toISOString()
-                      .split("T")[0]
+                  ? new Date(form.contractStartDate).toISOString().split("T")[0]
                   : ""
               }
               onChange={(e) =>

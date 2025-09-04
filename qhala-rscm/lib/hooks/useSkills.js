@@ -5,7 +5,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/hooks/useAuth";
 
-// --- Helper for chart processing ---
+// Helper for chart processing (part of the analytics page)
 const processSkillDataForChart = (rawData, selectedCategory) => {
   if (!rawData || !Array.isArray(rawData)) {
     return { labels: [], datasets: [], categories: ["All"], aggregated: false };
@@ -85,35 +85,28 @@ const processSkillDataForChart = (rawData, selectedCategory) => {
   };
 };
 
-// --- Main Hook ---
 export const useSkills = (
   initialSelectedSkills = [],
   nlpSuggestedSkills = [],
   onChange
 ) => {
   const { user } = useAuth();
-
-  // --- Local state (matching original patterns) ---
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSkillsMap, setSelectedSkillsMap] = useState(new Map());
   const [expandedCategories, setExpandedCategories] = useState({});
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // --- Convex queries (fixed parameters) ---
-  // Fix: Don't pass email to getAll, it doesn't expect it
   const allSkills = useQuery(api.skills.getAll, {});
 
-  // Only call distribution if user is authenticated
   const skillDistribution = useQuery(
     api.skills.getDistribution,
     user?.email ? { email: user.email } : "skip"
   );
 
-  // --- Derived loading states ---
   const loadingSkills = allSkills === undefined;
   const loadingDistribution = skillDistribution === undefined;
 
-  // --- Initialize selected skills (matching original pattern) ---
+  // Initialize selected skills
   useEffect(() => {
     const newMap = new Map();
     initialSelectedSkills.forEach((skill) => {
@@ -129,7 +122,7 @@ export const useSkills = (
     setSelectedSkillsMap(newMap);
   }, [initialSelectedSkills]);
 
-  // --- Initialize expanded categories when skills load ---
+  // Initialize expanded categories when skills load
   useEffect(() => {
     if (allSkills && Array.isArray(allSkills)) {
       const initialExpanded = allSkills.reduce((acc, skill) => {
@@ -141,7 +134,7 @@ export const useSkills = (
     }
   }, [allSkills]);
 
-  // --- Selection handlers (matching original) ---
+  //  Selection handlers
   const handleToggleSkill = useCallback(
     (skillFromApi) => {
       const newMap = new Map(selectedSkillsMap);
@@ -198,7 +191,7 @@ export const useSkills = (
     setExpandedCategories((prev) => ({ ...prev, [category]: !prev[category] }));
   }, []);
 
-  // --- Filtering (matching original) ---
+  // Filtering
   const filteredSkills = useMemo(() => {
     if (!searchTerm) return allSkills || [];
     return (allSkills || []).filter(
@@ -223,7 +216,7 @@ export const useSkills = (
     [skillsByCategory]
   );
 
-  // --- Chart data processing ---
+  // Chart data processing
   const chartData = useMemo(() => {
     if (!skillDistribution) return null;
     return processSkillDataForChart(skillDistribution, selectedCategory);
@@ -236,7 +229,7 @@ export const useSkills = (
     // Skills data
     allSkills: allSkills || [],
     loadingSkills,
-    errorSkills: null, // Convex handles errors automatically
+    errorSkills: null,
 
     // Skill selector functionality
     searchTerm,
@@ -261,7 +254,6 @@ export const useSkills = (
   };
 };
 
-// --- Backward compatibility exports ---
 export const useSkillSelector = (
   initialSelectedSkills = [],
   nlpSuggestedSkills = [],

@@ -81,7 +81,7 @@ const ProjectDetail = ({
         </div>
       </div>
 
-      {/* 1. Overview Section */}
+      {/* Overview Section */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -172,7 +172,7 @@ const ProjectDetail = ({
         </CardContent>
       </Card>
 
-      {/* 2. Allocations Section */}
+      {/* Allocations Section */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -219,7 +219,7 @@ const ProjectDetail = ({
         </CardContent>
       </Card>
 
-      {/* 3. Manage Team & Recommendations Section */}
+      {/*  Manage Team & Recommendations Section */}
       {canManageTeam && (
         <Card>
           <CardHeader>
@@ -298,7 +298,7 @@ const ProjectDetail = ({
         </Card>
       )}
 
-      {/* 4. Tasks Section */}
+      {/*  Tasks Section */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
