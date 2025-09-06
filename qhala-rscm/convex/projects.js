@@ -70,6 +70,35 @@ export const getAll = query({
   },
 });
 
+// GET /api/projects/for-user
+export const getForUser = query({
+  args: { email: v.string(), userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const actor = await getActor(ctx, args.email);
+
+    // Employees can only fetch their own projects
+    if (actor._id !== args.userId && !["admin", "hr"].includes(actor.role)) {
+      throw new Error("You can only view your own projects.");
+    }
+
+    // Find allocations for this user
+    const allocations = await ctx.db
+      .query("allocations")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .collect();
+
+    const projectIds = [...new Set(allocations.map((a) => a.projectId))];
+
+    const projects = [];
+    for (const pid of projectIds) {
+      const project = await ctx.db.get(pid);
+      if (project) projects.push(project);
+    }
+
+    return projects.sort((a, b) => a.name.localeCompare(b.name));
+  },
+});
+
 // GET /api/projects/[id]
 export const getById = query({
   args: { id: v.id("projects") },
