@@ -1,6 +1,16 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 
+async function getActor(ctx, email) {
+  if (!email) throw new Error("Unauthorized: missing email");
+  const actor = await ctx.db
+    .query("users")
+    .withIndex("by_email", (ix) => ix.eq("email", email))
+    .first();
+  if (!actor) throw new Error("User not found");
+  return actor;
+}
+
 function requireRole(user, allowed) {
   if (!user || !allowed.includes(user.role)) {
     throw new Error("You don’t have permission to perform this action.");
@@ -10,23 +20,21 @@ function requireRole(user, allowed) {
 // GET requests
 export const getAll = query({
   args: {
+    email: v.string(),
     status: v.optional(v.string()),
     requestedByPmId: v.optional(v.id("users")),
     countOnly: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
+    const actor = await getActor(ctx, args.email);
 
-    const actor = await ctx.db
-      .query("users")
-      .withIndex("by_email", (ix) => ix.eq("email", identity.email))
-      .first();
-    if (!actor) throw new Error("User not found");
-
+    //  Permission check
     let canAccess = false;
     if (args.requestedByPmId) {
-      if (actor._id === args.requestedByPmId || ["admin", "hr"].includes(actor.role)) {
+      if (
+        actor._id === args.requestedByPmId ||
+        ["admin", "hr"].includes(actor.role)
+      ) {
         canAccess = true;
       }
     } else {
@@ -34,18 +42,39 @@ export const getAll = query({
     }
     if (!canAccess) throw new Error("Forbidden: Insufficient permissions.");
 
-    let q = ctx.db.query("resourceRequests");
-    if (args.status) q = q.withIndex("by_status", (ix) => ix.eq("status", args.status));
-    if (args.requestedByPmId) {
-      q = q.withIndex("by_pm", (ix) => ix.eq("requestedByPmId", args.requestedByPmId));
+    //  Query with correct index
+    let q;
+    if (args.requestedByPmId && args.status) {
+      q = ctx.db
+        .query("resourceRequests")
+        .withIndex("by_pm_status", (ix) =>
+          ix
+            .eq("requestedByPmId", args.requestedByPmId)
+            .eq("status", args.status)
+        );
+    } else if (args.requestedByPmId) {
+      q = ctx.db
+        .query("resourceRequests")
+        .withIndex("by_pm", (ix) =>
+          ix.eq("requestedByPmId", args.requestedByPmId)
+        );
+    } else if (args.status) {
+      q = ctx.db
+        .query("resourceRequests")
+        .withIndex("by_status", (ix) => ix.eq("status", args.status));
+    } else {
+      q = ctx.db.query("resourceRequests");
     }
 
     const requests = await q.collect();
-    if (args.countOnly) return { count: requests.length };
-    return requests;
+
+    if (args.countOnly) {
+      return { count: requests.length };
+    }
+
+    return requests.sort((a, b) => b.createdAt - a.createdAt);
   },
 });
-
 // POST request
 export const create = mutation({
   args: {
@@ -84,7 +113,9 @@ export const create = mutation({
         ["pending_lm", "pending_hr", "approved"].includes(r.status)
     );
     if (duplicate) {
-      throw new Error("A pending or approved request for this user already exists.");
+      throw new Error(
+        "A pending or approved request for this user already exists."
+      );
     }
 
     const now = Date.now();
@@ -151,7 +182,10 @@ export const processApproval = mutation({
       updates.status = args.action === "approve" ? "pending_hr" : "rejected";
     }
     // HR approval
-    else if (request.status === "pending_hr" && ["hr", "admin"].includes(actor.role)) {
+    else if (
+      request.status === "pending_hr" &&
+      ["hr", "admin"].includes(actor.role)
+    ) {
       updates.hrApproval = {
         status: args.action === "approve" ? "approved" : "rejected",
         approvedBy: actor._id,
@@ -164,10 +198,14 @@ export const processApproval = mutation({
       if (args.action === "approve") {
         const existingAlloc = await ctx.db
           .query("allocations")
-          .withIndex("by_user", (ix) => ix.eq("userId", request.requestedUserId))
+          .withIndex("by_user", (ix) =>
+            ix.eq("userId", request.requestedUserId)
+          )
           .collect();
 
-        const duplicate = existingAlloc.find((a) => a.projectId === request.projectId);
+        const duplicate = existingAlloc.find(
+          (a) => a.projectId === request.projectId
+        );
         if (!duplicate) {
           await ctx.db.insert("allocations", {
             userId: request.requestedUserId,
@@ -183,7 +221,9 @@ export const processApproval = mutation({
         }
       }
     } else {
-      throw new Error("You don’t have permission to approve this request at this stage.");
+      throw new Error(
+        "You don’t have permission to approve this request at this stage."
+      );
     }
 
     await ctx.db.patch(args.requestId, updates);
@@ -193,7 +233,8 @@ export const processApproval = mutation({
       userId: request.requestedByPmId,
       message: `Your resource request has been ${updates.status}.`,
       link: `/projects/${request.projectId}`,
-      type: updates.status === "approved" ? "request_approved" : "request_rejected",
+      type:
+        updates.status === "approved" ? "request_approved" : "request_rejected",
       relatedResourceId: args.requestId,
       relatedResourceType: "resourceRequest",
       isRead: false,
@@ -231,8 +272,10 @@ export const getReport = query({
 
     let requests = await ctx.db.query("resourceRequests").collect();
 
-    if (args.status) requests = requests.filter((r) => r.status === args.status);
-    if (args.pmId) requests = requests.filter((r) => r.requestedByPmId === args.pmId);
+    if (args.status)
+      requests = requests.filter((r) => r.status === args.status);
+    if (args.pmId)
+      requests = requests.filter((r) => r.requestedByPmId === args.pmId);
 
     if (args.department || args.function) {
       const users = await ctx.db.query("users").collect();
@@ -241,7 +284,8 @@ export const getReport = query({
       requests = requests.filter((r) => {
         const user = userMap.get(r.requestedUserId);
         if (!user) return false;
-        if (args.department && user.department !== args.department) return false;
+        if (args.department && user.department !== args.department)
+          return false;
         if (args.function && user.function !== args.function) return false;
         return true;
       });

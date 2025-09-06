@@ -13,8 +13,10 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as activities from "../activities.js";
 import type * as allocations from "../allocations.js";
 import type * as cvCache from "../cvCache.js";
+import type * as events from "../events.js";
 import type * as files from "../files.js";
 import type * as notifications from "../notifications.js";
 import type * as projectFeedback from "../projectFeedback.js";
@@ -35,8 +37,10 @@ import type * as workRequests from "../workRequests.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  activities: typeof activities;
   allocations: typeof allocations;
   cvCache: typeof cvCache;
+  events: typeof events;
   files: typeof files;
   notifications: typeof notifications;
   projectFeedback: typeof projectFeedback;

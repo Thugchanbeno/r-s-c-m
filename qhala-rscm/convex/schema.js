@@ -220,7 +220,8 @@ export default defineSchema({
     .index("by_project", ["projectId"])
     .index("by_requested_user", ["requestedUserId"])
     .index("by_pm", ["requestedByPmId"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_pm_status", ["requestedByPmId", "status"]),
   // NOTIFICATIONS
   notifications: defineTable({
     userId: v.id("users"),
@@ -461,4 +462,31 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_feedback_type", ["feedbackType"])
     .index("by_submitted_by", ["submittedByUserId"]),
+  // ACTIVITIES
+  activities: defineTable({
+    userId: v.id("users"),
+    type: v.string(),
+    message: v.string(),
+    relatedResourceId: v.optional(v.string()),
+    relatedResourceType: v.optional(v.string()),
+    priority: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_created_at", ["createdAt"]),
+
+  // EVENTS
+  events: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    eventDate: v.number(),
+    eventType: v.string(),
+    priority: v.string(),
+    relatedResourceId: v.optional(v.string()),
+    relatedResourceType: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_date", ["eventDate"]),
 });
