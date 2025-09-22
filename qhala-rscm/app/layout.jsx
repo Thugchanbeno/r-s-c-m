@@ -3,7 +3,6 @@ import AuthProvider from "@/components/auth/AuthProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import ConvexClientProvider from "@/lib/convex";
 import { Toaster } from "sonner";
-import EtherealBackground from "@/components/common/EtherealBackground";
 import "react-toastify/dist/ReactToastify.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "./globals.css";
@@ -32,10 +31,8 @@ export default function RootLayout({ children }) {
         <ConvexClientProvider>
           <ThemeProvider>
             <AuthProvider>
-              <EtherealBackground>
                 {children}
                 <Toaster position="top-right" richColors />
-              </EtherealBackground>
             </AuthProvider>
           </ThemeProvider>
         </ConvexClientProvider>

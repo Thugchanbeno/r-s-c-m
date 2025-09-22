@@ -1,5 +1,7 @@
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { query, mutation, action, internalQuery, internalMutation } from "./_generated/server";
+import { internal } from "./_generated/api";
+import { createNotification, createBulkNotifications } from "./notificationUtils";
 
 function requireRole(user, allowed) {
   if (!user || !allowed.includes(user.role)) {
@@ -152,7 +154,7 @@ export const create = mutation({
 
     const now = Date.now();
     const { email, ...updates } = args;
-    return await ctx.db.insert("projects", {
+    const projectId = await ctx.db.insert("projects", {
       ...updates,
       pmId: actor._id,
       status: args.status || "Planning",
@@ -161,6 +163,38 @@ export const create = mutation({
       createdAt: now,
       updatedAt: now,
     });
+
+    // Notify relevant stakeholders about project creation
+    // Find HR and admin users who should know about new projects
+    const stakeholders = await ctx.db
+      .query("users")
+      .filter((q) => q.or(
+        q.eq(q.field("role"), "hr"),
+        q.eq(q.field("role"), "admin")
+      ))
+      .collect();
+
+    if (stakeholders.length > 0) {
+      await createBulkNotifications(ctx, {
+        userIds: stakeholders.map(u => u._id),
+        type: "project_status_changed",
+        title: "New Project Created",
+        message: `${actor.name} created new project: "${args.name}" in ${args.department}`,
+        link: `/projects/${projectId}`,
+        relatedResourceId: projectId,
+        relatedResourceType: "project",
+        actionUserId: actor._id,
+        actionUserRole: actor.role,
+        contextData: {
+          projectName: args.name,
+          department: args.department,
+          pmName: actor.name,
+          skillCount: (args.requiredSkills || []).length,
+        },
+      });
+    }
+
+    return projectId;
   },
 });
 
@@ -212,25 +246,67 @@ export const update = mutation({
       throw new Error("You can only update your own projects.");
     }
 
-    const { id, ...updates } = args;
+    const { id, email, ...updates } = args;
+    const oldProject = { ...project }; // Keep reference to old state
+    
     await ctx.db.patch(id, {
       ...updates,
       updatedAt: Date.now(),
     });
 
+    // Check if status changed and notify team members
+    if (updates.status && updates.status !== oldProject.status) {
+      // Find all users allocated to this project
+      const allocations = await ctx.db
+        .query("allocations")
+        .withIndex("by_project", (q) => q.eq("projectId", id))
+        .filter((q) => q.eq(q.field("status"), "active"))
+        .collect();
+
+      const teamMemberIds = allocations
+        .map(a => a.userId)
+        .filter(userId => userId !== actor._id); // Don't notify the actor
+
+      if (teamMemberIds.length > 0) {
+        await createBulkNotifications(ctx, {
+          userIds: teamMemberIds,
+          type: "project_status_changed",
+          title: "Project Status Update",
+          message: `Project "${oldProject.name}" status changed from ${oldProject.status} to ${updates.status}`,
+          link: `/projects/${id}`,
+          relatedResourceId: id,
+          relatedResourceType: "project",
+          actionUserId: actor._id,
+          actionUserRole: actor.role,
+          contextData: {
+            projectName: oldProject.name,
+            oldStatus: oldProject.status,
+            newStatus: updates.status,
+            updatedByName: actor.name,
+          },
+        });
+      }
+    }
+
     return { success: true, message: "Project updated successfully." };
   },
 });
 
-export const extractSkillsFromDescription = mutation({
+export const extractSkillsFromDescription = action({
   args: {
     email: v.string(),
     projectId: v.optional(v.id("projects")),
     description: v.string(),
   },
   handler: async (ctx, args) => {
-    const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["pm", "hr", "admin"]);
+    // Get actor info through a query since actions can't directly access db
+    const actor = await ctx.runQuery(internal.projects.getActorByEmail, {
+      email: args.email,
+    });
+    
+    if (!actor || !["pm", "hr", "admin"].includes(actor.role)) {
+      throw new Error("You don't have permission to perform this action.");
+    }
 
     if (!args.description || args.description.trim() === "") {
       throw new Error("Description is required.");
@@ -260,11 +336,11 @@ export const extractSkillsFromDescription = mutation({
 
       const extractedSkills = result.extracted_skills || [];
 
-      // Optionally persist to project
+      // Optionally persist to project using a mutation
       if (args.projectId) {
-        await ctx.db.patch(args.projectId, {
+        await ctx.runMutation(internal.projects.updateProjectSkills, {
+          projectId: args.projectId,
           nlpExtractedSkills: extractedSkills.map((s) => s.name || s),
-          updatedAt: Date.now(),
         });
       }
 
@@ -277,17 +353,25 @@ export const extractSkillsFromDescription = mutation({
 });
 
 // Recommendations
-export const getRecommendations = query({
+export const getRecommendations = action({
   args: {
     email: v.string(),
     projectId: v.id("projects"),
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["pm", "hr", "admin"]);
+    // Get actor info and project through queries since actions can't directly access db
+    const actor = await ctx.runQuery(internal.projects.getActorByEmail, {
+      email: args.email,
+    });
+    
+    if (!actor || !["pm", "hr", "admin"].includes(actor.role)) {
+      throw new Error("You don't have permission to perform this action.");
+    }
 
-    const project = await ctx.db.get(args.projectId);
+    const project = await ctx.runQuery(internal.projects.getProjectById, {
+      id: args.projectId,
+    });
     if (!project) throw new Error("Project not found");
 
     const nlpServiceUrl = `${
@@ -295,32 +379,62 @@ export const getRecommendations = query({
     }/recommend/users-for-project`;
 
     try {
+      console.log(`Calling Python microservice for project: ${args.projectId}`);
+      
+      // Use simple payload structure that matches working REST implementation
+      const payload = {
+        id: args.projectId,
+        limit: args.limit || 10,
+      };
+      
+      console.log('Payload to Python service:', JSON.stringify(payload, null, 2));
+      
       const response = await fetch(nlpServiceUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: args.projectId,
-          requiredSkills: project.requiredSkills || [],
-          limit: args.limit || 10,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
+      console.log('Python service response:', JSON.stringify(result, null, 2));
 
       if (!response.ok) {
+        console.error(
+          `Python microservice error (Status: ${response.status}):`,
+          result.detail || result.error || result
+        );
         throw new Error(
-          result.detail || result.error || "Recommendation service failed"
+          result.detail || result.error || `Python service failed with status ${response.status}`
         );
       }
 
-      if (!Array.isArray(result.recommendations)) {
-        throw new Error("Invalid recommendation data format.");
+      if (result && typeof result.recommendations !== "undefined") {
+        if (!Array.isArray(result.recommendations)) {
+          console.error(
+            "Python response 'recommendations' field was not an array:",
+            result
+          );
+          throw new Error("Invalid recommendation data format from service (not an array).");
+        }
+        console.log(`Successfully got ${result.recommendations.length} recommendations`);
+        return { success: true, users: result.recommendations };
+      } else {
+        console.error("Python response missing 'recommendations' key:", result);
+        throw new Error("Invalid or missing recommendation data from service.");
       }
-
-      return { success: true, users: result.recommendations };
     } catch (err) {
-      console.error("Recommendation error:", err);
-      throw new Error("Failed to fetch recommendations.");
+      console.error("Detailed recommendation error:", {
+        message: err.message,
+        stack: err.stack,
+        cause: err.cause,
+      });
+      
+      // More specific error handling
+      if (err.cause && err.cause.code === "ECONNREFUSED") {
+        throw new Error("Could not connect to the recommendation service. Please ensure the Python microservice is running on " + (process.env.NLP_API_URL || "http://localhost:8000"));
+      }
+      
+      throw new Error(err.message || "Failed to fetch recommendations.");
     }
   },
 });
@@ -470,5 +584,41 @@ export const getByOrganization = query({
     }
 
     return projects;
+  },
+});
+
+// Internal helper functions for actions
+export const getActorByEmail = internalQuery({
+  args: { email: v.string() },
+  handler: async (ctx, args) => {
+    if (!args.email) throw new Error("Unauthorized: missing email");
+    const actor = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .first();
+    if (!actor) throw new Error("User not found");
+    return actor;
+  },
+});
+
+export const getProjectById = internalQuery({
+  args: { id: v.id("projects") },
+  handler: async (ctx, args) => {
+    const project = await ctx.db.get(args.id);
+    if (!project) throw new Error("Project not found.");
+    return project;
+  },
+});
+
+export const updateProjectSkills = internalMutation({
+  args: {
+    projectId: v.id("projects"),
+    nlpExtractedSkills: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.projectId, {
+      nlpExtractedSkills: args.nlpExtractedSkills,
+      updatedAt: Date.now(),
+    });
   },
 });

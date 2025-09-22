@@ -1,6 +1,9 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useAuth } from "@/lib/hooks/useAuth";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -56,57 +59,24 @@ const UserList = ({
   onDeleteUser,
   onInitiateRequest,
 }) => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { user } = useAuth();
+  
+  // Convex Query with search filters
+  const users = useQuery(
+    api.users.getAll,
+    user?.email ? {
+      email: user.email,
+      search: searchTerm || undefined,
+      skillName: skillSearchTerm || undefined,
+      limit: 1000
+    } : "skip"
+  );
 
-  const fetchUsers = useCallback(async (textSearch, skillSearch) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams();
-      if (textSearch) {
-        params.append("search", textSearch);
-      }
-      if (skillSearch) {
-        params.append("skillName", skillSearch);
-      }
+  const loading = users === undefined;
+  const error = null; // Convex handles errors internally
+  const userList = users || [];
 
-      const apiUrl = `/api/users?${params.toString()}`;
-      const response = await fetch(apiUrl);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.error || `Error: ${response.status} ${response.statusText}`
-        );
-      }
-      const result = await response.json();
-      if (result.success && Array.isArray(result.data)) {
-        setUsers(result.data);
-      } else {
-        throw new Error(
-          result.error || "Invalid data format received from API."
-        );
-      }
-    } catch (err) {
-      console.error("UserList: Error fetching users:", err);
-      setError(err.message || "An error occurred while fetching users.");
-      setUsers([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      fetchUsers(searchTerm, skillSearchTerm);
-    }, 500);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchTerm, skillSearchTerm, fetchUsers]);
+  // No longer needed - Convex queries handle data fetching automatically with debouncing
 
   const handleEditClick = (userId) => {
     if (onEditUser) onEditUser(userId);
@@ -155,7 +125,7 @@ const UserList = ({
         animate="visible"
         className="space-y-4 pt-0"
       >
-        {users.length === 0 ? (
+        {userList.length === 0 ? (
           <motion.div
             variants={itemVariants}
             className="flex flex-col items-center justify-center py-12 px-6 bg-[rgb(var(--muted))] rounded-[var(--radius)] border-2 border-dashed border-[rgb(var(--border))]"
@@ -171,7 +141,7 @@ const UserList = ({
             </p>
           </motion.div>
         ) : (
-          users.map((user) => {
+          userList.map((user) => {
             const availabilityStyleClasses = getAvailabilityStyles(
               user.availabilityStatus
             );

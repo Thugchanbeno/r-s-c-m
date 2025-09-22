@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { createNotification, createBulkNotifications } from "./notificationUtils";
 
 function requireRole(user, allowed) {
   if (!user || !allowed.includes(user.role)) {
@@ -58,13 +59,26 @@ export const getAll = query({
     const skip = (page - 1) * limit;
 
     const paginated = all.slice(skip, skip + limit);
+    
+    // Enrich allocations with user and project details
+    const enrichedAllocations = [];
+    for (const allocation of paginated) {
+      const user = await ctx.db.get(allocation.userId);
+      const project = await ctx.db.get(allocation.projectId);
+      
+      enrichedAllocations.push({
+        ...allocation,
+        userId: user, // Replace ID with full user object
+        projectId: project, // Replace ID with full project object
+      });
+    }
 
     return {
-      count: paginated.length,
+      count: enrichedAllocations.length,
       totalAllocations: all.length,
       currentPage: page,
       totalPages: Math.ceil(all.length / limit),
-      data: paginated,
+      data: enrichedAllocations,
     };
   },
 });
@@ -76,7 +90,23 @@ export const create = mutation({
     userId: v.id("users"),
     projectId: v.id("projects"),
     allocationPercentage: v.number(),
-    role: v.string(),
+    role: v.union(
+      v.literal("Developer"),
+      v.literal("Senior Developer"),
+      v.literal("Lead Developer"),
+      v.literal("Tech Lead"),
+      v.literal("Project Manager"),
+      v.literal("Product Manager"),
+      v.literal("Designer"),
+      v.literal("UX Designer"),
+      v.literal("UI Designer"),
+      v.literal("Business Analyst"),
+      v.literal("QA Engineer"),
+      v.literal("DevOps Engineer"),
+      v.literal("Data Scientist"),
+      v.literal("Consultant"),
+      v.literal("Other")
+    ),
     startDate: v.optional(v.number()),
     endDate: v.optional(v.number()),
   },
@@ -92,25 +122,28 @@ export const create = mutation({
       throw new Error("End date cannot be before start date.");
     }
 
-    // Prevent overlapping allocations
+    // Check for duplicate project allocation (users cannot be allocated to same project twice)
     const existing = await ctx.db
       .query("allocations")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .filter((q) => q.eq(q.field("status"), "active"))
       .collect();
 
-    const newStart = args.startDate || Date.now();
-    const newEnd = args.endDate || new Date(9999, 11, 31).getTime();
-
-    for (const alloc of existing) {
-      const existingStart = alloc.startDate || 0;
-      const existingEnd = alloc.endDate || new Date(9999, 11, 31).getTime();
-      if (newStart <= existingEnd && newEnd >= existingStart) {
-        throw new Error("This user already has an overlapping allocation.");
-      }
+    // Check if user is already allocated to this project
+    const existingProjectAllocation = existing.find(alloc => alloc.projectId === args.projectId);
+    
+    if (existingProjectAllocation) {
+      const project = await ctx.db.get(args.projectId);
+      const existingEndDisplay = existingProjectAllocation.endDate ? 
+        new Date(existingProjectAllocation.endDate).toLocaleDateString() : 'ongoing';
+      
+      throw new Error(`User is already allocated to project "${project?.name || 'Unknown'}" as ${existingProjectAllocation.role} (${existingProjectAllocation.allocationPercentage}%) from ${new Date(existingProjectAllocation.startDate).toLocaleDateString()} to ${existingEndDisplay}. Users cannot be allocated to the same project twice.`);
     }
+    
+    // Note: Over-allocation above 100% is allowed - it makes users unavailable for recommendations
 
     const now = Date.now();
-    return await ctx.db.insert("allocations", {
+    const allocationId = await ctx.db.insert("allocations", {
       userId: args.userId,
       projectId: args.projectId,
       allocationPercentage: args.allocationPercentage,
@@ -121,6 +154,58 @@ export const create = mutation({
       createdAt: now,
       updatedAt: now,
     });
+
+    // Get user and project details for notifications
+    const user = await ctx.db.get(args.userId);
+    const project = await ctx.db.get(args.projectId);
+
+    if (user && project) {
+      // Notify the allocated user
+      await createNotification(ctx, {
+        userId: args.userId,
+        type: "allocation_created",
+        title: "New Project Allocation",
+        message: `You have been allocated to project "${project.name}" as ${args.role} (${args.allocationPercentage}%)`,
+        link: `/projects/${args.projectId}`,
+        actionUrl: `/projects/${args.projectId}`,
+        requiresAction: true,
+        relatedResourceId: allocationId,
+        relatedResourceType: "allocation",
+        actionUserId: actor._id,
+        actionUserRole: actor.role,
+        contextData: {
+          projectId: args.projectId,
+          projectName: project.name,
+          role: args.role,
+          allocationPercentage: args.allocationPercentage,
+          allocatedByName: actor.name,
+        },
+      });
+
+      // Notify project manager if different from allocator
+      if (project.pmId && project.pmId !== actor._id) {
+        await createNotification(ctx, {
+          userId: project.pmId,
+          type: "project_team_added",
+          title: "Team Member Added",
+          message: `${user.name} has been allocated to your project "${project.name}" as ${args.role}`,
+          link: `/projects/${args.projectId}`,
+          relatedResourceId: allocationId,
+          relatedResourceType: "allocation",
+          actionUserId: actor._id,
+          actionUserRole: actor.role,
+          contextData: {
+            userId: args.userId,
+            userName: user.name,
+            projectName: project.name,
+            role: args.role,
+            allocationPercentage: args.allocationPercentage,
+          },
+        });
+      }
+    }
+
+    return allocationId;
   },
 });
 
@@ -130,7 +215,23 @@ export const update = mutation({
     email: v.string(),
     id: v.id("allocations"),
     allocationPercentage: v.optional(v.number()),
-    role: v.optional(v.string()),
+    role: v.optional(v.union(
+      v.literal("Developer"),
+      v.literal("Senior Developer"),
+      v.literal("Lead Developer"),
+      v.literal("Tech Lead"),
+      v.literal("Project Manager"),
+      v.literal("Product Manager"),
+      v.literal("Designer"),
+      v.literal("UX Designer"),
+      v.literal("UI Designer"),
+      v.literal("Business Analyst"),
+      v.literal("QA Engineer"),
+      v.literal("DevOps Engineer"),
+      v.literal("Data Scientist"),
+      v.literal("Consultant"),
+      v.literal("Other")
+    )),
     startDate: v.optional(v.number()),
     endDate: v.optional(v.union(v.number(), v.null())),
   },
@@ -152,10 +253,42 @@ export const update = mutation({
       throw new Error("End date cannot be before start date.");
     }
 
-    await ctx.db.patch(args.id, {
-      ...args,
+    const { id, email, ...updates } = args;
+    const oldAllocation = { ...allocation };
+    
+    await ctx.db.patch(id, {
+      ...updates,
       updatedAt: Date.now(),
     });
+
+    // Get related entities for notifications
+    const user = await ctx.db.get(allocation.userId);
+    const project = await ctx.db.get(allocation.projectId);
+
+    if (user && project) {
+      // Check if allocation percentage changed significantly (>10%)
+      if (updates.allocationPercentage && 
+          Math.abs(updates.allocationPercentage - oldAllocation.allocationPercentage) > 10) {
+        
+        await createNotification(ctx, {
+          userId: allocation.userId,
+          type: "allocation_updated",
+          title: "Allocation Updated",
+          message: `Your allocation on project "${project.name}" changed from ${oldAllocation.allocationPercentage}% to ${updates.allocationPercentage}%`,
+          link: `/projects/${allocation.projectId}`,
+          relatedResourceId: id,
+          relatedResourceType: "allocation",
+          actionUserId: actor._id,
+          actionUserRole: actor.role,
+          contextData: {
+            projectName: project.name,
+            oldPercentage: oldAllocation.allocationPercentage,
+            newPercentage: updates.allocationPercentage,
+            role: allocation.role,
+          },
+        });
+      }
+    }
 
     return { success: true };
   },

@@ -18,6 +18,8 @@ import type * as allocations from "../allocations.js";
 import type * as cvCache from "../cvCache.js";
 import type * as events from "../events.js";
 import type * as files from "../files.js";
+import type * as notificationPreferences from "../notificationPreferences.js";
+import type * as notificationUtils from "../notificationUtils.js";
 import type * as notifications from "../notifications.js";
 import type * as projectFeedback from "../projectFeedback.js";
 import type * as projects from "../projects.js";
@@ -42,6 +44,8 @@ declare const fullApi: ApiFromModules<{
   cvCache: typeof cvCache;
   events: typeof events;
   files: typeof files;
+  notificationPreferences: typeof notificationPreferences;
+  notificationUtils: typeof notificationUtils;
   notifications: typeof notifications;
   projectFeedback: typeof projectFeedback;
   projects: typeof projects;

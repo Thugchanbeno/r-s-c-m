@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { createNotification } from "./notificationUtils";
 
 function requireRole(user, allowed) {
   if (!user || !allowed.includes(user.role)) {
@@ -218,14 +219,49 @@ export const processApproval = mutation({
 
     await ctx.db.patch(args.requestId, updates);
 
-    await ctx.db.insert("notifications", {
+    // Determine notification type based on approval stage and action
+    let notificationType;
+    if (args.action === "approve") {
+      if (request.status === "approved") {
+        notificationType = request.requestType === "leave" ? "leave_request_approved" : "overtime_request_approved";
+      } else {
+        // Still pending further approval
+        notificationType = request.requestType === "leave" ? "leave_request_pending_pm" : "resource_request_pending_hr";
+      }
+    } else {
+      notificationType = request.requestType === "leave" ? "leave_request_rejected" : "overtime_request_rejected";
+    }
+
+    const requestTypeDisplay = request.requestType === "leave" ? "leave" : "overtime";
+    const approverRole = actor.role === "line_manager" ? "Line Manager" : 
+                        actor.role === "pm" ? "Project Manager" : "HR";
+    
+    let message;
+    if (args.action === "approve" && request.status !== "approved") {
+      message = `Your ${requestTypeDisplay} request has been approved by ${approverRole} (${actor.name}) and is pending further approval`;
+    } else {
+      message = `Your ${requestTypeDisplay} request has been ${args.action}d by ${approverRole} (${actor.name})`;
+    }
+
+    await createNotification(ctx, {
       userId: request.userId,
-      message: `Your ${request.requestType} request has been ${args.action}d by ${actor.name}`,
-      type: args.action === "approve" ? "request_approved" : "request_rejected",
-      isRead: false,
+      type: notificationType,
+      title: `${requestTypeDisplay === "leave" ? "Leave" : "Overtime"} Request ${args.action === "approve" ? "Approved" : "Rejected"}`,
+      message,
+      link: `/requests/${args.requestId}`,
+      actionUrl: args.action === "reject" ? `/requests/new` : undefined,
+      requiresAction: args.action === "reject",
       relatedResourceId: args.requestId,
       relatedResourceType: "workRequest",
-      createdAt: now,
+      actionUserId: actor._id,
+      actionUserRole: actor.role,
+      contextData: {
+        requestType: request.requestType,
+        approvalStage: request.status,
+        approverName: actor.name,
+        approverRole: actor.role,
+        reason: args.reason,
+      },
     });
 
     return { success: true };

@@ -225,20 +225,126 @@ export default defineSchema({
   // NOTIFICATIONS
   notifications: defineTable({
     userId: v.id("users"),
+    title: v.optional(v.string()),
     message: v.string(),
     link: v.optional(v.string()),
     isRead: v.boolean(),
+    isArchived: v.optional(v.boolean()),
+    
+    // Comprehensive notification types (persistent only)
     type: v.union(
+      // User Management Domain (4 types)
+      v.literal("user_role_changed"),
+      v.literal("user_deactivated"),
+      v.literal("user_reactivated"),
+      v.literal("user_profile_incomplete"),
+      
+      // Skills & Verification Domain (7 types)
+      v.literal("skill_verification_requested"),
+      v.literal("skill_verification_approved"),
+      v.literal("skill_verification_rejected"),
+      v.literal("skill_verification_expired"),
+      v.literal("skill_in_demand"),
+      v.literal("new_skill_opportunity"),
+      v.literal("skills_profile_incomplete"),
+      
+      // Projects Domain (7 types)
+      v.literal("project_deadline_approaching"),
+      v.literal("project_overdue"),
+      v.literal("project_team_added"),
+      v.literal("project_team_removed"),
+      v.literal("project_skills_matched"),
+      v.literal("project_cancelled"),
+      v.literal("project_status_changed"),
+      
+      // Resources Domain (6 types)
+      v.literal("allocation_created"),
+      v.literal("allocation_updated"),
+      v.literal("allocation_cancelled"),
+      v.literal("allocation_conflict"),
+      v.literal("allocation_underutilized"),
+      v.literal("allocation_approaching_capacity"),
+      
+      // Approvals Domain (7 types)
+      v.literal("resource_request_pending_lm"),
+      v.literal("resource_request_pending_hr"),
+      v.literal("resource_request_lm_approved"),
+      v.literal("resource_request_lm_rejected"),
+      v.literal("resource_request_hr_approved"),
+      v.literal("resource_request_hr_rejected"),
+      v.literal("resource_request_expired"),
+      
+      // Work Requests Domain (10 types)
+      v.literal("leave_request_pending_lm"),
+      v.literal("leave_request_pending_pm"),
+      v.literal("leave_request_pending_hr"),
+      v.literal("leave_request_approved"),
+      v.literal("leave_request_rejected"),
+      v.literal("overtime_request_approved"),
+      v.literal("overtime_request_rejected"),
+      v.literal("leave_balance_low"),
+      v.literal("leave_expiring_soon"),
+      v.literal("covering_assignment"),
+      
+      // Tasks Domain (5 types)
+      v.literal("task_assigned"),
+      v.literal("task_deadline_approaching"),
+      v.literal("task_overdue"),
+      v.literal("task_commented"),
+      v.literal("task_reassigned"),
+      
+      // CV/Profile Domain (4 types)
+      v.literal("cv_processed"),
+      v.literal("cv_processing_failed"),
+      v.literal("profile_completeness_low"),
+      v.literal("profile_recommendation"),
+      
+      // Analytics Domain (6 types)
+      v.literal("report_generated"),
+      v.literal("report_failed"),
+      v.literal("analytics_alert"),
+      v.literal("capacity_alert"),
+      v.literal("skills_gap_alert"),
+      v.literal("utilization_alert"),
+      
+      // System Domain (6 types)
+      v.literal("system_maintenance"),
+      v.literal("system_update"),
+      v.literal("system_alert"),
+      v.literal("data_export_ready"),
+      v.literal("security_alert"),
+      v.literal("account_security"),
+      
+      // Legacy types for backward compatibility
       v.literal("new_request"),
       v.literal("request_approved"),
       v.literal("request_rejected"),
       v.literal("new_allocation"),
-      v.literal("task_assigned"),
-      v.literal("task_completed"),
       v.literal("skill_verification"),
-      v.literal("system_alert"),
       v.literal("general_info")
     ),
+    
+    // Notification categorization for filtering
+    category: v.union(
+      v.literal("user_management"),
+      v.literal("skills_verification"),
+      v.literal("projects"),
+      v.literal("resources"),
+      v.literal("approvals"),
+      v.literal("tasks"),
+      v.literal("system"),
+      v.literal("analytics")
+    ),
+    
+    // Priority levels
+    priority: v.union(
+      v.literal("critical"),   // Security, system down, urgent approvals
+      v.literal("high"),       // Deadlines, important approvals
+      v.literal("medium"),     // Regular updates, assignments
+      v.literal("low")         // Recommendations, tips
+    ),
+    
+    // Enhanced relationship tracking
     relatedResourceId: v.optional(v.string()),
     relatedResourceType: v.optional(
       v.union(
@@ -247,14 +353,54 @@ export default defineSchema({
         v.literal("resourceRequest"),
         v.literal("allocation"),
         v.literal("task"),
-        v.literal("userSkill")
+        v.literal("userSkill"),
+        v.literal("workRequest"),
+        v.literal("skill"),
+        v.literal("cvCache"),
+        v.literal("report")
       )
     ),
+    
+    // Who triggered this notification
+    actionUserId: v.optional(v.id("users")),
+    actionUserRole: v.optional(
+      v.union(
+        v.literal("admin"),
+        v.literal("hr"),
+        v.literal("pm"),
+        v.literal("line_manager"),
+        v.literal("employee"),
+        v.literal("system")
+      )
+    ),
+    
+    // Additional context data for rich notifications
+    contextData: v.optional(v.any()),
+    
+    // For action-required notifications
+    requiresAction: v.optional(v.boolean()),
+    actionCompleted: v.optional(v.boolean()),
+    actionCompletedAt: v.optional(v.number()),
+    actionUrl: v.optional(v.string()),  // Direct link to take action
+    
+    // Expiry for time-sensitive notifications
+    expiresAt: v.optional(v.number()),
+    
     createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
   })
     .index("by_user", ["userId"])
     .index("by_user_read", ["userId", "isRead"])
-    .index("by_created_at", ["createdAt"]),
+    .index("by_user_category", ["userId", "category"])
+    .index("by_user_priority", ["userId", "priority"])
+    .index("by_user_type", ["userId", "type"])
+    .index("by_user_requires_action", ["userId", "requiresAction"])
+    .index("by_created_at", ["createdAt"])
+    .index("by_category", ["category"])
+    .index("by_priority", ["priority"])
+    .index("by_action_user", ["actionUserId"])
+    .index("by_expires_at", ["expiresAt"])
+    .index("by_related_resource", ["relatedResourceType", "relatedResourceId"]),
   // CV CACHE
   cvCache: defineTable({
     fileName: v.string(),

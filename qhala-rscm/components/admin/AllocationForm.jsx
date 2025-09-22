@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import { AlertCircle } from "lucide-react";
-import SearchableSelectField from "@/components/common/SearchableSelectField";
+import { AlertCircle, ChevronDown } from "lucide-react";
 
 const AllocationForm = ({
   onFormSubmit,
@@ -120,30 +119,65 @@ const AllocationForm = ({
         </div>
       )}
 
-      <SearchableSelectField
-        label="User"
-        value={userId}
-        onChange={setUserId}
-        options={usersList}
-        optionValueKey="_id"
-        optionDisplayKey="name"
-        optionSecondaryKey="email"
-        placeholder="Select a user"
-        disabled={isProcessing}
-        required={true}
-      />
+      <div>
+        <label
+          htmlFor="userId"
+          className="block text-sm font-medium text-[rgb(var(--foreground))]"
+        >
+          User<span className="text-red-500 ml-1">*</span>
+        </label>
+        <div className="relative">
+          <select
+            id="userId"
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+            required
+            className={`${inputBaseClasses} appearance-none pr-8`}
+            disabled={isProcessing}
+          >
+            <option value="">Select a user...</option>
+            {usersList?.map((user) => (
+              <option key={user._id} value={user._id}>
+                {user.name} ({user.email})
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            size={16}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[rgb(var(--muted-foreground))] pointer-events-none"
+          />
+        </div>
+      </div>
 
-      <SearchableSelectField
-        label="Project"
-        value={projectId}
-        onChange={setProjectId}
-        options={projectsList}
-        optionValueKey="_id"
-        optionDisplayKey="name"
-        placeholder="Select a project"
-        disabled={isProcessing}
-        required={true}
-      />
+      <div>
+        <label
+          htmlFor="projectId"
+          className="block text-sm font-medium text-[rgb(var(--foreground))]"
+        >
+          Project<span className="text-red-500 ml-1">*</span>
+        </label>
+        <div className="relative">
+          <select
+            id="projectId"
+            value={projectId}
+            onChange={(e) => setProjectId(e.target.value)}
+            required
+            className={`${inputBaseClasses} appearance-none pr-8`}
+            disabled={isProcessing}
+          >
+            <option value="">Select a project...</option>
+            {projectsList?.map((project) => (
+              <option key={project._id} value={project._id}>
+                {project.name}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            size={16}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[rgb(var(--muted-foreground))] pointer-events-none"
+          />
+        </div>
+      </div>
       <div>
         <label
           htmlFor="role"
@@ -151,16 +185,37 @@ const AllocationForm = ({
         >
           Role on Project<span className="text-red-500 ml-1">*</span>
         </label>
-        <input
-          type="text"
-          id="role"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          required
-          className={inputBaseClasses}
-          placeholder="e.g., Developer, Tester"
-          disabled={isProcessing}
-        />
+        <div className="relative">
+          <select
+            id="role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            required
+            className={`${inputBaseClasses} appearance-none pr-8`}
+            disabled={isProcessing}
+          >
+          <option value="">Select a role...</option>
+          <option value="Developer">Developer</option>
+          <option value="Senior Developer">Senior Developer</option>
+          <option value="Lead Developer">Lead Developer</option>
+          <option value="Tech Lead">Tech Lead</option>
+          <option value="Project Manager">Project Manager</option>
+          <option value="Product Manager">Product Manager</option>
+          <option value="Designer">Designer</option>
+          <option value="UX Designer">UX Designer</option>
+          <option value="UI Designer">UI Designer</option>
+          <option value="Business Analyst">Business Analyst</option>
+          <option value="QA Engineer">QA Engineer</option>
+          <option value="DevOps Engineer">DevOps Engineer</option>
+          <option value="Data Scientist">Data Scientist</option>
+          <option value="Consultant">Consultant</option>
+          <option value="Other">Other</option>
+          </select>
+          <ChevronDown
+            size={16}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[rgb(var(--muted-foreground))] pointer-events-none"
+          />
+        </div>
       </div>
 
       <div>

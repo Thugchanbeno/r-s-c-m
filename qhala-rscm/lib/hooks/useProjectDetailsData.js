@@ -1,7 +1,7 @@
 // lib/hooks/useProjectDetailsData.js
 "use client";
 import { useState, useCallback } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useTasks } from "@/lib/hooks/useTasks";
@@ -42,6 +42,9 @@ export const useProjectDetailsData = (projectId) => {
 
   // --- Convex Mutations ---
   const createResourceRequest = useMutation(api.resourceRequests.create);
+  
+  // --- Convex Actions ---
+  const getProjectRecommendations = useAction(api.projects.getRecommendations);
 
   // --- Handlers ---
   const handleFetchRecommendations = useCallback(async () => {
@@ -51,18 +54,17 @@ export const useProjectDetailsData = (projectId) => {
     setShowRecommendations(true);
 
     try {
-      const response = await fetch("/api/ai/get-recommendations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId, limit: 5 }),
+      const result = await getProjectRecommendations({
+        email: user.email,
+        projectId: projectId,
+        limit: 5
       });
 
-      const result = await response.json();
-      if (!response.ok || result.error) {
+      if (result.success) {
+        setRecommendedUsers(result.users || []);
+      } else {
         throw new Error(result.error || "Failed to fetch recommendations");
       }
-
-      setRecommendedUsers(result.data || result.users || []);
     } catch (err) {
       console.error("Error fetching recommendations:", err);
       setRecommendationError(err.message);
@@ -70,7 +72,7 @@ export const useProjectDetailsData = (projectId) => {
     } finally {
       setLoadingRecommendations(false);
     }
-  }, [user?.email, projectId]);
+  }, [user?.email, projectId, getProjectRecommendations]);
 
   const handleInitiateResourceRequest = useCallback((user) => {
     setUserToRequest(user);

@@ -1,6 +1,6 @@
 // lib/hooks/useProjects.js
 "use client";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useTasks } from "@/lib/hooks/useTasks";
@@ -28,7 +28,9 @@ export const useProjects = (pmId = null, filters = {}) => {
   // Mutations
   const createProject = useMutation(api.projects.create);
   const updateProject = useMutation(api.projects.update);
-  const extractSkills = useMutation(api.projects.extractSkillsFromDescription);
+  
+  // Actions
+  const extractSkills = useAction(api.projects.extractSkillsFromDescription);
 
   // Task hook for project creation
   const { handleCreateTask } = useTasks();
