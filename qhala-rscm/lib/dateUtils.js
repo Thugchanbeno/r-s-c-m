@@ -46,6 +46,7 @@ export const formatDateRange = (startDate, endDate) => {
 
 export const formatDatePickerDate = (date) => {
   if (!date) return "";
+  // Use local time instead of UTC to avoid timezone issues
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
   const day = date.getDate().toString().padStart(2, "0");
@@ -61,7 +62,10 @@ export const parseDatePickerDate = (dateString) => {
     return null;
   }
   const parts = dateString.split("-");
+  // Use local time instead of UTC to avoid timezone shifting
   return new Date(
-    Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))
+    parseInt(parts[0]), // year
+    parseInt(parts[1]) - 1, // month (0-indexed)
+    parseInt(parts[2]) // day
   );
 };

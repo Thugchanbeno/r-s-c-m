@@ -399,7 +399,7 @@ const ProjectForm = ({
                   <label className="text-sm font-medium">Department</label>
                   <div className="relative">
                     <select
-                      name="Department"
+                      name="department"
                       value={formData.department}
                       onChange={handleChange}
                       required
@@ -423,7 +423,7 @@ const ProjectForm = ({
                   <div className="space-y-2">
                     <div className="relative">
                       <select
-                        name="Status"
+                        name="status"
                         value={formData.status}
                         onChange={handleChange}
                         required
@@ -458,7 +458,7 @@ const ProjectForm = ({
                     <DatePicker
                       selected={parseDatePickerDate(formData.startDate)}
                       onChange={(date) => handleDateChange("startDate", date)}
-                      dateFormat="YYYY-MM-DD"
+                      dateFormat="yyyy-MM-dd"
                       placeholderText="Select start date"
                       className={inputClasses}
                       isClearable
@@ -476,7 +476,7 @@ const ProjectForm = ({
                     <DatePicker
                       selected={parseDatePickerDate(formData.endDate)}
                       onChange={(date) => handleDateChange("endDate", date)}
-                      dateFormat="YYYY-MM-DD"
+                      dateFormat="yyyy-MM-dd"
                       placeholderText="Select end date"
                       className={inputClasses}
                       isClearable
@@ -496,7 +496,7 @@ const ProjectForm = ({
                   Project Description*
                 </label>
                 <textarea
-                  name="Description"
+                  name="description"
                   value={formData.description}
                   onChange={handleChange}
                   required

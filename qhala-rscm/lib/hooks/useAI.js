@@ -1,7 +1,7 @@
 // lib/hooks/useAI.js
 "use client";
 import { useState, useCallback } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { toast } from "sonner";
@@ -16,8 +16,8 @@ export const useAI = () => {
   const [quickAskError, setQuickAskError] = useState(null);
   const [showQuickAskSuggestions, setShowQuickAskSuggestions] = useState(false);
 
-  // Convex mutations
-  const extractSkills = useMutation(api.projects.extractSkillsFromDescription);
+  // Convex actions
+  const extractSkills = useAction(api.projects.extractSkillsFromDescription);
 
   // QuickAsk (reuses extractSkills)
   const handleQuickAskSearch = useCallback(async () => {

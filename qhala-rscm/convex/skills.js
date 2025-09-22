@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { createNotification } from "./notificationUtils";
 
 function requireRole(user, allowed) {
   if (!user || !allowed.includes(user.role)) {
@@ -210,14 +211,27 @@ export const verifyUserSkill = mutation({
     });
 
     const skill = await ctx.db.get(userSkill.skillId);
-    await ctx.db.insert("notifications", {
+    const notificationType = args.action === "approve" ? "skill_verification_approved" : "skill_verification_rejected";
+    
+    await createNotification(ctx, {
       userId: userSkill.userId,
+      type: notificationType,
+      title: `Skill Verification ${args.action === "approve" ? "Approved" : "Rejected"}`,
       message: `Your skill "${skill?.name}" has been ${args.action}d by ${actor.name}`,
-      type: "skill_verification",
-      isRead: false,
+      link: `/skills/profile`,
+      actionUrl: args.action === "reject" ? `/skills/profile` : undefined,
+      requiresAction: args.action === "reject",
       relatedResourceId: args.userSkillId,
       relatedResourceType: "userSkill",
-      createdAt: now,
+      actionUserId: actor._id,
+      actionUserRole: actor.role,
+      contextData: {
+        skillName: skill?.name,
+        skillCategory: skill?.category,
+        verifierName: actor.name,
+        reason: args.reason,
+        verificationAction: args.action,
+      },
     });
 
     return { success: true, message: `Skill ${args.action}d successfully.` };
@@ -318,14 +332,27 @@ export const uploadProofDocument = mutation({
     const user = await ctx.db.get(userSkill.userId);
     if (user?.lineManagerId) {
       const skill = await ctx.db.get(userSkill.skillId);
-      await ctx.db.insert("notifications", {
+      
+      await createNotification(ctx, {
         userId: user.lineManagerId,
+        type: "skill_verification_requested",
+        title: "Skill Verification Request",
         message: `${user.name} uploaded proof for skill "${skill?.name}" - pending your verification`,
-        type: "skill_verification",
-        isRead: false,
+        link: `/skills/verifications`,
+        actionUrl: `/skills/verifications`,
+        requiresAction: true,
+        expiresAt: now + (7 * 24 * 60 * 60 * 1000), // Expire in 7 days
         relatedResourceId: args.userSkillId,
         relatedResourceType: "userSkill",
-        createdAt: now,
+        actionUserId: user._id,
+        actionUserRole: user.role,
+        contextData: {
+          skillName: skill?.name,
+          skillCategory: skill?.category,
+          userName: user.name,
+          proofType: args.proofType,
+          fileName: args.fileName,
+        },
       });
     }
 

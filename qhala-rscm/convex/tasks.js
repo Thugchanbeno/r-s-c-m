@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { createNotification } from "./notificationUtils";
 
 function requireRole(user, allowed) {
   if (!user || !allowed.includes(user.role)) {
@@ -167,14 +168,24 @@ export const create = mutation({
     });
 
     if (taskData.assignedUserId && taskData.assignedUserId !== actor._id) {
-      await ctx.db.insert("notifications", {
+      await createNotification(ctx, {
         userId: taskData.assignedUserId,
-        message: `You have been assigned a new task: "${taskData.title}" in project "${project.name}"`,
         type: "task_assigned",
-        isRead: false,
+        title: "New Task Assignment",
+        message: `You have been assigned a new task: "${taskData.title}" in project "${project.name}"`,
+        link: `/tasks/${taskId}`,
+        actionUrl: `/tasks/${taskId}`,
+        requiresAction: true,
         relatedResourceId: taskId,
         relatedResourceType: "task",
-        createdAt: now,
+        actionUserId: actor._id,
+        actionUserRole: actor.role,
+        contextData: {
+          projectId: taskData.projectId,
+          projectName: project.name,
+          taskTitle: taskData.title,
+          priority: taskData.priority,
+        },
       });
     }
 
@@ -251,14 +262,23 @@ export const update = mutation({
       }
 
       if (project.pmId && project.pmId !== actor._id) {
-        await ctx.db.insert("notifications", {
+        await createNotification(ctx, {
           userId: project.pmId,
-          message: `Task "${task.title}" has been completed by ${actor.name}`,
           type: "task_completed",
-          isRead: false,
+          title: "Task Completed",
+          message: `Task "${task.title}" has been completed by ${actor.name}`,
+          link: `/tasks/${id}`,
           relatedResourceId: id,
           relatedResourceType: "task",
-          createdAt: now,
+          actionUserId: actor._id,
+          actionUserRole: actor.role,
+          contextData: {
+            projectId: task.projectId,
+            projectName: project.name,
+            taskTitle: task.title,
+            completedByName: actor.name,
+            skillProficiencyGain: task.skillProficiencyGain,
+          },
         });
       }
     }

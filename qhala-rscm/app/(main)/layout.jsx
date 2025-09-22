@@ -10,7 +10,6 @@ import ContentFooter from "@/components/navigation/ContentFooter";
 import DiscoverIconCluster from "@/components/navigation/DiscoverIconCluster";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import EtherealBackground from "@/components/common/EtherealBackground"; // ✅ import
 
 export default function MainAppLayout({ children }) {
   const { data: session, status } = useSession({
@@ -47,10 +46,7 @@ export default function MainAppLayout({ children }) {
   const iconClusterBottomOffset = "bottom-[8px]";
 
   return (
-    <EtherealBackground>
-      {" "}
-      {/* ✅ wrap the whole dashboard */}
-      <div className="flex h-screen text-[rgb(var(--foreground))] relative z-10">
+      <div className="flex h-screen text-[rgb(var(--foreground))] relative">
         {useAdminStyling ? (
           <AdminSidebar
             isMobileOpen={isMobileSidebarOpen}
@@ -89,8 +85,7 @@ export default function MainAppLayout({ children }) {
           <main
             className={cn(
               "flex-1 overflow-y-auto",
-              "bg-[rgb(var(--background))]/80", // ✅ make slightly transparent so background shows
-              "backdrop-blur-sm", // ✅ optional: blur effect
+              "bg-[rgb(var(--background))]",
               "rounded-tl-lg rounded-bl-lg",
               "pt-14 md:pt-16 pb-14 md:pb-16",
               "px-4 sm:px-6 md:px-8"
@@ -108,6 +103,5 @@ export default function MainAppLayout({ children }) {
           </div>
         </div>
       </div>
-    </EtherealBackground>
   );
 }

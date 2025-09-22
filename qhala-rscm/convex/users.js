@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { createNotification, createBulkNotifications } from "./notificationUtils";
 
 function requireRole(user, allowed) {
   if (!user || !allowed.includes(user.role)) {
@@ -163,7 +164,34 @@ export const updateProfile = mutation({
     requireRole(actor, ["hr", "admin"]);
     const { id, email, ...updates } = args;
 
+    // Get current user state before update
+    const currentUser = await ctx.db.get(args.id);
+    if (!currentUser) throw new Error("User not found");
+
     await ctx.db.patch(args.id, { ...updates, updatedAt: Date.now() });
+
+    // Notify user if their role changed
+    if (updates.role && updates.role !== currentUser.role) {
+      await createNotification(ctx, {
+        userId: args.id,
+        type: "user_role_changed",
+        title: "Role Updated",
+        message: `Your role has been updated from ${currentUser.role} to ${updates.role} by ${actor.name}`,
+        link: `/profile`,
+        actionUrl: `/profile`,
+        requiresAction: true,
+        relatedResourceId: args.id,
+        relatedResourceType: "user",
+        actionUserId: actor._id,
+        actionUserRole: actor.role,
+        contextData: {
+          oldRole: currentUser.role,
+          newRole: updates.role,
+          updatedByName: actor.name,
+        },
+      });
+    }
+
     return { success: true };
   },
 });
@@ -309,6 +337,45 @@ export const assignLineManager = mutation({
       lineManagerId: args.lineManagerId,
       updatedAt: Date.now(),
     });
+
+    // Notify the user about their new line manager
+    await createNotification(ctx, {
+      userId: args.userId,
+      type: "user_role_changed", // Using existing type for role/management changes
+      title: "Line Manager Assigned",
+      message: `${lm.name} has been assigned as your line manager by ${actor.name}`,
+      link: `/profile`,
+      relatedResourceId: args.userId,
+      relatedResourceType: "user",
+      actionUserId: actor._id,
+      actionUserRole: actor.role,
+      contextData: {
+        lineManagerName: lm.name,
+        lineManagerEmail: lm.email,
+        assignedByName: actor.name,
+      },
+    });
+
+    // Notify the line manager about their new direct report
+    await createNotification(ctx, {
+      userId: args.lineManagerId,
+      type: "user_role_changed", // Using existing type for management changes
+      title: "New Direct Report",
+      message: `${target.name} has been assigned to report to you by ${actor.name}`,
+      link: `/team`,
+      actionUrl: `/team`,
+      requiresAction: true,
+      relatedResourceId: args.userId,
+      relatedResourceType: "user",
+      actionUserId: actor._id,
+      actionUserRole: actor.role,
+      contextData: {
+        directReportName: target.name,
+        directReportEmail: target.email,
+        assignedByName: actor.name,
+      },
+    });
+
     return { success: true, message: "Line manager assigned successfully." };
   },
 });
@@ -332,7 +399,7 @@ export const createUserFromAuth = mutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now();
-    return await ctx.db.insert("users", {
+    const userId = await ctx.db.insert("users", {
       email: args.email,
       name: args.name,
       avatarUrl: args.avatarUrl || "",
@@ -347,6 +414,36 @@ export const createUserFromAuth = mutation({
       createdAt: now,
       updatedAt: now,
     });
+
+    // Notify HR and admin about new user registration
+    const hrAndAdmins = await ctx.db
+      .query("users")
+      .filter((q) => q.or(
+        q.eq(q.field("role"), "hr"),
+        q.eq(q.field("role"), "admin")
+      ))
+      .collect();
+
+    if (hrAndAdmins.length > 0) {
+      await createBulkNotifications(ctx, {
+        userIds: hrAndAdmins.map(u => u._id),
+        type: "user_profile_incomplete",
+        title: "New User Registration",
+        message: `${args.name} (${args.email}) has registered and needs profile setup`,
+        link: `/users/${userId}`,
+        actionUrl: `/users/${userId}`,
+        requiresAction: true,
+        relatedResourceId: userId,
+        relatedResourceType: "user",
+        contextData: {
+          userName: args.name,
+          userEmail: args.email,
+          registrationDate: now,
+        },
+      });
+    }
+
+    return userId;
   },
 });
 // Update User Auth
