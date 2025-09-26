@@ -261,6 +261,8 @@ export const processApproval = mutation({
         approverName: actor.name,
         approverRole: actor.role,
         reason: args.reason,
+        actionUserName: actor.name,
+        actionUserAvatar: actor.avatarUrl,
       },
     });
 

@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useMutation } from "convex/react";
+import { useSession } from "next-auth/react";
+import { api } from "@/convex/_generated/api";
 import { Save, User, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +36,7 @@ const PrefilledSkills = ({ skills }) => (
 );
 
 export const UserCreationForm = ({ initialData, onBack, onSuccess }) => {
+  const { data: session } = useSession();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -46,6 +50,9 @@ export const UserCreationForm = ({ initialData, onBack, onSuccess }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  
+  // Convex mutation
+  const createUser = useMutation(api.users.create);
 
   useEffect(() => {
     if (initialData) {
@@ -67,23 +74,32 @@ export const UserCreationForm = ({ initialData, onBack, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!session?.user?.email) {
+      setError("Authentication required");
+      return;
+    }
+    
     setIsSaving(true);
     setError(null);
     setSuccess(false);
     try {
-      const response = await fetch("/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+      // Extract skill IDs if skills exist
+      const skillIds = formData.skills.map(skill => skill.id).filter(Boolean);
+      
+      await createUser({
+        email: session.user.email,
+        name: formData.name,
+        newUserEmail: formData.email,
+        role: formData.role,
+        department: formData.department,
+        availabilityStatus: formData.availabilityStatus,
+        skills: skillIds.length > 0 ? skillIds : undefined,
       });
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || "Failed to create user.");
-      }
+      
       setSuccess(true);
       setTimeout(() => onSuccess(), 1500);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to create user.");
     } finally {
       setIsSaving(false);
     }

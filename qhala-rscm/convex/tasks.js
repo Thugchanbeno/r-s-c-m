@@ -185,6 +185,8 @@ export const create = mutation({
           projectName: project.name,
           taskTitle: taskData.title,
           priority: taskData.priority,
+          actionUserName: actor.name,
+          actionUserAvatar: actor.avatarUrl,
         },
       });
     }
@@ -278,6 +280,8 @@ export const update = mutation({
             taskTitle: task.title,
             completedByName: actor.name,
             skillProficiencyGain: task.skillProficiencyGain,
+            actionUserName: actor.name,
+            actionUserAvatar: actor.avatarUrl,
           },
         });
       }

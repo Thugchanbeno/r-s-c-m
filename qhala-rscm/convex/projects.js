@@ -189,6 +189,8 @@ export const create = mutation({
           projectName: args.name,
           department: args.department,
           pmName: actor.name,
+          actionUserName: actor.name,
+          actionUserAvatar: actor.avatarUrl,
           skillCount: (args.requiredSkills || []).length,
         },
       });
@@ -283,6 +285,8 @@ export const update = mutation({
             oldStatus: oldProject.status,
             newStatus: updates.status,
             updatedByName: actor.name,
+            actionUserName: actor.name,
+            actionUserAvatar: actor.avatarUrl,
           },
         });
       }

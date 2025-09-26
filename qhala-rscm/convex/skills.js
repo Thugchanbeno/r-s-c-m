@@ -64,8 +64,9 @@ export const create = mutation({
     if (existing) throw new Error(`Skill '${args.name}' already exists.`);
 
     const now = Date.now();
+    const { email, ...skillData } = args;
     return await ctx.db.insert("skills", {
-      ...args,
+      ...skillData,
       aliases: args.aliases?.map((a) => a.trim().toLowerCase()) || [],
       createdAt: now,
       updatedAt: now,
@@ -231,6 +232,8 @@ export const verifyUserSkill = mutation({
         verifierName: actor.name,
         reason: args.reason,
         verificationAction: args.action,
+        actionUserName: actor.name,
+        actionUserAvatar: actor.avatarUrl,
       },
     });
 
@@ -352,6 +355,8 @@ export const uploadProofDocument = mutation({
           userName: user.name,
           proofType: args.proofType,
           fileName: args.fileName,
+          actionUserName: user.name,
+          actionUserAvatar: user.avatarUrl,
         },
       });
     }

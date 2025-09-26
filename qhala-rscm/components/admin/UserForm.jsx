@@ -1,11 +1,15 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import { useQuery, useMutation } from "convex/react";
+import { useSession } from "next-auth/react";
+import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { AlertCircle, CheckCircle } from "lucide-react";
 import { toast } from "react-toastify";
 
 const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
+  const { data: session } = useSession();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -15,52 +19,41 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
     authProviderId: "",
   });
 
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  const fetchUserData = useCallback(async () => {
+  // Convex hooks
+  const userData = useQuery(
+    api.users.getById, 
+    userId ? { id: userId } : "skip"
+  );
+  const updateUser = useMutation(api.users.updateProfile);
+
+  const loading = userData === undefined;
+
+  // Handle user data from Convex query
+  useEffect(() => {
+    if (userData) {
+      setFormData({
+        name: userData.name || "",
+        email: userData.email || "",
+        role: userData.role || "employee",
+        department: userData.department || "",
+        availabilityStatus: userData.availabilityStatus || "available",
+        authProviderId: userData.authProviderId || "",
+      });
+      setError(null);
+      setSuccess(null);
+    }
+  }, [userData]);
+
+  // Set error if user not found
+  useEffect(() => {
     if (!userId) {
       setError("No User ID provided for editing.");
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-    try {
-      const response = await fetch(`/api/users/${userId}`);
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(
-          errData.error || `Error fetching user: ${response.status}`
-        );
-      }
-      const result = await response.json();
-      if (result.success && result.data) {
-        setFormData({
-          name: result.data.name || "",
-          email: result.data.email || "",
-          role: result.data.role || "employee",
-          department: result.data.department || "",
-          availabilityStatus: result.data.availabilityStatus || "available",
-          authProviderId: result.data.authProviderId || "",
-        });
-      } else {
-        throw new Error(result.error || "Invalid user data received.");
-      }
-    } catch (err) {
-      console.error("EditUserForm: Failed to load user data:", err);
-      setError(`Failed to load user data: ${err.message}`);
-    } finally {
-      setLoading(false);
     }
   }, [userId]);
-
-  useEffect(() => {
-    fetchUserData();
-  }, [fetchUserData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,29 +65,27 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!session?.user?.email) {
+      setError("Authentication required");
+      return;
+    }
+    
     setSubmitting(true);
     setError(null);
     setSuccess(null);
     try {
-      const response = await fetch(`/api/users/${userId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          role: formData.role,
-          department: formData.department,
-          availabilityStatus: formData.availabilityStatus,
-        }),
+      await updateUser({
+        email: session.user.email,
+        id: userId,
+        role: formData.role,
+        department: formData.department,
+        availabilityStatus: formData.availabilityStatus,
       });
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(
-          result.error || `Error updating user: ${response.status}`
-        );
-      }
+      
       setSuccess(`User "${formData.name}" updated successfully!`);
       toast.success(`User "${formData.name}" updated successfully!`);
       if (onUserUpdated) {
-        onUserUpdated(result.data);
+        onUserUpdated(userData);
       }
     } catch (err) {
       setError(err.message || "Could not update user.");

@@ -17,7 +17,6 @@ export async function GET(req) {
     const search = searchParams.get("search") || undefined;
 
     const skills = await convex.query(api.skills.getAll, { 
-      email,
       category, 
       search 
     });

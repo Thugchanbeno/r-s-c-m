@@ -1,10 +1,14 @@
 "use client";
 import { useState } from "react";
+import { useMutation } from "convex/react";
+import { useSession } from "next-auth/react";
+import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle } from "lucide-react";
 import { toast } from "react-toastify";
 
 const AddSkillForm = ({ onSkillAdded, onCancel }) => {
+  const { data: session } = useSession();
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
@@ -12,9 +16,17 @@ const AddSkillForm = ({ onSkillAdded, onCancel }) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  
+  // Convex mutation
+  const createSkill = useMutation(api.skills.create);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!session?.user?.email) {
+      setError("Authentication required");
+      return;
+    }
+    
     setSubmitting(true);
     setError(null);
     setSuccess(null);
@@ -25,33 +37,21 @@ const AddSkillForm = ({ onSkillAdded, onCancel }) => {
       .filter((alias) => alias !== "");
 
     try {
-      const response = await fetch("/api/skills", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          category,
-          description,
-          aliases: aliasesArray,
-        }),
+      const skillId = await createSkill({
+        email: session.user.email,
+        name,
+        category: category || undefined,
+        description: description || undefined,
+        aliases: aliasesArray.length > 0 ? aliasesArray : undefined,
       });
 
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        const errorMessage = Array.isArray(result.error)
-          ? result.error.join(", ")
-          : result.error;
-        throw new Error(errorMessage || `Error: ${response.status}`);
-      }
-
-      setSuccess(`Skill "${result.data.name}" added successfully!`);
+      setSuccess(`Skill "${name}" added successfully!`);
       setName("");
       setCategory("");
       setDescription("");
       setAliases("");
       if (onSkillAdded) onSkillAdded();
-      toast.success(`Skill "${result.data.name}" added successfully!`);
+      toast.success(`Skill "${name}" added successfully!`);
     } catch (err) {
       setError(err.message || "Could not add skill.");
       toast.error(err.message || "Could not add skill.");

@@ -230,7 +230,7 @@ export default defineSchema({
     link: v.optional(v.string()),
     isRead: v.boolean(),
     isArchived: v.optional(v.boolean()),
-    
+
     // Comprehensive notification types (persistent only)
     type: v.union(
       // User Management Domain (4 types)
@@ -238,7 +238,7 @@ export default defineSchema({
       v.literal("user_deactivated"),
       v.literal("user_reactivated"),
       v.literal("user_profile_incomplete"),
-      
+
       // Skills & Verification Domain (7 types)
       v.literal("skill_verification_requested"),
       v.literal("skill_verification_approved"),
@@ -247,7 +247,7 @@ export default defineSchema({
       v.literal("skill_in_demand"),
       v.literal("new_skill_opportunity"),
       v.literal("skills_profile_incomplete"),
-      
+
       // Projects Domain (7 types)
       v.literal("project_deadline_approaching"),
       v.literal("project_overdue"),
@@ -256,7 +256,7 @@ export default defineSchema({
       v.literal("project_skills_matched"),
       v.literal("project_cancelled"),
       v.literal("project_status_changed"),
-      
+
       // Resources Domain (6 types)
       v.literal("allocation_created"),
       v.literal("allocation_updated"),
@@ -264,7 +264,7 @@ export default defineSchema({
       v.literal("allocation_conflict"),
       v.literal("allocation_underutilized"),
       v.literal("allocation_approaching_capacity"),
-      
+
       // Approvals Domain (7 types)
       v.literal("resource_request_pending_lm"),
       v.literal("resource_request_pending_hr"),
@@ -273,7 +273,7 @@ export default defineSchema({
       v.literal("resource_request_hr_approved"),
       v.literal("resource_request_hr_rejected"),
       v.literal("resource_request_expired"),
-      
+
       // Work Requests Domain (10 types)
       v.literal("leave_request_pending_lm"),
       v.literal("leave_request_pending_pm"),
@@ -285,20 +285,20 @@ export default defineSchema({
       v.literal("leave_balance_low"),
       v.literal("leave_expiring_soon"),
       v.literal("covering_assignment"),
-      
+
       // Tasks Domain (5 types)
       v.literal("task_assigned"),
       v.literal("task_deadline_approaching"),
       v.literal("task_overdue"),
       v.literal("task_commented"),
       v.literal("task_reassigned"),
-      
+
       // CV/Profile Domain (4 types)
       v.literal("cv_processed"),
       v.literal("cv_processing_failed"),
       v.literal("profile_completeness_low"),
       v.literal("profile_recommendation"),
-      
+
       // Analytics Domain (6 types)
       v.literal("report_generated"),
       v.literal("report_failed"),
@@ -306,7 +306,7 @@ export default defineSchema({
       v.literal("capacity_alert"),
       v.literal("skills_gap_alert"),
       v.literal("utilization_alert"),
-      
+
       // System Domain (6 types)
       v.literal("system_maintenance"),
       v.literal("system_update"),
@@ -314,7 +314,7 @@ export default defineSchema({
       v.literal("data_export_ready"),
       v.literal("security_alert"),
       v.literal("account_security"),
-      
+
       // Legacy types for backward compatibility
       v.literal("new_request"),
       v.literal("request_approved"),
@@ -323,7 +323,7 @@ export default defineSchema({
       v.literal("skill_verification"),
       v.literal("general_info")
     ),
-    
+
     // Notification categorization for filtering
     category: v.union(
       v.literal("user_management"),
@@ -335,15 +335,15 @@ export default defineSchema({
       v.literal("system"),
       v.literal("analytics")
     ),
-    
+
     // Priority levels
     priority: v.union(
-      v.literal("critical"),   // Security, system down, urgent approvals
-      v.literal("high"),       // Deadlines, important approvals
-      v.literal("medium"),     // Regular updates, assignments
-      v.literal("low")         // Recommendations, tips
+      v.literal("critical"), // Security, system down, urgent approvals
+      v.literal("high"), // Deadlines, important approvals
+      v.literal("medium"), // Regular updates, assignments
+      v.literal("low") // Recommendations, tips
     ),
-    
+
     // Enhanced relationship tracking
     relatedResourceId: v.optional(v.string()),
     relatedResourceType: v.optional(
@@ -360,7 +360,7 @@ export default defineSchema({
         v.literal("report")
       )
     ),
-    
+
     // Who triggered this notification
     actionUserId: v.optional(v.id("users")),
     actionUserRole: v.optional(
@@ -373,19 +373,19 @@ export default defineSchema({
         v.literal("system")
       )
     ),
-    
+
     // Additional context data for rich notifications
     contextData: v.optional(v.any()),
-    
+
     // For action-required notifications
     requiresAction: v.optional(v.boolean()),
     actionCompleted: v.optional(v.boolean()),
     actionCompletedAt: v.optional(v.number()),
-    actionUrl: v.optional(v.string()),  // Direct link to take action
-    
+    actionUrl: v.optional(v.string()), // Direct link to take action
+
     // Expiry for time-sensitive notifications
     expiresAt: v.optional(v.number()),
-    
+
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
   })

@@ -179,6 +179,8 @@ export const create = mutation({
           role: args.role,
           allocationPercentage: args.allocationPercentage,
           allocatedByName: actor.name,
+          actionUserName: actor.name,
+          actionUserAvatar: actor.avatarUrl,
         },
       });
 
@@ -194,13 +196,15 @@ export const create = mutation({
           relatedResourceType: "allocation",
           actionUserId: actor._id,
           actionUserRole: actor.role,
-          contextData: {
-            userId: args.userId,
-            userName: user.name,
-            projectName: project.name,
-            role: args.role,
-            allocationPercentage: args.allocationPercentage,
-          },
+        contextData: {
+          userId: args.userId,
+          userName: user.name,
+          projectName: project.name,
+          role: args.role,
+          allocationPercentage: args.allocationPercentage,
+          actionUserName: actor.name,
+          actionUserAvatar: actor.avatarUrl,
+        },
         });
       }
     }
@@ -285,6 +289,8 @@ export const update = mutation({
             oldPercentage: oldAllocation.allocationPercentage,
             newPercentage: updates.allocationPercentage,
             role: allocation.role,
+            actionUserName: actor.name,
+            actionUserAvatar: actor.avatarUrl,
           },
         });
       }
