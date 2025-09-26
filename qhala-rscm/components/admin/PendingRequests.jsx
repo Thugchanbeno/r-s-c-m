@@ -1,5 +1,8 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
+import { useQuery } from "convex/react";
+import { useSession } from "next-auth/react";
+import { api } from "@/convex/_generated/api";
 import {
   Card,
   CardHeader,
@@ -24,42 +27,26 @@ import {
 import { cn } from "@/lib/utils";
 
 const PendingRequestsList = ({ onProcessRequest, processingRequestId }) => {
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const fetchPendingRequests = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch("/api/resourcerequests?status=pending");
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(
-          errData.error ||
-            `Failed to fetch pending requests: ${response.statusText}`
-        );
-      }
-      const result = await response.json();
-      if (result.success && Array.isArray(result.data)) {
-        setRequests(result.data);
-      } else {
-        throw new Error(
-          result.error || "Invalid data format for pending requests."
-        );
-      }
-    } catch (err) {
-      console.error("Error fetching pending requests:", err);
-      setError(err.message || "Could not load pending requests.");
-      setRequests([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchPendingRequests();
-  }, [fetchPendingRequests]);
+  const { data: session } = useSession();
+  
+  // Use Convex queries to fetch all pending requests (pending_lm and pending_hr)
+  const pendingLmRequests = useQuery(
+    api.resourceRequests.getAll,
+    session?.user?.email 
+      ? { email: session.user.email, status: "pending_lm" }
+      : "skip"
+  );
+  
+  const pendingHrRequests = useQuery(
+    api.resourceRequests.getAll,
+    session?.user?.email 
+      ? { email: session.user.email, status: "pending_hr" }
+      : "skip"
+  );
+  
+  const loading = pendingLmRequests === undefined || pendingHrRequests === undefined;
+  const requests = [...(pendingLmRequests || []), ...(pendingHrRequests || [])];
+  const [error] = useState(null); // Convex handles errors internally
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";

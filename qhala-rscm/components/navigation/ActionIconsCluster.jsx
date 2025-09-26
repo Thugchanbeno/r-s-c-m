@@ -1,10 +1,11 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
 import { Sun, Moon, Bell, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
-import NotificationDropdown from "@/components/user/NotificationDropdown";
+import { useNotificationCount } from "@/lib/hooks/useNotificationCount";
+import NotificationDropdownWrapper from "@/components/user/NotificationDropdownWrapper";
 
 const ActionIconsCluster = ({ 
   onMobileSidebarToggle, 
@@ -12,36 +13,12 @@ const ActionIconsCluster = ({
 }) => {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
-  const [notificationCount, setNotificationCount] = useState(0);
   const { data: session, status: sessionStatus } = useSession();
+  const { count: notificationCount } = useNotificationCount();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => setMounted(true), []);
-
-  const fetchNotificationCount = useCallback(async () => {
-    if (sessionStatus === "authenticated" && session?.user) {
-      try {
-        const response = await fetch("/api/notifications/count");
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success) setNotificationCount(data.count);
-        }
-      } catch (error) {
-        // console.error("Failed to fetch notification count:", error);
-      }
-    } else if (sessionStatus === "unauthenticated") {
-      setNotificationCount(0);
-    }
-  }, [sessionStatus, session]);
-
-  useEffect(() => {
-    if (sessionStatus === "authenticated") {
-      fetchNotificationCount();
-      const intervalId = setInterval(fetchNotificationCount, 120000);
-      return () => clearInterval(intervalId);
-    }
-  }, [fetchNotificationCount, sessionStatus]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -55,17 +32,11 @@ const ActionIconsCluster = ({
   }, [isDropdownOpen]);
 
   const toggleThemeCb = () => setTheme(theme === "dark" ? "light" : "dark");
-  const toggleDropdownCb = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-    if (!isDropdownOpen && sessionStatus === "authenticated")
-      fetchNotificationCount();
-  };
-  const handleMarkAllReadSuccessCb = () => setNotificationCount(0);
-  const handleDropdownNotificationsUpdateCb = (newUnreadCount) => {
-    if (typeof newUnreadCount === "number")
-      setNotificationCount(newUnreadCount);
-    else if (sessionStatus === "authenticated") fetchNotificationCount();
-  };
+  const toggleDropdownCb = () => setIsDropdownOpen(!isDropdownOpen);
+  
+  // These callbacks are now handled by the enhanced notification hook
+  const handleMarkAllReadSuccessCb = () => {}; // No-op, handled by hook
+  const handleDropdownNotificationsUpdateCb = () => {}; // No-op, handled by hook
 
   const outerSeamlessBg = "bg-slate-900";
   const innerElevatedBg = "bg-slate-900";
@@ -150,7 +121,7 @@ const ActionIconsCluster = ({
                     </span>
                   )}
                 </button>
-                <NotificationDropdown
+                <NotificationDropdownWrapper
                   isOpen={isDropdownOpen}
                   onClose={() => setIsDropdownOpen(false)}
                   onMarkAllReadSuccess={handleMarkAllReadSuccessCb}
@@ -218,7 +189,7 @@ const ActionIconsCluster = ({
                     </span>
                   )}
                 </button>
-                <NotificationDropdown
+                <NotificationDropdownWrapper
                   isOpen={isDropdownOpen}
                   onClose={() => setIsDropdownOpen(false)}
                   onMarkAllReadSuccess={handleMarkAllReadSuccessCb}

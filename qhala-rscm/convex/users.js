@@ -188,6 +188,8 @@ export const updateProfile = mutation({
           oldRole: currentUser.role,
           newRole: updates.role,
           updatedByName: actor.name,
+          actionUserName: actor.name,
+          actionUserAvatar: actor.avatarUrl,
         },
       });
     }
@@ -353,6 +355,8 @@ export const assignLineManager = mutation({
         lineManagerName: lm.name,
         lineManagerEmail: lm.email,
         assignedByName: actor.name,
+        actionUserName: actor.name,
+        actionUserAvatar: actor.avatarUrl,
       },
     });
 
@@ -373,6 +377,8 @@ export const assignLineManager = mutation({
         directReportName: target.name,
         directReportEmail: target.email,
         assignedByName: actor.name,
+        actionUserName: actor.name,
+        actionUserAvatar: actor.avatarUrl,
       },
     });
 
@@ -439,6 +445,8 @@ export const createUserFromAuth = mutation({
           userName: args.name,
           userEmail: args.email,
           registrationDate: now,
+          actionUserName: args.name,
+          actionUserAvatar: args.avatarUrl,
         },
       });
     }
