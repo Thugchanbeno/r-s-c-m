@@ -405,7 +405,7 @@ export const getSkillAnalytics = query({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["admin", "hr", "pm"]);
+    requireRole(actor, ["admin", "hr", "pm", "line_manager"]);
 
     let userSkills = await ctx.db.query("userSkills").collect();
     if (args.skillId) {

@@ -17,6 +17,7 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
     department: "",
     availabilityStatus: "available",
     authProviderId: "",
+    lineManagerId: null,
   });
 
   const [submitting, setSubmitting] = useState(false);
@@ -27,6 +28,10 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
   const userData = useQuery(
     api.users.getById, 
     userId ? { id: userId } : "skip"
+  );
+  const allUsers = useQuery(
+    api.users.getAll,
+    session?.user?.email ? { email: session.user.email, search: "", limit: 1000 } : "skip"
   );
   const updateUser = useMutation(api.users.updateProfile);
 
@@ -42,6 +47,7 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
         department: userData.department || "",
         availabilityStatus: userData.availabilityStatus || "available",
         authProviderId: userData.authProviderId || "",
+        lineManagerId: userData.lineManagerId || null,
       });
       setError(null);
       setSuccess(null);
@@ -80,6 +86,7 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
         role: formData.role,
         department: formData.department,
         availabilityStatus: formData.availabilityStatus,
+        lineManagerId: formData.lineManagerId || undefined,
       });
       
       setSuccess(`User "${formData.name}" updated successfully!`);
@@ -159,6 +166,7 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
           className={`${inputBaseClasses} appearance-none`}
         >
           <option value="employee">Employee</option>
+          <option value="line_manager">Line Manager</option>
           <option value="pm">Project Manager</option>
           <option value="hr">HR</option>
           <option value="admin">Admin</option>
@@ -182,7 +190,6 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
         />
       </div>
 
-      {/* New Availability Status Field */}
       <div>
         <label
           htmlFor="availabilityStatus"
@@ -202,6 +209,34 @@ const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
           <option value="unavailable">Unavailable</option>
           <option value="on_leave">On Leave</option>
         </select>
+      </div>
+
+      <div>
+        <label
+          htmlFor="lineManagerId"
+          className="block text-sm font-medium text-[rgb(var(--foreground))]"
+        >
+          Line Manager
+        </label>
+        <select
+          id="lineManagerId"
+          name="lineManagerId"
+          value={formData.lineManagerId || ""}
+          onChange={handleChange}
+          className={`${inputBaseClasses} appearance-none`}
+        >
+          <option value="">None</option>
+          {allUsers && allUsers
+            .filter((u) => u._id !== userId && u.role === "line_manager")
+            .map((manager) => (
+              <option key={manager._id} value={manager._id}>
+                {manager.name}
+              </option>
+            ))}
+        </select>
+        <p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">
+          Only users with Line Manager role will appear here
+        </p>
       </div>
 
       <div className="flex justify-end space-x-3 pt-4">

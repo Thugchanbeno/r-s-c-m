@@ -16,7 +16,6 @@ const ManagerDashboard = ({ user }) => {
 
   const quickActions = [
     { label: "Approve Requests", icon: CheckSquare, href: "/approvals" },
-    { label: "Review Skills", icon: Award, href: "/skills/review" },
     { label: "View Team", icon: Users, href: "/team" },
     { label: "Reports", icon: Eye, href: "/reports" },
   ];

@@ -29,9 +29,13 @@ export const getAll = query({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["hr", "admin", "pm"]);
+    requireRole(actor, ["hr", "admin", "pm", "line_manager"]);
 
     let users = await ctx.db.query("users").collect();
+
+    if (actor.role === "line_manager") {
+      users = users.filter((u) => u.lineManagerId === actor._id);
+    }
 
     if (args.search) {
       const s = args.search.toLowerCase();
@@ -146,6 +150,7 @@ export const updateProfile = mutation({
         v.literal("on_leave")
       )
     ),
+    lineManagerId: v.optional(v.union(v.id("users"), v.null())),
     employeeType: v.optional(
       v.union(
         v.literal("permanent"),
