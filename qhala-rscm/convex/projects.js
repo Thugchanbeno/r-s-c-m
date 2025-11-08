@@ -54,7 +54,7 @@ export const getAll = query({
         .withIndex("by_pm", (q) => q.eq("pmId", args.pmId))
         .collect();
     } else {
-      requireRole(actor, ["admin", "hr", "pm"]);
+      requireRole(actor, ["admin", "hr", "pm", "line_manager"]);
       projects = await ctx.db.query("projects").collect();
     }
     if (args.department) {

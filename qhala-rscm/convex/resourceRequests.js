@@ -33,12 +33,12 @@ export const getAll = query({
     if (args.requestedByPmId) {
       if (
         actor._id === args.requestedByPmId ||
-        ["admin", "hr"].includes(actor.role)
+        ["admin", "hr", "line_manager"].includes(actor.role)
       ) {
         canAccess = true;
       }
     } else {
-      if (["admin", "hr"].includes(actor.role)) canAccess = true;
+      if (["admin", "hr", "line_manager"].includes(actor.role)) canAccess = true;
     }
     if (!canAccess) throw new Error("Forbidden: Insufficient permissions.");
 
@@ -66,13 +66,37 @@ export const getAll = query({
       q = ctx.db.query("resourceRequests");
     }
 
-    const requests = await q.collect();
+    let requests = await q.collect();
+
+    if (actor.role === "line_manager") {
+      const directReports = await ctx.db
+        .query("users")
+        .withIndex("by_line_manager", (q) => q.eq("lineManagerId", actor._id))
+        .collect();
+      const directReportIds = new Set(directReports.map((u) => u._id));
+      requests = requests.filter((r) => directReportIds.has(r.requestedUserId));
+    }
 
     if (args.countOnly) {
       return { count: requests.length };
     }
 
-    return requests.sort((a, b) => b.createdAt - a.createdAt);
+    // Populate related data
+    const enrichedRequests = [];
+    for (const req of requests) {
+      const requestedUser = await ctx.db.get(req.requestedUserId);
+      const project = await ctx.db.get(req.projectId);
+      const requestedByPm = await ctx.db.get(req.requestedByPmId);
+      
+      enrichedRequests.push({
+        ...req,
+        requestedUserId: requestedUser,
+        projectId: project,
+        requestedByPmId: requestedByPm,
+      });
+    }
+
+    return enrichedRequests.sort((a, b) => b.createdAt - a.createdAt);
   },
 });
 // POST request
@@ -151,19 +175,13 @@ export const create = mutation({
 // Multi-step approval (LM → HR)
 export const processApproval = mutation({
   args: {
+    email: v.string(),
     requestId: v.id("resourceRequests"),
     action: v.union(v.literal("approve"), v.literal("reject")),
     reason: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-
-    const actor = await ctx.db
-      .query("users")
-      .withIndex("by_email", (ix) => ix.eq("email", identity.email))
-      .first();
-    if (!actor) throw new Error("User not found");
+    const actor = await getActor(ctx, args.email);
 
     const request = await ctx.db.get(args.requestId);
     if (!request) throw new Error("Resource request not found.");

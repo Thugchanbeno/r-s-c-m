@@ -63,13 +63,43 @@ export const getAll = query({
       requests = requests.filter((r) => r.status === args.status);
     }
 
-    if (!["admin", "hr", "pm", "line_manager"].includes(actor.role)) {
+    // Filter based on role
+    if (actor.role === "line_manager") {
+      const directReports = await ctx.db
+        .query("users")
+        .withIndex("by_line_manager", (q) => q.eq("lineManagerId", actor._id))
+        .collect();
+      const directReportIds = new Set(directReports.map((u) => u._id));
+      requests = requests.filter((r) => directReportIds.has(r.userId));
+    } else if (!["admin", "hr", "pm"].includes(actor.role)) {
+      // Regular employees only see their own requests
       requests = requests.filter((r) => r.userId === actor._id);
+    }
+
+    // Populate related user and project data
+    const enrichedRequests = [];
+    for (const req of requests) {
+      const user = await ctx.db.get(req.userId);
+      let project = null;
+      if (req.projectId) {
+        project = await ctx.db.get(req.projectId);
+      }
+      let coveringUser = null;
+      if (req.coveringUserId) {
+        coveringUser = await ctx.db.get(req.coveringUserId);
+      }
+      
+      enrichedRequests.push({
+        ...req,
+        userId: user,
+        projectId: project,
+        coveringUserId: coveringUser,
+      });
     }
 
     const skip = args.skip ?? 0;
     const limit = args.limit ?? 50;
-    return requests.slice(skip, skip + limit);
+    return enrichedRequests.slice(skip, skip + limit);
   },
 });
 
