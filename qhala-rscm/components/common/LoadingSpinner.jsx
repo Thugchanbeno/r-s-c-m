@@ -1,29 +1,26 @@
 "use client";
-import { PulseLoader } from "react-spinners";
+import { BarLoader } from "react-spinners";
+
 const LoadingSpinner = ({
   loading = true,
-  color = "#333333",
-  size = 15,
-  speedMultiplier = 0.75,
+  color = "#4a2545", // RSCM Violet
+  width = 100,
+  height = 4,
+  speedMultiplier = 1,
   className = "",
   ...props
 }) => {
-  const loaderHeight = size;
-  const loaderWidth = size / 3;
-  const loaderRadius = size / 2;
-
   if (!loading) {
     return null;
   }
 
   return (
     <div className={`flex items-center justify-center ${className}`}>
-      <PulseLoader
+      <BarLoader
         color={color}
         loading={loading}
-        height={loaderHeight}
-        width={loaderWidth}
-        radius={loaderRadius}
+        width={width}
+        height={height}
         speedMultiplier={speedMultiplier}
         aria-label="Loading Spinner"
         data-testid="loader"

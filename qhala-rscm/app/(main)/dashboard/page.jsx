@@ -1,31 +1,26 @@
 // app/dashboard/page.jsx
 "use client";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { redirect } from "next/navigation";
 import Dashboard from "@/components/dashboard/main-dashboard";
-import { LoadingSpinner } from "@/components/dashboard/dashboard-components";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 export default function DashboardPage() {
-  const { data: session, status } = useSession({
-    required: true,
-    onUnauthenticated() {
-      redirect("/api/auth/signin?callbackUrl=/dashboard");
-    },
-  });
+  const { user, isLoading, isAuthenticated } = useAuth();
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-10 text-center">
-        <LoadingSpinner size={32} />
-        <p className="mt-4 text-lg text-gray-600">Loading your dashboard...</p>
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 gap-4">
+        <LoadingSpinner width={200} height={4} />
+        <p className="text-sm text-rscm-dark-purple">Loading your dashboard...</p>
       </div>
     );
   }
 
-  if (!session?.user) {
+  if (!isAuthenticated || !user) {
     redirect("/api/auth/signin?callbackUrl=/dashboard");
     return null;
   }
 
-  return <Dashboard user={session.user} />;
+  return <Dashboard user={user} />;
 }
