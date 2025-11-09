@@ -34,7 +34,8 @@ export const getForCurrentUser = query({
       if (skill) {
         skills.push({
           ...us,
-          skillName: skill.name,
+          skillId: skill, // Return full skill object nested in skillId
+          skillName: skill.name, // Keep for backward compatibility
           category: skill.category,
         });
       }
@@ -119,7 +120,8 @@ export const updateForCurrentUser = mutation({
       if (skill) {
         result.push({
           ...us,
-          skillName: skill.name,
+          skillId: skill, // Return full skill object nested in skillId
+          skillName: skill.name, // Keep for backward compatibility
           category: skill.category,
         });
       }
