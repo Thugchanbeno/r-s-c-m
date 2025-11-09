@@ -1,213 +1,180 @@
 "use client";
-import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
-import qlogo from "@/assets/qlogo.png";
+import rscmLogo from "@/assets/RSCM-full.png";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Zap, Cpu, BarChartBig } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
-import {
-  pageVariants,
-  itemVariants,
-  listContainerVariants,
-  fadeIn,
-} from "@/lib/animations";
+import { Network, BarChart3 } from "lucide-react";
 
 const HomePage = () => {
-  const [hoveredLetter, setHoveredLetter] = useState(null);
-
   const handleSignIn = () => {
     signIn("google", { callbackUrl: "/dashboard" });
   };
 
-  const qrscmFullName = "Resource & Skill Capacity Manager";
-  const appDescription =
-    "Qhala RSCM offers intelligent resource allocation, dynamic skill mapping, and clear capacity planning to drive optimal efficiency.";
-
-  const letterHoverColor = "hover:text-[rgb(var(--qhala-rich-gold))]";
-  const primaryColorRgbString = "var(--primary)";
-
-  const benefits = [
-    {
-      id: "ai-allocate",
-      icon: <Cpu size={28} className="text-primary" />,
-      title: "AI-Powered Resource Allocation",
-      description:
-        "Intelligently match the best talent to tasks, maximizing project outcomes and team satisfaction.",
-    },
-    {
-      id: "capacity",
-      icon: <BarChartBig size={28} className="text-primary" />,
-      title: "Optimized Capacity Planning",
-      description:
-        "Gain clear insights into team availability and make data-driven decisions to prevent burnout and boost output.",
-    },
-  ];
-
   return (
-    <motion.div
-      className={cn(
-        "relative flex min-h-screen flex-col overflow-hidden p-4 md:p-6",
-        "bg-background"
-      )}
-      initial="hidden"
-      animate="visible"
-      variants={pageVariants}
+    <div
+      className="min-h-screen bg-white relative flex flex-col"
+      style={{
+        backgroundImage: `radial-gradient(circle, rgb(var(--rscm-violet) / 0.08) 1px, transparent 1px)`,
+        backgroundSize: "24px 24px",
+      }}
     >
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-80 md:opacity-100">
-        <div
-          className="absolute top-0 left-0 -translate-y-1/4 -translate-x-1/4 w-[500px] h-[500px] md:w-[700px] md:h-[700px] rounded-full filter blur-3xl opacity-20 md:opacity-25"
-          style={{ background: `rgba(${primaryColorRgbString}, 0.35)` }}
-        ></div>
-        <div
-          className="absolute top-[-50px] left-[50px] -translate-y-1/4 -translate-x-1/4 w-[400px] h-[400px] md:w-[600px] md:h-[600px] rounded-full filter blur-3xl opacity-15 md:opacity-20 mix-blend-multiply"
-          style={{ backgroundColor: "#E94E24" }}
-        ></div>
-        <div
-          className={cn(
-            "absolute bottom-0 right-0 translate-y-1/4 translate-x-1/4 w-[500px] h-[500px] md:w-[700px] md:h-[700px] rounded-full filter blur-3xl opacity-15 md:opacity-20",
-            "bg-amber-400"
-          )}
-        ></div>
-      </div>
-
-      <motion.nav
-        className="relative z-20 w-full max-w-6xl mx-auto px-2 sm:px-4 lg:px-6 py-5 flex items-center justify-between"
-        variants={fadeIn}
-      >
-        <div className="flex items-center space-x-2">
+      <nav className="relative z-10 w-full py-2 mb-0 max-w-[1600px] mx-auto px-6 lg:px-16 xl:px-24">
+        <div className="flex items-center justify-between gap-8">
           <Image
-            src={qlogo}
-            alt="Qhala Logo"
-            width={32}
-            height={32}
-            className="h-8 w-8"
+            src={rscmLogo}
+            alt="RSCM"
+            width={350}
+            height={105}
+            className="h-36 w-auto"
             priority
-            sizes="32px"
           />
-          <span className="text-xl font-semibold text-foreground">Qhala</span>
-        </div>
-      </motion.nav>
-
-      <main className="relative z-10 flex flex-grow flex-col items-center justify-center text-center px-4 py-8 md:py-12">
-        <motion.div className="max-w-3xl" variants={fadeIn}>
-          <motion.div className="mb-4" variants={itemVariants}>
-            <span
-              className={cn(
-                "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium",
-                "bg-primary-accent-background text-primary"
-              )}
-            >
-              <Zap size={14} className="mr-1.5" />
-              Intelligent Team Management
-            </span>
-          </motion.div>
-          <motion.h1
-            className="text-4xl font-extrabold tracking-tight sm:text-5xl cursor-default text-foreground"
-            aria-label={qrscmFullName}
-            variants={itemVariants}
-          >
-            {qrscmFullName.split(" ").map((word, wordIndex) => (
-              <span key={wordIndex} className="whitespace-nowrap mr-1.5">
-                {word.split("").map((letter, letterIndex) => (
-                  <span
-                    key={letterIndex}
-                    aria-hidden="true"
-                    className={cn(
-                      "transition-all duration-300 ease-out inline-block",
-                      letterHoverColor,
-                      hoveredLetter === `${wordIndex}-${letterIndex}`
-                        ? "scale-110 -translate-y-1"
-                        : "scale-100 translate-y-0"
-                    )}
-                    onMouseEnter={() =>
-                      setHoveredLetter(`${wordIndex}-${letterIndex}`)
-                    }
-                    onMouseLeave={() => setHoveredLetter(null)}
-                  >
-                    {letter === " " ? "\u00A0" : letter}
-                  </span>
-                ))}
-              </span>
-            ))}
-          </motion.h1>
-          <motion.p
-            className="mt-5 text-base md:text-lg leading-7 max-w-xl mx-auto text-muted-foreground"
-            variants={itemVariants}
-          >
-            {appDescription}
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          className="mt-10 md:mt-12 grid md:grid-cols-2 gap-5 md:gap-6 max-w-5xl w-full"
-          variants={listContainerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          {benefits.map((benefit) => (
-            <motion.div
-              key={benefit.id}
-              className={cn(
-                "p-6 rounded-lg shadow-lg transform",
-                "bg-card border border-border/60",
-                "transition-all duration-300 ease-in-out",
-                "hover:-translate-y-1.5 hover:shadow-xl"
-              )}
-              variants={itemVariants}
-            >
-              <div
-                className={cn(
-                  "w-12 h-12 rounded-md flex items-center justify-center mb-4",
-                  "bg-primary-accent-background"
-                )}
-              >
-                {benefit.icon}
-              </div>
-              <h3 className="text-lg lg:text-xl font-semibold mb-2 text-foreground">
-                {benefit.title}
-              </h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {benefit.description}
-              </p>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        <motion.div className="mt-10 md:mt-12" variants={fadeIn}>
           <Button
             onClick={handleSignIn}
-            variant="primary"
             size="lg"
-            className={cn(
-              "px-8 py-3 text-base font-semibold",
-              "rounded-full",
-              "shadow-lg hover:shadow-xl",
-              "transition-all duration-300 ease-in-out",
-              "transform hover:scale-[1.03] active:scale-100 group",
-              "hover:ring-2 hover:ring-offset-2 hover:ring-[rgb(var(--accent))] hover:ring-offset-background",
-              "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgb(var(--accent))] focus-visible:ring-offset-background"
-            )}
+            className="font-bold  text-white flex-shrink-0 bg-rscm-plum"
           >
-            Sign in
-            <ArrowRight
-              size={20}
-              className="ml-2 transition-transform duration-300 ease-in-out group-hover:translate-x-1"
-            />
+            Get Started
           </Button>
-        </motion.div>
+        </div>
+      </nav>
+
+      <main className="relative z-10 flex-1 flex items-center -mt-8">
+        <div className="w-full px-6 lg:px-16 xl:px-24">
+          <div className="grid lg:grid-cols-2 gap-8 xl:gap-12 items-center max-w-[1600px] mx-auto">
+            <div className="space-y-8">
+              <div>
+                <h1 className="text-5xl lg:text-6xl xl:text-7xl font-black leading-tight mb-2">
+                  <span className="text-rscm-violet">Resource & Skill</span>
+                  <br />
+                  <span className="text-rscm-violet">Capacity </span>
+                  <span className="text-rscm-dark-purple">Management</span>
+                </h1>
+              </div>
+
+              <p className="text-lg text-black leading-relaxed">
+                Intelligent resource allocation, dynamic skill mapping, and
+                clear capacity planning to drive optimal efficiency for modern
+                teams.
+              </p>
+
+              <div className="grid md:grid-cols-2 gap-6 pt-4">
+                <div className="space-y-2">
+                  <div className="flex gap-3 items-start">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-rscm-violet">
+                        <Network className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-base mb-1">
+                        AI-Powered Resource Allocation
+                      </h3>
+                      <p className="text-sm text-black/70 leading-relaxed">
+                        Intelligently match the best talent to tasks, maximizing
+                        project outcomes and team satisfaction.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex gap-3 items-start">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-rscm-violet">
+                        <BarChart3 className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-base mb-1">
+                        Optimized Capacity Planning
+                      </h3>
+                      <p className="text-sm text-black/70 leading-relaxed">
+                        Gain clear insights into team availability and make
+                        data-driven decisions to prevent burnout and boost
+                        output.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-0 h-[520px] w-full max-w-[550px] ml-auto">
+              <div className="flex flex-col justify-between items-center">
+                <div
+                  className="w-full aspect-square bg-rscm-dutch-white"
+                  style={{
+                    borderRadius: "3.5rem 0 0 3.5rem",
+                  }}
+                ></div>
+                <div className="w-full aspect-square border-[10px] bg-white border-rscm-violet"></div>
+                <div
+                  className="w-full aspect-square bg-rscm-black"
+                  style={{
+                    borderRadius: "3.5rem 3.5rem 0 3.5rem",
+                  }}
+                ></div>
+              </div>
+
+              <div className="flex flex-col justify-between items-center">
+                <div className="w-full aspect-square flex items-center justify-center">
+                  <div className="w-[70%] h-[70%] rotate-45 bg-rscm-lilac"></div>
+                </div>
+                <div className="w-full aspect-square rounded-full bg-rscm-violet"></div>
+                <div className="w-full aspect-square flex items-center justify-center">
+                  <svg
+                    width="100%"
+                    height="100%"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                  >
+                    <polygon
+                      points="50,5 95,95 5,95"
+                      fill="white"
+                      stroke="#4A2545"
+                      strokeWidth="6"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              <div className="flex flex-col justify-between items-center">
+                <div className="w-full aspect-square overflow-hidden">
+                  <div
+                    className="w-full h-full bg-rscm-violet"
+                    style={{
+                      borderRadius: "0 85% 0 0",
+                    }}
+                  ></div>
+                </div>
+                <div className="w-full aspect-square overflow-hidden">
+                  <div
+                    className="w-full h-full bg-rscm-violet"
+                    style={{
+                      borderRadius: "0 0 85% 0",
+                    }}
+                  ></div>
+                </div>
+                <div className="w-full aspect-square overflow-hidden">
+                  <div
+                    className="w-full h-full bg-rscm-black"
+                    style={{
+                      borderRadius: "0 85% 0 0",
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
 
-      <motion.footer
-        className="relative z-10 mt-auto py-8 text-center"
-        variants={fadeIn}
-      >
-        <p className="text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} Qhala. All rights reserved.
+      <footer className="relative z-10 py-8 text-center">
+        <p className="text-sm text-black/60">
+          © 2025 RSCM. All rights reserved.
         </p>
-      </motion.footer>
-    </motion.div>
+      </footer>
+    </div>
   );
 };
 

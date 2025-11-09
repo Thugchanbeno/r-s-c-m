@@ -2,113 +2,91 @@
 @import "react-datepicker/dist/react-datepicker.css";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@theme {
+  --color-rscm-dutch-white: #eee6d3;
+  --color-rscm-lilac: #c398b5;
+  --color-rscm-plum: #824c71;
+  --color-rscm-violet: #4a2545;
+  --color-rscm-dark-purple: #251323;
+  --color-rscm-black: #000001;
+}
 
 @layer base {
   :root {
-    /* Qhala Brand Colors */
-    --qhala-deep-red: 192 0 0;
-    --qhala-rich-gold: 218 165 32;
-    --qhala-dark-navy: 0 51 102;
-    --qhala-charcoal-grey: 51 51 51;
-    --qhala-sky-blue: 135 206 235;
-    --qhala-soft-peach: 255 243 229;
-    --qhala-soft-peach-darker: 255 218 185;
+    /* RSCM Brand Colors */
+    --rscm-dutch-white: 238 230 211;
+    --rscm-lilac: 195 152 181;
+    --rscm-plum: 130 76 113;
+    --rscm-violet: 74 37 69;
+    --rscm-dark-purple: 37 19 35;
+    --rscm-black: 0 0 1;
 
-    /* Light Theme Palette */
-    --background: 248 249 250;
-    --foreground: 0 51 102;
+    /* Theme Palette */
+    --background: 255 255 255;
+    --foreground: 0 0 0;
 
     --card: 255 255 255;
-    --card-foreground: 0 51 102;
+    --card-foreground: 0 0 0;
     --popover: 255 255 255;
-    --popover-foreground: 0 51 102;
+    --popover-foreground: 0 0 0;
 
-    --border: 222 226 230;
-    --input: 222 226 230;
+    --border: 229 229 229;
+    --input: 229 229 229;
 
-    --primary: 0 51 102; /* dark navy */
+    --primary: 74 37 69;
     --primary-foreground: 255 255 255;
-    --primary-accent-background: 230 240 247;
+    --primary-hover: 94 57 89;
 
-    --secondary: 218 165 32; /* gold */
-    --secondary-foreground: 51 51 51;
+    --secondary: 130 76 113;
+    --secondary-foreground: 255 255 255;
+    --secondary-hover: 150 96 133;
 
-    --muted: 241 243 245;
-    --muted-foreground: 108 117 125;
+    --muted: 245 245 245;
+    --muted-foreground: 115 115 115;
 
-    --accent: 255 243 229; /* peach */
-    --accent-foreground: 0 51 102;
+    --accent: 238 225 206;
+    --accent-foreground: 0 0 0;
 
-    --destructive: 192 0 0; /* deep red */
+    --destructive: 220 38 38;
     --destructive-foreground: 255 255 255;
 
-    --success: 25 135 84;
+    --success: 34 197 94;
     --success-foreground: 255 255 255;
 
-    --warning: 255 193 7;
-    --warning-foreground: 51 51 51;
+    --warning: 251 191 36;
+    --warning-foreground: 0 0 0;
 
     --info: 59 130 246;
     --info-foreground: 255 255 255;
 
-    --ring: 0 51 102;
-    --radius: 0.625rem;
+    --ring: 74 37 69;
+    --radius: 0.5rem;
 
-    /* Code Font */
-    --font-code:
-      "Source Code Pro", ui-monospace, Menlo, Monaco, "Cascadia Mono",
-      "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace",
-      "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
-  }
+    /* Typography */
+    --font-sans:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+      Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+      "Segoe UI Symbol";
 
-  .dark {
-    /* Dark Theme Palette */
-    --background: 33 37 41;
-    --foreground: 222 226 230;
-
-    --card: 49 51 56;
-    --card-foreground: 222 226 230;
-    --popover: 49 51 56;
-    --popover-foreground: 222 226 230;
-
-    --border: 73 80 87;
-    --input: 73 80 87;
-
-    --primary: 135 206 235; /* sky blue */
-    --primary-foreground: 0 51 102;
-    --primary-accent-background: 23 71 102;
-
-    --secondary: 221 177 60;
-    --secondary-foreground: 51 51 51;
-
-    --muted: 54 58 63;
-    --muted-foreground: 140 146 151;
-
-    --accent: 255 243 229;
-    --accent-foreground: 0 51 102;
-
-    --destructive: 200 30 30;
-    --destructive-foreground: 255 255 255;
-
-    --success: 60 178 104;
-    --success-foreground: 33 37 41;
-
-    --warning: 255 203 47;
-    --warning-foreground: 33 37 41;
-
-    --info: 37 99 235;
-    --info-foreground: 248 250 252;
-
-    --ring: 135 206 235;
+    --font-mono:
+      ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
+      "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Fira Mono",
+      "Droid Sans Mono", "Courier New", monospace;
   }
 
   body {
     background-color: rgb(var(--background));
     color: rgb(var(--foreground));
-    font-family: var(--font-code); /* ✅ Source Code Pro everywhere */
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: var(--font-mono);
   }
 
   *:focus-visible {
@@ -119,20 +97,19 @@
       0 0 0 4px rgb(var(--ring));
   }
 
-  /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
 
   ::-webkit-scrollbar-track {
     background: rgb(var(--muted));
-    border-radius: 3px;
+    border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb {
     background: rgb(var(--muted-foreground) / 0.3);
-    border-radius: 3px;
+    border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
@@ -140,48 +117,45 @@
   }
 }
 
-/* Animation utilities */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+@layer components {
+  .rscm-toast {
+    box-shadow: 0 4px 12px rgba(74, 37, 69, 0.1) !important;
+    border-radius: 0.5rem !important;
+    font-family: var(--font-sans) !important;
+    font-size: 0.875rem !important;
+    padding: 1rem !important;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-@keyframes slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
+  .rscm-toast [data-icon] {
+    margin-right: 0.75rem !important;
   }
-  to {
-    opacity: 1;
-    transform: translateX(0);
+
+  .rscm-toast [data-content] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
   }
-}
 
-@keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
+  .rscm-toast [data-title] {
+    font-weight: 600 !important;
   }
-  to {
-    opacity: 1;
-    transform: scale(1);
+
+  .rscm-toast [data-description] {
+    font-size: 0.8125rem !important;
+    opacity: 0.8;
   }
-}
 
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out;
-}
+  .rscm-toast [data-button] {
+    background: rgb(var(--rscm-violet)) !important;
+    color: white !important;
+    border-radius: 0.375rem !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    transition: background-color 0.15s ease-in-out !important;
+  }
 
-.animate-slide-in {
-  animation: slide-in 0.3s ease-out;
-}
-
-.animate-scale-in {
-  animation: scale-in 0.2s ease-out;
+  .rscm-toast [data-button]:hover {
+    background: rgb(var(--rscm-plum)) !important;
+  }
 }

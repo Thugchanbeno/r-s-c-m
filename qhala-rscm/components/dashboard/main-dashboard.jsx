@@ -1,25 +1,24 @@
 // components/dashboard/main-dashboard.jsx
 import React from "react";
-import EmployeeDashboard from "@/components/dashboard/employee-dashboard";
-import PMDashboard from "@/components/dashboard/pm-dashboard";
-import HRDashboard from "@/components/dashboard/hr-admin-dashboard";
-import ManagerDashboard from "@/components/dashboard/line-manager-dashboard";
+import EmployeeDashboardNew from "@/components/dashboard/EmployeeDashboardNew";
+import PMDashboardNew from "@/components/dashboard/PMDashboardNew";
+import AdminDashboard from "@/components/dashboard/AdminDashboard";
+import LineManagerDashboardNew from "@/components/dashboard/LineManagerDashboardNew";
 
 const Dashboard = ({ user }) => {
   const renderDashboard = () => {
     switch (user.role) {
       case "employee":
-        return <EmployeeDashboard user={user} />;
-        ``;
+        return <EmployeeDashboardNew user={user} />;
       case "pm":
-        return <PMDashboard user={user} />;
+        return <PMDashboardNew user={user} />;
       case "hr":
       case "admin":
-        return <HRDashboard user={user} />;
+        return <AdminDashboard user={user} />;
       case "line_manager":
-        return <ManagerDashboard user={user} />;
+        return <LineManagerDashboardNew user={user} />;
       default:
-        return <EmployeeDashboard user={user} />;
+        return <EmployeeDashboardNew user={user} />;
     }
   };
 
