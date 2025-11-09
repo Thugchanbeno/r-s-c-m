@@ -1,22 +1,6 @@
 "use client";
-import ProfileView from "@/components/views/ProfileView.jsx";
-import { useSession } from "next-auth/react";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import ProfilePageNew from "@/components/profile/ProfilePageNew";
 
 export default function ProfilePage() {
-  const { status } = useSession({ required: true });
-
-  if (status === "loading") {
-    return (
-      <div className="flex justify-center items-center pt-20">
-        <LoadingSpinner size={30} />
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <ProfileView />
-    </div>
-  );
+  return <ProfilePageNew />;
 }

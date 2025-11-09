@@ -1,24 +1,39 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
-import rscmLogo from "@/assets/RSCM.png";
+import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   LayoutDashboard,
-  Users,
   Briefcase,
-  Bell,
-  UserCircle,
+  Users,
   Settings,
   LogOut,
+  UserCircle,
 } from "lucide-react";
+import rscmLogo from "@/assets/RSCM.png";
 
 const AppSidebar = () => {
-  const [expandedSection, setExpandedSection] = useState(null);
   const { data: session } = useSession();
+  const [expandedSection, setExpandedSection] = useState(null);
+  const [activeHash, setActiveHash] = useState("");
   const pathname = usePathname();
+
+  // Track hash changes for scrollspy
+  useEffect(() => {
+    const handleHashChange = () => {
+      setActiveHash(window.location.hash);
+    };
+    
+    // Set initial hash
+    setActiveHash(window.location.hash);
+    
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
 
   const userRole = session?.user?.role || "employee";
   const userName = session?.user?.name || session?.user?.email || "User";
@@ -30,14 +45,21 @@ const AppSidebar = () => {
       name: "Dashboard",
       icon: LayoutDashboard,
       href: "/dashboard",
-      roles: ["admin", "hr", "pm", "employee"],
+      roles: ["admin", "hr", "pm", "employee", "line_manager"],
+    },
+    {
+      id: "profile",
+      name: "Profile",
+      icon: UserCircle,
+      href: "/profile",
+      roles: ["admin", "hr", "pm", "employee", "line_manager"],
     },
     {
       id: "projects",
       name: "Projects",
       icon: Briefcase,
       href: "/projects",
-      roles: ["admin", "hr", "pm", "employee"],
+      roles: ["admin", "hr", "pm", "employee", "line_manager"],
     },
     {
       id: "resources",
@@ -55,9 +77,15 @@ const AppSidebar = () => {
         { label: "Manage skills", href: "/admin/skills", roles: ["admin", "hr"] },
         { label: "View analytics", href: "/admin/analytics", roles: ["admin", "hr"] },
         { label: "View approvals", href: "/approvals", roles: ["admin", "hr", "line_manager"] },
-        { label: "My profile", href: "/profile", roles: ["employee", "pm", "line_manager"] },
         { label: "My team", href: "/resources", roles: ["pm", "line_manager"] },
         { label: "Request resources", href: "/resources/requests", roles: ["pm"] },
+      ],
+      profile: [
+        { label: "Overview", href: "/profile#overview", roles: ["admin", "hr", "pm", "employee", "line_manager"] },
+        { label: "Skills & Development", href: "/profile#skills", roles: ["admin", "hr", "pm", "employee", "line_manager"] },
+        { label: "Employment Details", href: "/profile#employment", roles: ["admin", "hr", "pm", "employee", "line_manager"] },
+        { label: "Line Manager", href: "/profile#manager", roles: ["admin", "hr", "pm", "employee", "line_manager"] },
+        { label: "Work Requests", href: "/profile#requests", roles: ["admin", "hr", "pm", "employee", "line_manager"] },
       ],
       projects: [
         { label: "Create project", href: "/projects/new", roles: ["admin", "hr", "pm"] },
@@ -139,20 +167,12 @@ const AppSidebar = () => {
           })}
         </div>
 
-        <div className="flex flex-col gap-0.5 pt-4 mt-4 w-full items-center">
-          <Link
-            href="/profile"
-            className="w-10 h-10 flex items-center justify-center text-rscm-dark-purple hover:bg-white/50 rounded-md transition-all duration-200"
-            title="Profile"
-          >
-            <UserCircle size={20} />
-          </Link>
-
+        <div className="flex flex-col gap-0.5 pt-4 mt-auto w-full items-center border-t border-gray-200">
           {(userRole === "admin" || userRole === "hr") && (
             <Link
               href="/admin"
-              className="w-10 h-10 flex items-center justify-center text-rscm-dark-purple hover:bg-white/50 rounded-md transition-all duration-200"
-              title="Settings"
+              className="w-10 h-10 flex items-center justify-center text-rscm-dark-purple hover:bg-white/50 rounded-md transition-all duration-200 mt-4"
+              title="Admin Settings"
             >
               <Settings size={20} />
             </Link>
@@ -168,30 +188,51 @@ const AppSidebar = () => {
         </div>
       </div>
 
-      {expandedSection && (
-        <div className="w-60 bg-white rounded-lg shadow-sm p-4 my-3 ml-1 animate-in slide-in-from-left duration-200">
-          <h3 className="font-semibold text-sm mb-4 text-rscm-violet">
-            {filteredNavigation.find((n) => n.id === expandedSection)?.name}
-          </h3>
-          <div className="space-y-1">
-            {getQuickActions(expandedSection).map((action, index) => (
-              <Link
-                key={index}
-                href={action.href}
-                className="block px-3 py-2 text-sm text-rscm-dark-purple hover:bg-rscm-dutch-white/30 rounded transition-colors"
-                onClick={() => setExpandedSection(null)}
-              >
-                {action.label}
-              </Link>
-            ))}
-            {getQuickActions(expandedSection).length === 0 && (
-              <p className="text-xs text-gray-400 px-3 py-2">
-                No quick actions available
-              </p>
-            )}
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {expandedSection && (
+          <motion.div
+            initial={{ opacity: 0, x: -20, width: 0 }}
+            animate={{ opacity: 1, x: 0, width: 240 }}
+            exit={{ opacity: 0, x: -20, width: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="bg-white rounded-lg shadow-sm p-4 my-3 ml-1 overflow-hidden"
+          >
+            <motion.div
+              key={expandedSection}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.15 }}
+            >
+              <h3 className="font-semibold text-sm mb-4 text-rscm-violet">
+                {filteredNavigation.find((n) => n.id === expandedSection)?.name}
+              </h3>
+              <div className="space-y-1">
+                {getQuickActions(expandedSection).map((action, index) => {
+                  const isActiveHash = action.href.includes("#") && action.href.endsWith(activeHash);
+                  return (
+                    <Link
+                      key={index}
+                      href={action.href}
+                      className={`block px-3 py-2 text-sm rounded transition-colors ${
+                        isActiveHash
+                          ? "bg-rscm-violet text-white font-medium"
+                          : "text-rscm-dark-purple hover:bg-rscm-dutch-white/30"
+                      }`}
+                    >
+                      {action.label}
+                    </Link>
+                  );
+                })}
+                {getQuickActions(expandedSection).length === 0 && (
+                  <p className="text-xs text-gray-400 px-3 py-2">
+                    No quick actions available
+                  </p>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

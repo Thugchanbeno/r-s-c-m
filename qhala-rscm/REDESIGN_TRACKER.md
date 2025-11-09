@@ -90,11 +90,18 @@
   - [ ] Capacity planning interfaces
   - [ ] Update visualizations
 
-- [ ] **Profile** (`app/(main)/profile/*`)
-  - [ ] Profile view page
-  - [ ] Profile edit forms
-  - [ ] Skills section
-  - [ ] Update user cards
+- [x] **Profile** (`app/(main)/profile/*`) - ✅ COMPLETED
+  - [x] Profile view page (ProfilePageNew.jsx)
+  - [x] Profile header with avatar, capacity, leave balance
+  - [x] Skills section with current/desired skills and pending verifications
+  - [x] Projects & employment details cards
+  - [x] Line manager card
+  - [x] Work requests history
+  - [x] All modals (Leave, Overtime, Skills Editor, Employment Details)
+  - [x] CV upload onboarding flow
+  - [x] Skills verification workflow with proof requirements
+  - [x] Scrollspy navigation integration with sidebar
+  - [x] Smooth animations and transitions
 
 - [ ] **Notifications** (`app/(main)/notifications/*`)
   - [ ] Notification center page
@@ -218,6 +225,18 @@
   - [x] WorkRequestsTab.jsx (update colors)
   - [x] ResourceRequestsTab.jsx (update colors)
   - [x] SkillVerificationsTab.jsx (update colors)
+
+- [x] **Profile Components** (`components/profile/*`) - ✅ COMPLETED
+  - [x] ProfilePageNew.jsx - Main profile layout with scrollspy
+  - [x] ProfileHeaderNew.jsx - Avatar, capacity, leave balance stats
+  - [x] SkillsSectionNew.jsx - Current/desired skills with pending verifications
+  - [x] ProjectsEmploymentSectionNew.jsx - Projects and employment cards
+  - [x] LineManagerCardNew.jsx - Line manager info
+  - [x] WorkRequestsSectionNew.jsx - Request history
+  - [x] LeaveRequestModal.jsx - Annual leave requests
+  - [x] OvertimeRequestModal.jsx - Overtime logging
+  - [x] SkillsEditorModal.jsx - Skills management with CV upload
+  - [x] EmploymentDetailsModal.jsx - Employment details editing
 
 - [ ] **Admin Components** (`components/admin/*`)
   - [ ] UserForm.jsx
@@ -361,11 +380,11 @@
 ## 📊 Progress Summary
 
 **Total Tasks:** ~100+  
-**Completed:** ~45  
-**In Progress:** Feature pages (Projects, Resources, Profile)  
-**Not Started:** ~55  
+**Completed:** ~60  
+**In Progress:** Feature pages (Projects, Resources, Approvals)  
+**Not Started:** ~40  
 
-**Estimated Time:** 2-3 full sessions (Session 2 ~80% complete)
+**Estimated Time:** 2-3 full sessions (Session 2 ~90% complete)
 
 ---
 
@@ -379,15 +398,19 @@
 5. ✅ Redesign landing page (needs polish)
 6. ⏳ Update core components (Button, Card, Badge) - NEXT
 
-### Session 2 (Nov 9) - Core Pages ✅ 80% COMPLETE
+### Session 2 (Nov 9) - Core Pages ✅ 90% COMPLETE
 1. ✅ Dashboard redesigns (all 4 roles complete)
 2. ✅ Navigation components (AppLayout, AppSidebar, NotificationRotator)
 3. ✅ Layout system (removed old layouts)
 4. ✅ Toast notifications with RSCM colors
 5. ✅ Avatar display with Google profile pictures
 6. ✅ Role-based sidebar actions
-7. ⏳ Common UI components (Button, Card, Badge) - NEXT
-8. ⏳ Approvals page updates - NEXT
+7. ✅ Profile page complete redesign
+8. ✅ Profile modals (Leave, Overtime, Skills, Employment)
+9. ✅ Skills verification workflow with proof requirements
+10. ✅ CV upload onboarding flow
+11. ⏳ Common UI components (Button, Card, Badge) - NEXT
+12. ⏳ Approvals page updates - NEXT
 
 ### Session 3 - Feature Pages & Polish
 1. Projects, Resources, Profile pages
