@@ -1,5 +1,5 @@
 "use client";
-import ResourcesView from "@/components/views/ResourcesView.jsx"; // Adjust path
+import ResourcesViewNew from "@/components/views/ResourcesViewNew";
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 
@@ -14,9 +14,5 @@ export default function ResourcesPage() {
     );
   }
 
-  return (
-    <div>
-      <ResourcesView />
-    </div>
-  );
+  return <ResourcesViewNew />;
 }

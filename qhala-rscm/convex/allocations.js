@@ -68,8 +68,12 @@ export const getAll = query({
       
       enrichedAllocations.push({
         ...allocation,
-        userId: user, // Replace ID with full user object
-        projectId: project, // Replace ID with full project object
+        userName: user?.name || "Unknown User",
+        userEmail: user?.email,
+        userAvatar: user?.avatarUrl,
+        projectName: project?.name || "Unknown Project",
+        projectDepartment: project?.department,
+        projectColor: project?.color,
       });
     }
 
