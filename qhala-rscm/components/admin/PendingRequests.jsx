@@ -25,6 +25,7 @@ import {
   BellRing,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatRequestStatus } from "@/components/common/CustomColors";
 
 const PendingRequestsList = ({ onProcessRequest, processingRequestId }) => {
   const { data: session } = useSession();
@@ -120,7 +121,7 @@ const PendingRequestsList = ({ onProcessRequest, processingRequestId }) => {
                   </span>
                 </CardTitle>
                 <Badge variant="warning" pill={true} size="sm">
-                  {req.status}
+                  {formatRequestStatus(req.status)}
                 </Badge>
               </div>
               <CardDescription className="text-xs text-[rgb(var(--muted-foreground))] mt-1.5 space-x-2">

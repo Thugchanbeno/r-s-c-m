@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { formatRequestStatus } from "@/components/common/CustomColors";
 
 export default function ResourceRequestsTab({ user }) {
   const { data: session } = useSession();
@@ -133,7 +134,7 @@ export default function ResourceRequestsTab({ user }) {
                   </span>
                 </CardTitle>
                 <Badge variant="warning" pill={true} size="sm">
-                  {req.status}
+                  {formatRequestStatus(req.status)}
                 </Badge>
               </div>
               <CardDescription className="text-xs text-[rgb(var(--muted-foreground))] mt-1.5 space-x-2">

@@ -87,14 +87,7 @@ const AppSidebar = () => {
 
   const getQuickActions = (navId) => {
     const actionsByNav = {
-      dashboard: [
-        { label: "Manage users", href: "/admin/users", roles: ["admin", "hr"] },
-        { label: "Manage skills", href: "/admin/skills", roles: ["admin", "hr"] },
-        { label: "View analytics", href: "/admin/analytics", roles: ["admin", "hr"] },
-        { label: "View approvals", href: "/approvals", roles: ["admin", "hr", "line_manager"] },
-        { label: "My team", href: "/resources", roles: ["pm", "line_manager"] },
-        { label: "Request resources", href: "/resources/requests", roles: ["pm"] },
-      ],
+      dashboard: [],
       profile: [
         { label: "Overview", href: "/profile#overview", roles: ["admin", "hr", "pm", "employee", "line_manager"] },
         { label: "Skills & Development", href: "/profile#skills", roles: ["admin", "hr", "pm", "employee", "line_manager"] },
@@ -170,21 +163,38 @@ const AppSidebar = () => {
             
             return (
               <div key={item.id} className="relative">
-                <button
-                  onClick={() => toggleSection(item.id)}
-                  title={item.name}
-                  className={`
-                    w-10 h-10 flex items-center justify-center rounded-md transition-all duration-200
-                    ${
-                      active || isExpanded
-                        ? "bg-rscm-violet text-white"
-                        : "text-rscm-dark-purple hover:bg-white/50"
-                    }
-                  `}
-                >
-                  <Icon size={20} strokeWidth={active ? 2 : 1.5} />
-                </button>
-                {hasActions && !isExpanded && (
+                {item.id === "dashboard" ? (
+                  <Link
+                    href={item.href}
+                    title={item.name}
+                    className={`
+                      w-10 h-10 flex items-center justify-center rounded-md transition-all duration-200
+                      ${
+                        active
+                          ? "bg-rscm-violet text-white"
+                          : "text-rscm-dark-purple hover:bg-white/50"
+                      }
+                    `}
+                  >
+                    <Icon size={20} strokeWidth={active ? 2 : 1.5} />
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => toggleSection(item.id)}
+                    title={item.name}
+                    className={`
+                      w-10 h-10 flex items-center justify-center rounded-md transition-all duration-200
+                      ${
+                        active || isExpanded
+                          ? "bg-rscm-violet text-white"
+                          : "text-rscm-dark-purple hover:bg-white/50"
+                      }
+                    `}
+                  >
+                    <Icon size={20} strokeWidth={active ? 2 : 1.5} />
+                  </button>
+                )}
+                {hasActions && !isExpanded && item.id !== "dashboard" && (
                   <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-rscm-lilac rounded-full"></div>
                 )}
               </div>
