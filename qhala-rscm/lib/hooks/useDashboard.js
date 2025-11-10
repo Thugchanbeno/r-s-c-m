@@ -105,7 +105,7 @@ export const useDashboard = () => {
       : "skip"
   );
 
-  // ✅ Role-aware loading check
+  //  Role-aware loading check
   const isLoading =
     currentUser === undefined ||
     recentActivities === undefined ||
