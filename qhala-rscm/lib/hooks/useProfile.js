@@ -36,9 +36,6 @@ export const useProfile = () => {
     authUser?.email ? { email: authUser.email } : "skip"
   );
 
-  // Note: getPendingVerifications is for line managers to see their team's pending skills
-  // For the user's own profile, we derive pending skills from their userSkills
-
   // Mutations
   const updateUserProfile = useMutation(api.users.updateProfile);
   const updateUserSkills = useMutation(api.userSkills.updateForCurrentUser);
@@ -77,31 +74,37 @@ export const useProfile = () => {
     useState({});
 
   // Derived
-  const currentSkills = useMemo(
-    () => {
-      const skills = userSkills?.filter((s) => s.isCurrent) || [];
-      // Add isVerified flag based on proof documents
-      return skills.map(skill => ({
-        ...skill,
-        isVerified: skill.proofDocuments?.some((doc) => doc.verificationStatus === "approved") || false,
-        isPending: skill.proofDocuments?.some((doc) => doc.verificationStatus === "pending") || false,
-      }));
-    },
-    [userSkills]
-  );
+  const currentSkills = useMemo(() => {
+    const skills = userSkills?.filter((s) => s.isCurrent) || [];
+    // Add isVerified flag based on proof documents
+    return skills.map((skill) => ({
+      ...skill,
+      isVerified:
+        skill.proofDocuments?.some(
+          (doc) => doc.verificationStatus === "approved"
+        ) || false,
+      isPending:
+        skill.proofDocuments?.some(
+          (doc) => doc.verificationStatus === "pending"
+        ) || false,
+    }));
+  }, [userSkills]);
   const desiredSkills = useMemo(
     () => userSkills?.filter((s) => s.isDesired) || [],
     [userSkills]
   );
-  
+
   // Derive pending verifications from current skills with pending proof documents
   const pendingSkillVerifications = useMemo(
-    () => currentSkills.filter((skill) => 
-      skill.proofDocuments?.some((doc) => doc.verificationStatus === "pending")
-    ),
+    () =>
+      currentSkills.filter((skill) =>
+        skill.proofDocuments?.some(
+          (doc) => doc.verificationStatus === "pending"
+        )
+      ),
     [currentSkills]
   );
-  
+
   const isOnboarding = currentSkills.length === 0;
 
   const groupedSkillsTaxonomy = useMemo(() => {
