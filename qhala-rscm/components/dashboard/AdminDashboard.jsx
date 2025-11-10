@@ -24,8 +24,20 @@ const AdminDashboard = ({ user }) => {
     api.resourceRequests.getAll,
     user?.email ? { email: user.email, status: "pending_hr" } : "skip"
   );
+  
+  // Also fetch other pending items that might need approval
+  const allPendingResourceRequests = useQuery(
+    api.resourceRequests.getAll,
+    user?.email ? { email: user.email } : "skip"
+  );
+  
+  // Fetch pending work requests
+  const pendingWorkRequests = useQuery(
+    api.workRequests.getAll,
+    user?.email ? { email: user.email } : "skip"
+  );
 
-  if (loading || pendingResourceRequests === undefined) {
+  if (loading || pendingResourceRequests === undefined || allPendingResourceRequests === undefined) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <LoadingSpinner width={200} height={4} />
@@ -55,19 +67,88 @@ const AdminDashboard = ({ user }) => {
     uniqueSkills: data.uniqueSkills || 0,
   };
 
-  const pendingApprovals = (pendingResourceRequests || []).slice(0, 5).map((req) => ({
-    title: `Resource request: ${req.requestedUserId?.name || "User"}`,
-    description: `${req.projectId?.name || "Project"} - ${req.requestedRole} (${req.requestedPercentage}%)`,
-  }));
+  // For HR/Admin - show only items that require HR-level approval
+  const hrPendingResourceRequests = (pendingResourceRequests || []).filter(req => req.status === "pending_hr");
   
-  const recentActivity = (data.activities || []).slice(0, 5);
+  // Also check for other HR-relevant pending items
+  const allResourceRequests = (allPendingResourceRequests || []).filter(req => req.status === "pending_hr");
+  
+  // Get pending work requests that need HR approval (typically leave > certain days)
+  const hrWorkRequests = (pendingWorkRequests || []).filter(req => 
+    req.status === 'pending' && 
+    (req.requestType === 'leave' && parseInt(req.duration) > 3) // Leave > 3 days needs HR
+  );
+  
+  const pendingApprovals = [];
+  
+  // Add HR-pending resource requests
+  [...hrPendingResourceRequests, ...allResourceRequests].forEach((req) => {
+    if (!pendingApprovals.find(p => p.id === `resource_${req._id}`)) {
+      pendingApprovals.push({
+        id: `resource_${req._id}`,
+        title: `Resource Request: ${req.requestedUserId?.name || "User"}`,
+        description: `${req.projectId?.name || "Project"} - ${req.requestedRole} (${req.requestedPercentage}%)`,
+        type: 'resource_request'
+      });
+    }
+  });
+  
+  // Add work requests requiring HR approval
+  hrWorkRequests.slice(0, 3).forEach((req) => {
+    pendingApprovals.push({
+      id: `work_${req._id}`,
+      title: `${req.requestType === 'leave' ? 'Extended Leave' : 'Overtime'}: ${req.userId?.name || "User"}`,
+      description: `${req.reason || 'No reason provided'} - ${req.duration} days`,
+      type: 'work_request'
+    });
+  });
+  
+  // Limit to 5 most recent
+  const finalPendingApprovals = pendingApprovals.slice(0, 5);
+  
+  const recentActivity = (data.activities || []).slice(0, 5).map((activity) => ({
+    description: activity.message || activity.description || "Recent activity",
+    timestamp: activity.time || activity.timestamp || "Unknown time",
+    type: activity.type || "general",
+    priority: activity.priority || "medium"
+  }));
+  // Generate capacity alerts based on utilization
   const capacityAlerts = [];
+  
+  if (stats.utilization > 90) {
+    capacityAlerts.push({
+      type: "overutilized",
+      message: `Organization utilization at ${stats.utilization}% - Consider additional resources`
+    });
+  } else if (stats.utilization < 50) {
+    capacityAlerts.push({
+      type: "underutilized", 
+      message: `Organization utilization at ${stats.utilization}% - Optimize resource allocation`
+    });
+  }
+  
+  // Add alerts for pending approvals if high
+  if (finalPendingApprovals.length > 5) {
+    capacityAlerts.push({
+      type: "high_approval_backlog",
+      message: `${finalPendingApprovals.length} pending approvals require attention`
+    });
+  }
+  
+  // Alert for low skill diversity
+  if (stats.uniqueSkills < 20) {
+    capacityAlerts.push({
+      type: "skill_diversity",
+      message: `Only ${stats.uniqueSkills} unique skills tracked - Consider skills assessment`
+    });
+  }
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
+    if (hour >= 5 && hour < 12) return "Good morning";
+    if (hour >= 12 && hour < 17) return "Good afternoon";
+    if (hour >= 17 && hour < 22) return "Good evening";
+    return "Good night"; // For hours 22-23 and 0-4
   };
 
   const getRoleDisplay = (role) => {
@@ -206,8 +287,8 @@ const AdminDashboard = ({ user }) => {
           </div>
 
           <div className="divide-y divide-gray-50">
-            {pendingApprovals.length > 0 ? (
-              pendingApprovals.map((approval, index) => (
+            {finalPendingApprovals.length > 0 ? (
+              finalPendingApprovals.map((approval, index) => (
                 <div
                   key={index}
                   className="px-6 py-3 hover:bg-rscm-dutch-white/20 transition-colors cursor-pointer group"

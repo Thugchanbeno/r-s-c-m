@@ -122,6 +122,18 @@ export const getRequestStatusColor = (status) => {
   return colors[status] || colors.pending_lm;
 };
 
+export const formatRequestStatus = (status) => {
+  const statusMap = {
+    'pending_lm': 'Pending Line Manager',
+    'pending_pm': 'Pending PM',
+    'pending_hr': 'Pending HR',
+    'approved': 'Approved',
+    'rejected': 'Rejected',
+    'cancelled': 'Cancelled'
+  };
+  return statusMap[status] || status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+};
+
 export const getStatusBadgeVariant = (status) => {
   switch (status) {
     case "Planning":

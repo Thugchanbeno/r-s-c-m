@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "convex/react";
 import { useSession } from "next-auth/react";
 import { api } from "@/convex/_generated/api";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { getRequestStatusColor, formatRequestStatus } from "@/components/common/CustomColors";
 import Image from "next/image";
 import {
   CheckCircle,
@@ -49,6 +50,7 @@ export default function ResourceRequestsTabNew({ user }) {
       year: "numeric",
     });
   };
+
 
   const handleProcessRequest = async (requestId, action) => {
     setProcessingRequestId(requestId);
@@ -145,8 +147,8 @@ export default function ResourceRequestsTabNew({ user }) {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-xs font-medium">
-                  {req.status}
+                <span className={`${getRequestStatusColor(req.status)} px-2 py-1 rounded-full text-xs font-medium`}>
+                  {formatRequestStatus(req.status)}
                 </span>
                 <div className="flex items-center gap-1.5 text-xs text-gray-500">
                   <Clock className="w-3.5 h-3.5" />
