@@ -8,6 +8,7 @@ import ResourcesListNew from "@/components/resources/ResourcesListNew";
 import AllocationsViewNew from "@/components/resources/AllocationsViewNew";
 import AllocationModal from "@/components/resources/AllocationModal";
 import UserManagementModal from "@/components/resources/UserManagementModal";
+import AdminAnalyticsNew from "@/components/admin/AdminAnalyticsNew";
 import { useAllocations } from "@/lib/hooks/useAllocations";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -15,16 +16,16 @@ import { api } from "@/convex/_generated/api";
 export default function TestLayoutPage() {
   const { user, isLoading } = useAuth();
   const { submitAllocation, isProcessingAction } = useAllocations();
-  const [testView, setTestView] = useState("resources"); // "resources" or "allocations"
+  const [testView, setTestView] = useState("analytics");
   const [searchTerm, setSearchTerm] = useState("");
   const [skillSearchTerm, setSkillSearchTerm] = useState("");
-  
+
   // Modal states
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedAllocation, setSelectedAllocation] = useState(null);
   const [showUserModal, setShowUserModal] = useState(false);
   const [showAllocationModal, setShowAllocationModal] = useState(false);
-  
+
   // Get users and projects for allocation modal
   const users = useQuery(
     api.users.getAll,
@@ -54,13 +55,28 @@ export default function TestLayoutPage() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-semibold text-rscm-dark-purple mb-1 text-sm">
-                🧪 Component Test Layout - Resources
+                🧪 Component Test Layout - Admin
               </h3>
               <p className="text-xs text-gray-600">
-                Testing {testView === "resources" ? "ResourcesListNew" : "AllocationsViewNew"}
+                Testing{" "}
+                {testView === "analytics"
+                  ? "AdminAnalyticsNew"
+                  : testView === "resources"
+                  ? "ResourcesListNew"
+                  : "AllocationsViewNew"}
               </p>
             </div>
             <div className="flex gap-2">
+              <button
+                onClick={() => setTestView("analytics")}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  testView === "analytics"
+                    ? "bg-rscm-violet text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Analytics
+              </button>
               <button
                 onClick={() => setTestView("resources")}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
@@ -106,7 +122,9 @@ export default function TestLayoutPage() {
         )}
 
         {/* Component Views */}
-        {testView === "resources" ? (
+        {testView === "analytics" ? (
+          <AdminAnalyticsNew />
+        ) : testView === "resources" ? (
           <ResourcesListNew
             searchTerm={searchTerm}
             skillSearchTerm={skillSearchTerm}
@@ -115,7 +133,6 @@ export default function TestLayoutPage() {
               setShowUserModal(true);
             }}
             onAllocateUser={(usr) => {
-              // Create a pre-filled allocation object with the selected user
               setSelectedAllocation({
                 userId: usr._id,
                 projectId: "",
@@ -140,7 +157,7 @@ export default function TestLayoutPage() {
             }}
           />
         )}
-        
+
         {/* Modals */}
         <UserManagementModal
           isOpen={showUserModal}
@@ -157,7 +174,7 @@ export default function TestLayoutPage() {
           }}
           isSubmitting={false}
         />
-        
+
         <AllocationModal
           isOpen={showAllocationModal}
           onClose={() => {

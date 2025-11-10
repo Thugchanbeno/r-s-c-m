@@ -11,26 +11,28 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 export default function ProjectsListNew() {
   const { user } = useAuth();
-  
+
   const queryArgs = user?.email ? { email: user.email } : "skip";
   const allProjects = useQuery(api.projects.getAll, queryArgs);
-  const allocationsResponse = useQuery(api.allocations.getAll, { 
-    ...queryArgs, 
-    limit: 1000 // Get all allocations for filtering
+  const allocationsResponse = useQuery(api.allocations.getAll, {
+    ...queryArgs,
+    limit: 1000,
   });
-  
+
   const allAllocations = allocationsResponse?.data || [];
-  
+
   const [viewMode, setViewMode] = useState("grid");
   const [filters, setFilters] = useState({
     search: "",
     status: "all",
-    department: "all"
+    department: "all",
   });
 
   const canViewAllProjects = useMemo(() => {
     if (!user) return false;
-    return ["Project Manager", "Line Manager", "HR", "Admin"].includes(user.role);
+    return ["Project Manager", "Line Manager", "HR", "Admin"].includes(
+      user.role
+    );
   }, [user]);
 
   const canCreateProject = useMemo(() => {
@@ -42,29 +44,32 @@ export default function ProjectsListNew() {
 
   const filteredProjects = useMemo(() => {
     if (!projects) return [];
-    
+
     return projects.filter((project) => {
-      const matchesSearch = 
+      const matchesSearch =
         project.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-        project.description?.toLowerCase().includes(filters.search.toLowerCase());
-      
-      const matchesStatus = 
+        project.description
+          ?.toLowerCase()
+          .includes(filters.search.toLowerCase());
+
+      const matchesStatus =
         filters.status === "all" || project.status === filters.status;
-      
-      const matchesDepartment = 
-        filters.department === "all" || project.department === filters.department;
-      
+
+      const matchesDepartment =
+        filters.department === "all" ||
+        project.department === filters.department;
+
       return matchesSearch && matchesStatus && matchesDepartment;
     });
   }, [projects, filters]);
 
   const getProjectAllocations = (projectId) => {
     if (!allAllocations || allAllocations.length === 0) return [];
-    
-    // Filter allocations for this project (status "active" not "approved")
-    // Map enriched data to match ProjectCard expectations
+
     return allAllocations
-      .filter((alloc) => alloc.projectId === projectId && alloc.status === "active")
+      .filter(
+        (alloc) => alloc.projectId === projectId && alloc.status === "active"
+      )
       .map((alloc) => ({
         ...alloc,
         userId: {
@@ -78,10 +83,10 @@ export default function ProjectsListNew() {
 
   const enrichedProjects = useMemo(() => {
     if (!filteredProjects || !allAllocations) return [];
-    
+
     return filteredProjects.map((project) => ({
       ...project,
-      allocations: getProjectAllocations(project._id)
+      allocations: getProjectAllocations(project._id),
     }));
   }, [filteredProjects, allAllocations]);
 
@@ -109,7 +114,7 @@ export default function ProjectsListNew() {
             {canViewAllProjects ? "All projects" : "Your projects"}
           </p>
         </div>
-        
+
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
             <button
@@ -137,9 +142,7 @@ export default function ProjectsListNew() {
           </div>
 
           {canCreateProject && (
-            <button
-              className="flex items-center gap-2 bg-rscm-violet text-white px-4 py-2 rounded-lg hover:bg-rscm-plum transition-colors"
-            >
+            <button className="flex items-center gap-2 bg-rscm-violet text-white px-4 py-2 rounded-lg hover:bg-rscm-plum transition-colors">
               <Plus className="w-5 h-5" />
               New Project
             </button>
@@ -152,19 +155,21 @@ export default function ProjectsListNew() {
       {enrichedProjects.length === 0 ? (
         <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 bg-gray-50 rounded-lg">
           <div className="text-center">
-            <p className="text-lg font-medium text-rscm-dark-purple">No projects found</p>
+            <p className="text-lg font-medium text-rscm-dark-purple">
+              No projects found
+            </p>
             <p className="text-sm text-gray-600 mt-1">
-              {filters.search || filters.status !== "all" || filters.department !== "all"
+              {filters.search ||
+              filters.status !== "all" ||
+              filters.department !== "all"
                 ? "Try adjusting your filters"
                 : canViewAllProjects
-                ? "Create a new project to get started"
-                : "You don't have any projects assigned yet"}
+                  ? "Create a new project to get started"
+                  : "You don't have any projects assigned yet"}
             </p>
           </div>
           {canCreateProject && (
-            <button
-              className="flex items-center gap-2 bg-rscm-violet text-white px-4 py-2 rounded-lg hover:bg-rscm-plum transition-colors"
-            >
+            <button className="flex items-center gap-2 bg-rscm-violet text-white px-4 py-2 rounded-lg hover:bg-rscm-plum transition-colors">
               <Plus className="w-5 h-5" />
               Create Your First Project
             </button>
