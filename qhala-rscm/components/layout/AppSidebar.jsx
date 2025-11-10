@@ -13,6 +13,7 @@ import {
   Settings,
   LogOut,
   UserCircle,
+  ClipboardCheck,
 } from "lucide-react";
 import rscmLogo from "@/assets/RSCM.png";
 
@@ -68,6 +69,13 @@ const AppSidebar = () => {
       href: "/resources",
       roles: ["admin", "hr", "pm"],
     },
+    {
+      id: "approvals",
+      name: "Approvals",
+      icon: ClipboardCheck,
+      href: "/approvals",
+      roles: ["admin", "hr", "pm", "line_manager"],
+    },
   ];
 
   const getQuickActions = (navId) => {
@@ -98,6 +106,11 @@ const AppSidebar = () => {
         { label: "Capacity view", href: "/resources?tab=capacity", roles: ["admin", "hr", "pm"] },
         { label: "Allocations", href: "/resources?tab=allocations", roles: ["admin", "hr", "pm"] },
         { label: "Request resource", href: "/resources/requests", roles: ["pm"] },
+      ],
+      approvals: [
+        { label: "Work Requests", href: "/approvals?tab=work", roles: ["admin", "hr", "pm", "line_manager"] },
+        { label: "Resource Requests", href: "/approvals?tab=resources", roles: ["admin", "hr", "pm", "line_manager"] },
+        { label: "Skill Verifications", href: "/approvals?tab=skills", roles: ["admin", "hr", "pm", "line_manager"] },
       ],
     };
 
