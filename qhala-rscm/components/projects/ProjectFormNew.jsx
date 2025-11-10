@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useProjectFormData } from "@/lib/hooks/useProjectFormData";
 import { departmentEnum, projectStatusEnum } from "@/lib/projectconstants";
 import { formatDatePickerDate, parseDatePickerDate } from "@/lib/dateUtils";
-import SkillSelector from "@/components/projects/skill-selector";
+import SkillSelectorNew from "@/components/projects/SkillSelectorNew";
 import QuickAsk from "@/components/projects/quick-ask";
 import { TaskManagerLocal } from "@/components/projects/TaskManagerNew";
 import DatePicker from "react-datepicker";
@@ -570,13 +570,13 @@ const ProjectFormNew = ({
                 <p className="text-xs text-gray-500 mb-3">
                   Review and manage all selected skills for this project
                 </p>
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <SkillSelector
-                    initialSelectedSkills={projectData.requiredSkills}
-                    nlpSuggestedSkills={nlpSuggestedSkills}
-                    onChange={handleRequiredSkillsChange}
-                  />
-                </div>
+                <SkillSelectorNew
+                  initialSelectedSkills={projectData.requiredSkills}
+                  nlpSuggestedSkills={nlpSuggestedSkills}
+                  onChange={handleRequiredSkillsChange}
+                  title="Project Skills"
+                  description="Select the skills required for this project"
+                />
                 {projectData.requiredSkills.length === 0 &&
                   !isEditMode &&
                   descriptionProcessed && (
