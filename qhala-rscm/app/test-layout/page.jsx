@@ -4,14 +4,36 @@ import AppLayout from "@/components/layout/AppLayout";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { toast } from "sonner";
-
-// Import resource components when ready
-// import ResourcesListNew from "@/components/resources/ResourcesListNew";
-// import ResourceAllocationFormNew from "@/components/resources/ResourceAllocationFormNew";
+import ResourcesListNew from "@/components/resources/ResourcesListNew";
+import AllocationsViewNew from "@/components/resources/AllocationsViewNew";
+import AllocationModal from "@/components/resources/AllocationModal";
+import UserManagementModal from "@/components/resources/UserManagementModal";
+import { useAllocations } from "@/lib/hooks/useAllocations";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 export default function TestLayoutPage() {
   const { user, isLoading } = useAuth();
-  const [testView, setTestView] = useState("list"); // "list" or "form"
+  const { submitAllocation, isProcessingAction } = useAllocations();
+  const [testView, setTestView] = useState("resources"); // "resources" or "allocations"
+  const [searchTerm, setSearchTerm] = useState("");
+  const [skillSearchTerm, setSkillSearchTerm] = useState("");
+  
+  // Modal states
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedAllocation, setSelectedAllocation] = useState(null);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [showAllocationModal, setShowAllocationModal] = useState(false);
+  
+  // Get users and projects for allocation modal
+  const users = useQuery(
+    api.users.getAll,
+    user?.email ? { email: user.email, limit: 1000 } : "skip"
+  );
+  const projects = useQuery(
+    api.projects.getAll,
+    user?.email ? { email: user.email } : "skip"
+  );
 
   if (isLoading) {
     return (
@@ -35,14 +57,14 @@ export default function TestLayoutPage() {
                 🧪 Component Test Layout - Resources
               </h3>
               <p className="text-xs text-gray-600">
-                Ready for resources component testing
+                Testing {testView === "resources" ? "ResourcesListNew" : "AllocationsViewNew"}
               </p>
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => setTestView("list")}
+                onClick={() => setTestView("resources")}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                  testView === "list"
+                  testView === "resources"
                     ? "bg-rscm-violet text-white"
                     : "bg-white text-gray-700 hover:bg-gray-100"
                 }`}
@@ -50,40 +72,112 @@ export default function TestLayoutPage() {
                 Resources List
               </button>
               <button
-                onClick={() => setTestView("form")}
+                onClick={() => setTestView("allocations")}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                  testView === "form"
+                  testView === "allocations"
                     ? "bg-rscm-violet text-white"
                     : "bg-white text-gray-700 hover:bg-gray-100"
                 }`}
               >
-                Allocate Resource
+                Allocations
               </button>
             </div>
           </div>
         </div>
 
-        {/* Placeholder for resource components */}
-        <div className="bg-white rounded-lg shadow-sm px-6 py-12 text-center">
-          <div className="max-w-md mx-auto">
-            <div className="w-16 h-16 bg-rscm-lilac/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-rscm-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </div>
-            <h3 className="text-base font-semibold text-rscm-dark-purple mb-2">
-              Ready for Resources Redesign
-            </h3>
-            <p className="text-sm text-gray-600 mb-4">
-              This test layout is prepared for testing new resource components.
-            </p>
-            <div className="text-xs text-gray-500 space-y-1">
-              <p>• Import resource components when ready</p>
-              <p>• Test list and form views</p>
-              <p>• Verify compact Intercom design patterns</p>
-            </div>
+        {/* Search Bars (for resources view only) */}
+        {testView === "resources" && (
+          <div className="bg-white rounded-lg shadow-sm px-4 py-3 flex gap-3">
+            <input
+              type="text"
+              placeholder="Search by name, email, department..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-1 px-3 py-2 bg-gray-50 rounded-md text-sm focus:ring-2 focus:ring-rscm-violet/20 focus:bg-white outline-none"
+            />
+            <input
+              type="text"
+              placeholder="Search by skill..."
+              value={skillSearchTerm}
+              onChange={(e) => setSkillSearchTerm(e.target.value)}
+              className="flex-1 px-3 py-2 bg-gray-50 rounded-md text-sm focus:ring-2 focus:ring-rscm-violet/20 focus:bg-white outline-none"
+            />
           </div>
-        </div>
+        )}
+
+        {/* Component Views */}
+        {testView === "resources" ? (
+          <ResourcesListNew
+            searchTerm={searchTerm}
+            skillSearchTerm={skillSearchTerm}
+            onManageUser={(usr) => {
+              setSelectedUser(usr);
+              setShowUserModal(true);
+            }}
+            onAllocateUser={(usr) => {
+              // Create a pre-filled allocation object with the selected user
+              setSelectedAllocation({
+                userId: usr._id,
+                projectId: "",
+                allocationPercentage: "",
+                role: "",
+                startDate: null,
+                endDate: null,
+              });
+              setShowAllocationModal(true);
+            }}
+          />
+        ) : (
+          <AllocationsViewNew
+            onEditAllocation={(allocation) => {
+              setSelectedAllocation(allocation);
+              setShowAllocationModal(true);
+            }}
+            onCreateAllocation={() => {
+              setSelectedAllocation(null);
+              setSelectedUser(null);
+              setShowAllocationModal(true);
+            }}
+          />
+        )}
+        
+        {/* Modals */}
+        <UserManagementModal
+          isOpen={showUserModal}
+          onClose={() => {
+            setShowUserModal(false);
+            setSelectedUser(null);
+          }}
+          user={selectedUser}
+          users={users || []}
+          onSubmit={(data) => {
+            toast.success(`User ${data.name} updated!`);
+            setShowUserModal(false);
+            setSelectedUser(null);
+          }}
+          isSubmitting={false}
+        />
+        
+        <AllocationModal
+          isOpen={showAllocationModal}
+          onClose={() => {
+            setShowAllocationModal(false);
+            setSelectedAllocation(null);
+            setSelectedUser(null);
+          }}
+          allocation={selectedAllocation}
+          users={users || []}
+          projects={projects || []}
+          onSubmit={async (data) => {
+            const result = await submitAllocation(data);
+            if (result.success) {
+              setShowAllocationModal(false);
+              setSelectedAllocation(null);
+              setSelectedUser(null);
+            }
+          }}
+          isSubmitting={isProcessingAction}
+        />
       </div>
     </AppLayout>
   );

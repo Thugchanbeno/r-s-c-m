@@ -94,9 +94,9 @@ const AppSidebar = () => {
         { label: "Manage allocations", href: "/resources/allocations", roles: ["admin", "hr", "pm"] },
       ],
       resources: [
-        { label: "Resource planning", href: "/resources", roles: ["admin", "hr", "pm"] },
-        { label: "Capacity view", href: "/resources/capacity", roles: ["admin", "hr", "pm"] },
-        { label: "Allocations", href: "/resources/allocations", roles: ["admin", "hr", "pm"] },
+        { label: "Resource planning", href: "/resources?tab=planning", roles: ["admin", "hr", "pm"] },
+        { label: "Capacity view", href: "/resources?tab=capacity", roles: ["admin", "hr", "pm"] },
+        { label: "Allocations", href: "/resources?tab=allocations", roles: ["admin", "hr", "pm"] },
         { label: "Request resource", href: "/resources/requests", roles: ["pm"] },
       ],
     };
