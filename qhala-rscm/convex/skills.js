@@ -276,6 +276,7 @@ export const getPendingVerifications = query({
         ...us,
         userName: user?.name,
         userEmail: user?.email,
+        userAvatarUrl: user?.avatarUrl,
         skillName: skill?.name,
         skillCategory: skill?.category,
       });
