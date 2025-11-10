@@ -1,7 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
 import { useProjectDetailsData } from "@/lib/hooks/useProjectDetailsData";
-import ProjectDetail from "@/components/projects/project-detail";
+import ProjectDetailPageNew from "@/components/projects/ProjectDetailPageNew";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Modal from "@/components/common/Modal";
 import RequestResourceForm from "@/components/user/RequestResourceForm";
@@ -36,21 +36,9 @@ export default function ProjectDetailPage() {
     onDeleteTask,
   } = useProjectDetailsData(projectId);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <LoadingSpinner size={40} />
-      </div>
-    );
-  }
-
-  if (!project) {
-    return <div className="p-6 text-center">Project not found</div>;
-  }
-
   return (
     <>
-      <ProjectDetail
+      <ProjectDetailPageNew
         project={project}
         allocations={allocations}
         utilization={utilization}
@@ -64,6 +52,7 @@ export default function ProjectDetailPage() {
         onUpdateTask={onUpdateTask}
         onDeleteTask={onDeleteTask}
         canManageTeam={canManageTeam}
+        isLoading={loading}
       />
 
       {/* Resource Request Modal */}
