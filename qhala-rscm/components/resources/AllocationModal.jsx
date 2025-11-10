@@ -227,7 +227,7 @@ const AllocationModal = ({
           {/* Info Message */}
           <div className="bg-rscm-lilac/10 border border-rscm-lilac/30 rounded-md px-3 py-2">
             <p className="text-xs text-rscm-dark-purple">
-              <strong>Note:</strong> Allocation percentage represents the amount of the user's capacity assigned to this project.
+              <strong>Note:</strong> Allocation percentage represents the amount of the user&apos;s capacity assigned to this project.
             </p>
           </div>
 

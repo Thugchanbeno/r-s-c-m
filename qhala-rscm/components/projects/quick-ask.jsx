@@ -105,7 +105,7 @@ const QuickAsk = ({
             Analyzing your request
           </h3>
           <p className="text-xs text-gray-500 mt-1">
-            Finding skill matches for "{query}"
+            Finding skill matches for &quot;{query}&quot;
           </p>
         </div>
       )}
@@ -191,7 +191,7 @@ const QuickAsk = ({
             No skills found
           </h3>
           <p className="text-xs text-gray-500 mb-3">
-            No matches for <span className="font-medium">"{query}"</span>
+            No matches for <span className="font-medium">&quot;{query}&quot;</span>
           </p>
           <button
             type="button"
