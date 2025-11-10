@@ -9,6 +9,8 @@ import AllocationsViewNew from "@/components/resources/AllocationsViewNew";
 import AllocationModal from "@/components/resources/AllocationModal";
 import UserManagementModal from "@/components/resources/UserManagementModal";
 import AdminAnalyticsNew from "@/components/admin/AdminAnalyticsNew";
+import SkillsManagementNew from "@/components/admin/SkillsManagementNew";
+import SkillSelectorNew from "@/components/projects/SkillSelectorNew";
 import { useAllocations } from "@/lib/hooks/useAllocations";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -16,7 +18,7 @@ import { api } from "@/convex/_generated/api";
 export default function TestLayoutPage() {
   const { user, isLoading } = useAuth();
   const { submitAllocation, isProcessingAction } = useAllocations();
-  const [testView, setTestView] = useState("analytics");
+  const [testView, setTestView] = useState("skills");
   const [searchTerm, setSearchTerm] = useState("");
   const [skillSearchTerm, setSkillSearchTerm] = useState("");
 
@@ -61,6 +63,10 @@ export default function TestLayoutPage() {
                 Testing{" "}
                 {testView === "analytics"
                   ? "AdminAnalyticsNew"
+                  : testView === "skills"
+                  ? "SkillsManagementNew"
+                  : testView === "skillselector"
+                  ? "SkillSelectorNew"
                   : testView === "resources"
                   ? "ResourcesListNew"
                   : "AllocationsViewNew"}
@@ -76,6 +82,26 @@ export default function TestLayoutPage() {
                 }`}
               >
                 Analytics
+              </button>
+              <button
+                onClick={() => setTestView("skills")}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  testView === "skills"
+                    ? "bg-rscm-violet text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Skills
+              </button>
+              <button
+                onClick={() => setTestView("skillselector")}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  testView === "skillselector"
+                    ? "bg-rscm-violet text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Skill Selector
               </button>
               <button
                 onClick={() => setTestView("resources")}
@@ -124,6 +150,16 @@ export default function TestLayoutPage() {
         {/* Component Views */}
         {testView === "analytics" ? (
           <AdminAnalyticsNew />
+        ) : testView === "skills" ? (
+          <SkillsManagementNew />
+        ) : testView === "skillselector" ? (
+          <SkillSelectorNew 
+            initialSelectedSkills={[]}
+            nlpSuggestedSkills={[]}
+            onChange={(skills) => console.log("Selected skills:", skills)}
+            title="Test Skill Selector"
+            description="Testing the new skill selector component with RSCM design patterns"
+          />
         ) : testView === "resources" ? (
           <ResourcesListNew
             searchTerm={searchTerm}

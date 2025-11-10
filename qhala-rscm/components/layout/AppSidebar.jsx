@@ -76,6 +76,13 @@ const AppSidebar = () => {
       href: "/approvals",
       roles: ["admin", "hr", "pm", "line_manager"],
     },
+    {
+      id: "admin",
+      name: "Admin",
+      icon: Settings,
+      href: "/admin",
+      roles: ["admin", "hr"],
+    },
   ];
 
   const getQuickActions = (navId) => {
@@ -112,6 +119,10 @@ const AppSidebar = () => {
         { label: "Resource Requests", href: "/approvals?tab=resources", roles: ["admin", "hr", "pm", "line_manager"] },
         { label: "Skill Verifications", href: "/approvals?tab=skills", roles: ["admin", "hr", "pm", "line_manager"] },
       ],
+      admin: [
+        { label: "Analytics & Insights", href: "/admin/analytics", roles: ["admin", "hr"] },
+        { label: "Skills Management", href: "/admin/skills", roles: ["admin", "hr"] },
+      ],
     };
 
     const actions = actionsByNav[navId] || [];
@@ -123,7 +134,8 @@ const AppSidebar = () => {
   );
 
   const isActive = (href) => {
-    if (href === "/dashboard") return pathname === href;
+    if (href === "/dashboard") return pathname === "/dashboard";
+    if (href === "/admin") return pathname.startsWith("/admin");
     return pathname.startsWith(href);
   };
 
@@ -181,16 +193,6 @@ const AppSidebar = () => {
         </div>
 
         <div className="flex flex-col gap-0.5 pt-4 mt-auto w-full items-center border-t border-gray-200">
-          {(userRole === "admin" || userRole === "hr") && (
-            <Link
-              href="/admin"
-              className="w-10 h-10 flex items-center justify-center text-rscm-dark-purple hover:bg-white/50 rounded-md transition-all duration-200 mt-4"
-              title="Admin Settings"
-            >
-              <Settings size={20} />
-            </Link>
-          )}
-
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
             className="w-10 h-10 flex items-center justify-center text-rscm-dark-purple hover:bg-white/50 rounded-md transition-all duration-200"
