@@ -224,4 +224,4 @@ export const proficiencySelectedStyles = {
   base: "bg-[rgb(var(--accent))] text-[rgb(var(--accent-foreground))] border-[rgb(var(--accent))] scale-105 shadow-sm",
 };
 export const selectedItemRingStyles =
-  "ring-2 ring-offset-1 ring-[rgb(var(--qhala-soft-peach-darker))] ring-offset-background";
+  "ring-2 ring-offset-1 ring-[rgb(var(--primary))] ring-offset-background";

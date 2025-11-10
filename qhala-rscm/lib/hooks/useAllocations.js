@@ -14,11 +14,13 @@ export function useAllocations() {
   // Convex Queries
   const allocationsData = useQuery(
     api.allocations.getAll,
-    user?.email ? {
-      email: user.email,
-      page: currentPage,
-      limit: ITEMS_PER_PAGE
-    } : "skip"
+    user?.email
+      ? {
+          email: user.email,
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+        }
+      : "skip"
   );
 
   const usersList = useQuery(
@@ -46,14 +48,9 @@ export function useAllocations() {
   const totalPages = allocationsData?.totalPages || 1;
   const totalAllocations = allocationsData?.totalAllocations || 0;
   const loading = allocationsData === undefined;
-  const loadingDropdowns = usersList === undefined || projectsList === undefined;
+  const loadingDropdowns =
+    usersList === undefined || projectsList === undefined;
   const dropdownError = null; // Convex handles errors internally
-
-  // No longer needed - data comes from Convex queries
-
-  // No longer needed - Convex queries handle data fetching automatically
-
-  // No longer needed - Convex queries are reactive
 
   const goToPage = (newPage) => {
     if (
@@ -87,7 +84,9 @@ export function useAllocations() {
     // Convert date strings to timestamps for Convex
     const processedFormData = {
       ...formData,
-      startDate: formData.startDate ? new Date(formData.startDate).getTime() : null,
+      startDate: formData.startDate
+        ? new Date(formData.startDate).getTime()
+        : null,
       endDate: formData.endDate ? new Date(formData.endDate).getTime() : null,
     };
 
@@ -104,7 +103,7 @@ export function useAllocations() {
           ...processedFormData,
         });
       }
-      
+
       toast.success(
         `Allocation ${isEditing ? "updated" : "created"} successfully!`
       );
@@ -128,7 +127,10 @@ export function useAllocations() {
   const removeAllocationAPI = async (allocationId) => {
     if (!allocationId || !user?.email) {
       toast.error("Cannot delete: Invalid allocation ID or not authenticated");
-      return { success: false, error: "Invalid allocation ID or not authenticated" };
+      return {
+        success: false,
+        error: "Invalid allocation ID or not authenticated",
+      };
     }
     setIsProcessingAction(true);
     setError(null);
