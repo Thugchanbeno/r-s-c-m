@@ -7,20 +7,11 @@ import { useAuth } from "@/lib/hooks/useAuth";
 export const useDashboard = () => {
   const { user } = useAuth();
 
-  if (!user?.email) {
-    return {
-      loading: false,
-      error: "User not authenticated",
-      role: null,
-      data: {},
-    };
-  }
-
-  const currentUser = useQuery(api.users.getCurrentUser, { email: user.email });
+  const currentUser = useQuery(api.users.getCurrentUser, user?.email ? { email: user.email } : "skip");
 
   const projects = useQuery(
     api.projects.getAll,
-    currentUser && ["admin", "hr", "pm", "line_manager"].includes(user.role)
+    currentUser && user?.email && ["admin", "hr", "pm", "line_manager"].includes(user.role)
       ? {
           email: user.email,
           pmId: user.role === "pm" ? currentUser._id : undefined,
@@ -31,7 +22,7 @@ export const useDashboard = () => {
 
   const allocations = useQuery(
     api.allocations.getSummary,
-    currentUser && ["admin", "hr", "pm"].includes(user.role)
+    currentUser && user?.email && ["admin", "hr", "pm"].includes(user.role)
       ? {
           email: user.email,
           scope: ["admin", "hr"].includes(user.role) ? "overall" : undefined,
@@ -42,31 +33,31 @@ export const useDashboard = () => {
 
   const userAllocationSummary = useQuery(
     api.users.getAllocationSummary,
-    currentUser && user.role === "employee"
+    currentUser && user?.email && user.role === "employee"
       ? { email: user.email, userId: currentUser._id }
       : "skip"
   );
 
   const userSkills = useQuery(
     api.userSkills.getForCurrentUser,
-    user.role === "employee" ? { email: user.email, countOnly: true } : "skip"
+    user?.email && user.role === "employee" ? { email: user.email, countOnly: true } : "skip"
   );
 
   const skillsDistribution = useQuery(
     api.skills.getDistribution,
-    ["hr", "admin"].includes(user.role) ? { email: user.email } : "skip"
+    user?.email && ["hr", "admin"].includes(user.role) ? { email: user.email } : "skip"
   );
 
   const totalUsers = useQuery(
     api.users.getAll,
-    ["hr", "admin"].includes(user.role)
+    user?.email && ["hr", "admin"].includes(user.role)
       ? { email: user.email, countOnly: true }
       : "skip"
   );
 
   const pendingRequests = useQuery(
     api.resourceRequests.getAll,
-    currentUser && user.role === "pm"
+    currentUser && user?.email && user.role === "pm"
       ? {
           email: user.email,
           requestedByPmId: currentUser._id,
@@ -78,48 +69,49 @@ export const useDashboard = () => {
 
   const directReports = useQuery(
     api.users.getAll,
-    user.role === "line_manager"
+    user?.email && user.role === "line_manager"
       ? { email: user.email, search: "", limit: 100 }
       : "skip"
   );
 
   const pendingVerifications = useQuery(
     api.skills.getPendingVerifications,
-    user.role === "line_manager" ? { email: user.email } : "skip"
+    user?.email && user.role === "line_manager" ? { email: user.email } : "skip"
   );
 
-  const recentActivities = useQuery(api.activities.getRecent, {
+  const recentActivities = useQuery(api.activities.getRecent, user?.email ? {
     email: user.email,
     limit: 10,
-  });
+  } : "skip");
 
-  const upcomingEvents = useQuery(api.events.getUpcoming, {
+  const upcomingEvents = useQuery(api.events.getUpcoming, user?.email ? {
     email: user.email,
     limit: 5,
-  });
+  } : "skip");
 
   const userProjects = useQuery(
     api.projects.getForUser,
-    currentUser && user.role === "employee"
+    currentUser && user?.email && user.role === "employee"
       ? { email: user.email, userId: currentUser._id }
       : "skip"
   );
 
   //  Role-aware loading check
   const isLoading =
+    !user?.email ||
     currentUser === undefined ||
     recentActivities === undefined ||
     upcomingEvents === undefined ||
-    (["admin", "hr", "pm"].includes(user.role) && projects === undefined) ||
-    (["admin", "hr", "pm"].includes(user.role) && allocations === undefined) ||
-    (user.role === "employee" &&
+    (user?.role && ["admin", "hr", "pm"].includes(user.role) && projects === undefined) ||
+    (user?.role && ["admin", "hr", "pm"].includes(user.role) && allocations === undefined) ||
+    (user?.role === "employee" &&
       (userSkills === undefined ||
         userAllocationSummary === undefined ||
         userProjects === undefined)) ||
-    (user.role === "pm" && pendingRequests === undefined) ||
-    (["hr", "admin"].includes(user.role) &&
+    (user?.role === "pm" && pendingRequests === undefined) ||
+    (user?.role && ["hr", "admin"].includes(user.role) &&
       (skillsDistribution === undefined || totalUsers === undefined)) ||
-    (user.role === "line_manager" &&
+    (user?.role === "line_manager" &&
       (directReports === undefined || pendingVerifications === undefined));
 
   // Skills data for HR/Admin
@@ -150,7 +142,7 @@ export const useDashboard = () => {
     ) || [];
 
   const suggestedSkills =
-    user.role === "employee"
+    user?.role === "employee"
       ? [
           "JavaScript - High demand",
           "React - Growing 25%",
@@ -158,10 +150,20 @@ export const useDashboard = () => {
         ]
       : [];
 
+  // Return early if user is not authenticated
+  if (!user?.email) {
+    return {
+      loading: false,
+      error: "User not authenticated",
+      role: null,
+      data: {},
+    };
+  }
+
   return {
     loading: isLoading,
     error: null,
-    role: user.role,
+    role: user?.role,
     data: {
       // Employee data
       capacity: userAllocationSummary?.totalCurrentCapacityPercentage || 0,
@@ -175,7 +177,7 @@ export const useDashboard = () => {
 
       // PM data
       managedProjects:
-        user.role === "pm" ? projects?.count || projects?.length || 0 : 0,
+        user?.role === "pm" ? projects?.count || projects?.length || 0 : 0,
       uniqueResources: allocations?.uniqueUserCount || 0,
       teamUtilization: allocations?.utilizationPercentage || 0,
       pendingRequests: pendingRequests?.count || pendingRequests?.length || 0,

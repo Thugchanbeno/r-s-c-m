@@ -181,7 +181,7 @@ const EmployeeDashboardNew = ({ user }) => {
                 My projects
               </h2>
               <p className="text-xs text-gray-500 mt-0.5">
-                Projects you're currently working on
+                Projects you&apos;re currently working on
               </p>
             </div>
             <button 

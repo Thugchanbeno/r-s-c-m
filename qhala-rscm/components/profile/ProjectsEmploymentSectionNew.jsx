@@ -44,7 +44,7 @@ const ProjectsEmploymentSectionNew = ({
               <Briefcase size={48} className="mx-auto mb-3 text-gray-300" />
               <p className="text-gray-500 mb-2">No active projects</p>
               <p className="text-xs text-gray-400">
-                You're not currently allocated to any projects
+                You&apos;re not currently allocated to any projects
               </p>
             </div>
           ) : (

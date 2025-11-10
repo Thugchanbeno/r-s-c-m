@@ -225,7 +225,7 @@ const UserManagementModal = ({
           {/* Info Message */}
           <div className="bg-rscm-lilac/10 border border-rscm-lilac/30 rounded-md px-3 py-2">
             <p className="text-xs text-rscm-dark-purple">
-              <strong>Note:</strong> For advanced user management (skills, employment details), visit the user's profile page.
+              <strong>Note:</strong> For advanced user management (skills, employment details), visit the user&apos;s profile page.
             </p>
           </div>
 
