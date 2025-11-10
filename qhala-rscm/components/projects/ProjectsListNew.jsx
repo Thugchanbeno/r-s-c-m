@@ -62,9 +62,18 @@ export default function ProjectsListNew() {
     if (!allAllocations || allAllocations.length === 0) return [];
     
     // Filter allocations for this project (status "active" not "approved")
-    return allAllocations.filter(
-      (alloc) => alloc.projectId._id === projectId && alloc.status === "active"
-    );
+    // Map enriched data to match ProjectCard expectations
+    return allAllocations
+      .filter((alloc) => alloc.projectId === projectId && alloc.status === "active")
+      .map((alloc) => ({
+        ...alloc,
+        userId: {
+          _id: alloc.userId,
+          name: alloc.userName,
+          email: alloc.userEmail,
+          avatarUrl: alloc.userAvatar,
+        },
+      }));
   };
 
   const enrichedProjects = useMemo(() => {

@@ -17,6 +17,7 @@ import {
 import Image from "next/image";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { TaskManagerConvex } from "@/components/projects/TaskManagerNew";
+import { getSkillLevelName } from "@/components/common/CustomColors";
 
 const ProjectDetailPageNew = ({
   project,
@@ -234,14 +235,14 @@ const ProjectDetailPageNew = ({
                     <h3 className="text-sm font-semibold text-rscm-dark-purple">Required Skills</h3>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {project.requiredSkills.map((skill) => (
+                    {project.requiredSkills.map((skill, idx) => (
                       <span
-                        key={skill.skillId}
+                        key={`${skill.skillId}-${idx}`}
                         className="px-3 py-1.5 bg-rscm-lilac/10 text-rscm-violet text-xs font-medium rounded-full"
                       >
                         {skill.skillName}
                         {skill.proficiencyLevel && (
-                          <span className="ml-1 opacity-70">• L{skill.proficiencyLevel}</span>
+                          <span className="ml-1 opacity-70">• {getSkillLevelName(skill.proficiencyLevel)}</span>
                         )}
                       </span>
                     ))}
@@ -255,42 +256,47 @@ const ProjectDetailPageNew = ({
           {activeTab === "team" && (
             <div className="space-y-4">
               {allocations.length > 0 ? (
-                allocations.map((alloc) => (
-                  <div
-                    key={alloc._id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      {alloc.userId?.avatarUrl ? (
-                        <Image
-                          src={alloc.userId.avatarUrl}
-                          alt={alloc.userId.name || "User"}
-                          width={40}
-                          height={40}
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-rscm-violet flex items-center justify-center">
-                          <span className="text-sm font-medium text-white">
-                            {alloc.userId?.name?.[0] || "?"}
-                          </span>
+                allocations.map((alloc) => {
+                  const userName = alloc.userId?.name || alloc.userName || "Unknown User";
+                  const userAvatar = alloc.userId?.avatarUrl || alloc.userAvatar;
+                  
+                  return (
+                    <div
+                      key={alloc._id}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        {userAvatar ? (
+                          <Image
+                            src={userAvatar}
+                            alt={userName}
+                            width={40}
+                            height={40}
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-rscm-violet flex items-center justify-center">
+                            <span className="text-sm font-medium text-white">
+                              {userName?.[0]?.toUpperCase() || "?"}
+                            </span>
+                          </div>
+                        )}
+                        <div>
+                          <h4 className="font-medium text-rscm-dark-purple">
+                            {userName}
+                          </h4>
+                          <p className="text-xs text-gray-500">
+                            {alloc.role} • {formatDate(alloc.startDate)} - {formatDate(alloc.endDate)}
+                          </p>
                         </div>
-                      )}
-                      <div>
-                        <h4 className="font-medium text-rscm-dark-purple">
-                          {alloc.userId?.name || "Unknown User"}
-                        </h4>
-                        <p className="text-xs text-gray-500">
-                          {alloc.role} • {formatDate(alloc.startDate)} - {formatDate(alloc.endDate)}
-                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-semibold text-rscm-violet">{alloc.allocationPercentage}%</p>
+                        <p className="text-xs text-gray-500">capacity</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-lg font-semibold text-rscm-violet">{alloc.allocationPercentage}%</p>
-                      <p className="text-xs text-gray-500">capacity</p>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <div className="text-center py-12">
                   <Users className="w-12 h-12 mx-auto text-gray-300 mb-3" />
