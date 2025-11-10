@@ -848,3 +848,261 @@ The expandable sidebar panels should only be used for contextual navigation/filt
 ---
 
 **Last Updated:** November 10, 2025 - 13:11
+
+---
+
+## 📚 Knowledge Transfer Context
+
+### System Overview
+RSCM (Resource & Skill Capacity Management) is a SaaS application for managing team resources, skills, project allocations, and approvals. The system is undergoing a complete UI/UX redesign from an old "Qhala"-branded interface to a modern Intercom-inspired design with RSCM branding.
+
+### Tech Stack
+- **Framework:** Next.js 14 (App Router)
+- **Database:** Convex (real-time serverless database)
+- **Styling:** Tailwind CSS v4 with custom RSCM color palette
+- **UI Components:** Mix of custom components and Shadcn UI
+- **Authentication:** NextAuth.js with Google OAuth
+- **State Management:** Convex useQuery/useMutation hooks
+
+### Architecture Patterns
+
+#### Component Naming Convention
+- **New components:** End with "New" suffix (e.g., `ProjectsListNew.jsx`, `ProfilePageNew.jsx`)
+- **Old components:** Original names without suffix (being deprecated)
+- **Reason:** Allows gradual migration while keeping old code functional
+
+#### File Organization
+```
+app/
+  (main)/              # Authenticated pages
+    dashboard/
+    projects/
+    resources/
+    approvals/
+    notifications/
+    profile/
+  api/                 # API routes (legacy, being replaced by Convex)
+
+components/
+  layout/              # AppLayout, AppSidebar, NotificationRotator
+  dashboard/           # Role-specific dashboard components
+  projects/            # Project management components
+  resources/           # Resource management components
+  approvals/           # Approval workflow components
+  profile/             # User profile components
+  common/              # Shared utilities (CustomColors, LoadingSpinner)
+  ui/                  # Shadcn UI components
+
+convex/
+  *.js                 # Convex queries and mutations
+  schema.js            # Database schema
+```
+
+#### Role-Based Access Control
+The system has 5 user roles with different permissions:
+1. **Employee** - Basic access (view own data, request leave/overtime)
+2. **Line Manager** - Manage direct reports, approve leave requests
+3. **Project Manager (PM)** - Create projects, request resources, manage tasks
+4. **HR** - Full access to user management, approvals, allocations
+5. **Admin** - Full system access, settings, analytics
+
+#### Data Flow Pattern
+```
+Component → Convex useQuery → Real-time data
+User Action → Convex useMutation → Database update → All clients notified
+```
+
+### Design System
+
+#### RSCM Color Palette
+```css
+--rscm-violet: #4a2545      /* Primary brand color */
+--rscm-plum: #824c71        /* Secondary brand color */
+--rscm-lilac: #c398b5       /* Accent color */
+--rscm-dark-purple: #251323 /* Text/headings */
+--rscm-dutch-white: #EEE1CE /* Background alternative */
+```
+
+#### Design Principles (Intercom-Inspired)
+1. **No Heavy Borders** - Use background color differences for separation
+2. **Card-Based Layout** - White cards on gray dot-grid background
+3. **Compact Spacing** - Tight margins (mb-2, mb-3, gap-2) for information density
+4. **Subtle Shadows** - Light `shadow-sm` for depth, not heavy borders
+5. **200ms Transitions** - Smooth animations throughout
+6. **Avatar-First** - Show user avatars prominently (Google profile pictures)
+
+#### Common Component Patterns
+
+**Card Structure:**
+```jsx
+<div className="bg-white rounded-lg shadow-sm p-4">
+  {/* Content */}
+</div>
+```
+
+**Primary Button:**
+```jsx
+<button className="bg-rscm-violet text-white px-4 py-2 rounded-lg hover:bg-rscm-plum transition-colors">
+  Action
+</button>
+```
+
+**Status Badge:**
+```jsx
+<span className="px-2.5 py-1 rounded-full text-xs font-medium bg-rscm-lilac/10 text-rscm-violet">
+  Status
+</span>
+```
+
+### Current State
+
+#### What's Complete (✅)
+1. **Core Layout**
+   - AppLayout with gray dot-grid background
+   - AppSidebar with collapsed icon bar + expandable panels
+   - NotificationRotator banner at top
+   - All using RSCM colors
+
+2. **Dashboard (All Roles)**
+   - EmployeeDashboardNew.jsx
+   - LineManagerDashboardNew.jsx
+   - PMDashboardNew.jsx
+   - AdminDashboard.jsx
+   - Greeting cards with avatars and geometric shapes
+   - Role-specific metrics and quick actions
+
+3. **Profile Page**
+   - ProfilePageNew.jsx with scrollspy navigation
+   - ProfileHeaderNew with capacity indicators
+   - SkillsSectionNew with current/desired skills
+   - All modals (Leave, Overtime, Skills Editor, Employment)
+   - CV upload onboarding flow
+
+4. **Projects Section**
+   - ProjectsListNew with grid/list view toggle
+   - ProjectCard with team avatars, skills bar, status badges
+   - ProjectDetailPageNew with tabs (Overview, Team, Tasks, Resources)
+   - ProjectFormNew - 3-step wizard
+   - TaskManagerNew - Kanban board
+   - All with RSCM colors and compact design
+
+5. **Resources Section**
+   - ResourcesViewNew with 3 tabs (Planning, Capacity, Allocations)
+   - ResourcesListNew - User grid with filters
+   - AllocationModal for creating allocations
+   - UserManagementModal for line manager assignment
+
+6. **Approvals Section**
+   - ApprovalsViewNew with 3 tabs (Work, Resources, Skills)
+   - WorkRequestsTabNew - Leave/overtime approvals
+   - ResourceRequestsTabNew - Allocation requests with rejection reasons
+   - SkillVerificationsTabNew - Skill proof verification
+   - Role-based tab visibility
+
+7. **Notifications Section**
+   - NotificationsViewNew with compact header
+   - NotificationCardNew with priority indicators
+   - Bulk actions (mark read, archive, delete)
+   - Search and filter functionality
+
+#### What Needs Work (⏳)
+1. **Admin Pages** - User management, skills management, system settings
+2. **Common UI Components** - Standardize Button, Card, Badge with RSCM colors
+3. **Skills Management UI** - CRUD interfaces for skills
+4. **Login/Auth Pages** - Redesign sign-in experience
+5. **Responsive Testing** - Mobile/tablet layouts need verification
+6. **Brand Cleanup** - Remove remaining "Qhala" references throughout codebase
+
+### Common Issues & Solutions
+
+#### Issue: Data Structure Mismatches
+**Problem:** Convex queries return enriched data with flat fields (e.g., `userName`, `userAvatar`) but components expect nested objects (e.g., `userId.name`, `userId.avatarUrl`).
+
+**Solution:** Map the data in the component:
+```jsx
+const userName = alloc.userId?.name || alloc.userName || "Unknown User";
+const userAvatar = alloc.userId?.avatarUrl || alloc.userAvatar;
+```
+
+#### Issue: Proficiency Level Display
+**Problem:** Showing "L1", "L2" instead of readable names.
+
+**Solution:** Use `getSkillLevelName()` from `CustomColors.jsx`:
+```jsx
+import { getSkillLevelName } from "@/components/common/CustomColors";
+getSkillLevelName(1) // Returns "Beginner"
+```
+
+#### Issue: Role-Based Access
+**Problem:** Need to filter data based on user role.
+
+**Solution:** Check in Convex queries:
+```javascript
+// In Convex query
+const actor = await getActor(ctx, args.email);
+if (actor.role === "line_manager") {
+  // Filter to direct reports only
+}
+```
+
+### Working with This Codebase
+
+#### Adding a New Page
+1. Create `ComponentNameNew.jsx` in appropriate folder
+2. Use RSCM colors (`text-rscm-violet`, `bg-rscm-plum`, etc.)
+3. Follow compact spacing (p-4, mb-2, gap-2)
+4. Add subtle shadows (`shadow-sm`)
+5. Include avatars where relevant
+6. Wrap page in `<div className="space-y-6">` for consistent spacing
+
+#### Adding a New Feature
+1. Create Convex query/mutation in `convex/` folder
+2. Add required schema fields to `convex/schema.js`
+3. Create component with "New" suffix
+4. Use `useQuery` or `useMutation` hooks
+5. Add role-based access checks in Convex
+6. Follow existing component patterns (see completed sections)
+
+#### Testing Checklist
+- [ ] Test with all 5 user roles
+- [ ] Verify RSCM colors used throughout
+- [ ] Check avatars display correctly (Google profile pics)
+- [ ] Ensure proper spacing (compact but readable)
+- [ ] Test on mobile/tablet (responsive design)
+- [ ] Verify role-based access control
+- [ ] Check for "Qhala" references (should be none)
+
+### Key Files to Reference
+
+**Design Patterns:**
+- `components/projects/ProjectsListNew.jsx` - Grid/list view with filters
+- `components/projects/ProjectCard.jsx` - Compact card design
+- `components/dashboard/AdminDashboard.jsx` - Role-specific dashboard
+- `components/profile/ProfilePageNew.jsx` - Scrollspy navigation
+
+**Utility Functions:**
+- `components/common/CustomColors.jsx` - Color utilities, skill levels
+- `lib/hooks/useAuth.js` - Authentication and user data
+- `lib/hooks/useDashboard.js` - Dashboard data fetching
+
+**Convex Patterns:**
+- `convex/projects.js` - CRUD with role-based access
+- `convex/allocations.js` - Data enrichment (joining user/project data)
+- `convex/notificationUtils.js` - Creating notifications
+
+### Migration Strategy
+
+The redesign follows a **gradual replacement** approach:
+1. Keep old components functional
+2. Create new components with "New" suffix
+3. Route pages to new components
+4. Test thoroughly
+5. Once stable, delete old components
+6. Remove "New" suffix (optional, can keep for clarity)
+
+This allows rollback if issues arise and lets different parts of the app be on different versions during development.
+
+---
+
+**Knowledge Transfer Version:** 1.0  
+**Last Updated:** November 10, 2025 - 18:14
