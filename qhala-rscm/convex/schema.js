@@ -53,6 +53,7 @@ export default defineSchema({
     .index("by_department", ["department"])
     .index("by_function", ["function"])
     .index("by_line_manager", ["lineManagerId"])
+    .index("by_availability", ["availabilityStatus"])
     .index("by_employee_type", ["employeeType"]),
   // SKILLS
   skills: defineTable({
@@ -60,11 +61,17 @@ export default defineSchema({
     category: v.optional(v.string()),
     description: v.optional(v.string()),
     aliases: v.optional(v.array(v.string())),
+    embedding: v.optional(v.array(v.float64())),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_name", ["name"])
-    .index("by_category", ["category"]),
+    .index("by_category", ["category"])
+    .vectorIndex("by_embedding", {
+      vectorField: "embedding",
+      dimensions: 384,
+    }),
+
   // USER SKILLS
   userSkills: defineTable({
     userId: v.id("users"),
@@ -577,6 +584,32 @@ export default defineSchema({
     .index("by_priority", ["priority"])
     .index("by_due_date", ["dueDate"])
     .index("by_skill", ["relatedSkillId"]),
+
+  //RECOMMENDATION FEEDBACK
+  recommendationFeedback: defineTable({
+    userId: v.optional(v.id("users")),
+    projectId: v.optional(v.id("projects")),
+    recommendationType: v.string(), // "project" or "user"
+    rating: v.number(), // 1 for good, 0 for bad (mapped from boolean) we might need to implement a 1-5 scale later and map boolean to that
+    comments: v.optional(v.string()),
+    timestamp: v.number(),
+  }).index("by_timestamp", ["timestamp"]),
+
+  //RECOMMENDATIONS LOG
+  // Python writes here, Frontend reads from here
+  recommendations: defineTable({
+    targetId: v.string(), // The UserID or ProjectID receiving the recommendation
+    type: v.string(), // "user_for_project" or "project_for_user"
+    results: v.array(
+      v.object({
+        id: v.string(), // ID of the recommended item
+        score: v.number(),
+        confidence: v.number(),
+        reason: v.optional(v.string()),
+      })
+    ),
+    createdAt: v.number(),
+  }).index("by_target_type", ["targetId", "type"]),
 
   // PROJECT FEEDBACK
   projectFeedback: defineTable({

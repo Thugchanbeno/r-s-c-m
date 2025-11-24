@@ -6,6 +6,7 @@ import { formatDatePickerDate, parseDatePickerDate } from "@/lib/dateUtils";
 import SkillSelectorNew from "@/components/projects/SkillSelectorNew";
 import QuickAsk from "@/components/projects/quick-ask";
 import { TaskManagerLocal } from "@/components/projects/TaskManagerNew";
+import { useAI } from "@/lib/hooks/useAI";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
@@ -43,16 +44,27 @@ const ProjectFormNew = ({
     handleRequiredSkillsChange,
   } = useProjectFormData(initialData, isEditMode, onSubmit);
 
+  const {
+    quickAskQuery,
+    setQuickAskQuery,
+    quickAskSuggestions,
+    quickAskLoading,
+    quickAskError,
+    showQuickAskSuggestions,
+    handleQuickAskSearch, // This now uses Convex Action
+    handleQuickAskClear,
+  } = useAI();
+
   const [tasks, setTasks] = useState([]);
   const [currentStep, setCurrentStep] = useState(1); // 1: Details, 2: Skills, 3: Tasks
   const [createConfirmation, setCreateConfirmation] = useState(false);
-  
+
   // Quick Ask state
-  const [quickAskQuery, setQuickAskQuery] = useState("");
-  const [quickAskSuggestions, setQuickAskSuggestions] = useState([]);
-  const [quickAskLoading, setQuickAskLoading] = useState(false);
-  const [quickAskError, setQuickAskError] = useState(null);
-  const [showQuickAskSuggestions, setShowQuickAskSuggestions] = useState(false);
+  // const [quickAskQuery, setQuickAskQuery] = useState("");
+  // const [quickAskSuggestions, setQuickAskSuggestions] = useState([]);
+  // const [quickAskLoading, setQuickAskLoading] = useState(false);
+  // const [quickAskError, setQuickAskError] = useState(null);
+  // const [showQuickAskSuggestions, setShowQuickAskSuggestions] = useState(false);
 
   const displayError = submitError || localSubmitError;
 
@@ -88,11 +100,9 @@ const ProjectFormNew = ({
   };
 
   const canProceedFromSkills = () => {
-    return (
-      !isEditMode
-        ? projectData.requiredSkills.length > 0 || !descriptionProcessed
-        : true
-    );
+    return !isEditMode
+      ? projectData.requiredSkills.length > 0 || !descriptionProcessed
+      : true;
   };
 
   const handleNext = () => {
@@ -109,40 +119,40 @@ const ProjectFormNew = ({
     }
   };
 
-  const handleQuickAskSearch = async () => {
-    if (!quickAskQuery.trim()) return;
-    
-    setQuickAskLoading(true);
-    setQuickAskError(null);
-    setShowQuickAskSuggestions(false);
-    
-    try {
-      const response = await fetch("/api/recommendations/skills", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: quickAskQuery }),
-      });
-      const result = await response.json();
-      
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || "Failed to find skills.");
-      }
-      
-      setQuickAskSuggestions(result.data || []);
-      setShowQuickAskSuggestions(true);
-    } catch (err) {
-      setQuickAskError(err.message);
-    } finally {
-      setQuickAskLoading(false);
-    }
-  };
-  
+  // const handleQuickAskSearch = async () => {
+  //   if (!quickAskQuery.trim()) return;
+
+  //   setQuickAskLoading(true);
+  //   setQuickAskError(null);
+  //   setShowQuickAskSuggestions(false);
+
+  //   try {
+  //     const response = await fetch("/api/recommendations/skills", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ description: quickAskQuery }),
+  //     });
+  //     const result = await response.json();
+
+  //     if (!response.ok || !result.success) {
+  //       throw new Error(result.error || "Failed to find skills.");
+  //     }
+
+  //     setQuickAskSuggestions(result.data || []);
+  //     setShowQuickAskSuggestions(true);
+  //   } catch (err) {
+  //     setQuickAskError(err.message);
+  //   } finally {
+  //     setQuickAskLoading(false);
+  //   }
+  // };
+
   const handleQuickAskSkillSelected = (skill) => {
     // Add skill to required skills if not already there
     const isAlreadySelected = projectData.requiredSkills.some(
       (s) => s.skillId === skill.id
     );
-    
+
     if (!isAlreadySelected) {
       const newSkill = {
         skillId: skill.id,
@@ -271,8 +281,8 @@ const ProjectFormNew = ({
                         isActive
                           ? "bg-rscm-violet text-white"
                           : isCompleted
-                          ? "bg-rscm-lilac/20 text-rscm-violet"
-                          : "bg-gray-100 text-gray-400"
+                            ? "bg-rscm-lilac/20 text-rscm-violet"
+                            : "bg-gray-100 text-gray-400"
                       }`}
                     >
                       {isCompleted ? (
@@ -478,7 +488,8 @@ const ProjectFormNew = ({
                   AI Skill Analysis
                 </h2>
                 <p className="text-xs text-gray-500 mb-3">
-                  Analyze your project description to automatically extract required skills
+                  Analyze your project description to automatically extract
+                  required skills
                 </p>
                 <button
                   type="button"
@@ -548,11 +559,7 @@ const ProjectFormNew = ({
                   query={quickAskQuery}
                   onQueryChange={setQuickAskQuery}
                   onSearch={handleQuickAskSearch}
-                  onClear={() => {
-                    setQuickAskQuery("");
-                    setShowQuickAskSuggestions(false);
-                    setQuickAskSuggestions([]);
-                  }}
+                  onClear={handleQuickAskClear}
                   suggestions={quickAskSuggestions}
                   loading={quickAskLoading}
                   error={quickAskError}

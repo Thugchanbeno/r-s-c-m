@@ -1,4 +1,3 @@
-// app/api/ai/get-recommendations/route.js
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
@@ -13,17 +12,19 @@ export async function POST(req) {
 
   try {
     const body = await req.json();
-    const { projectId, limit = 10 } = body;
+    const { userId, projectId, recommendationType, rating, comments } = body;
 
-    const result = await fetchAction(api.projects.getRecommendations, {
-      email: session.user.email,
+    const result = await fetchAction(api.api.submitFeedback, {
+      userId,
       projectId,
-      limit,
+      recommendationType,
+      rating: rating ? 1 : 0,
+      comments,
     });
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Proxy error /api/ai/get-recommendations:", error);
+    console.error("Proxy error /api/feedback:", error);
     const errorMessage = error.message || "Server error";
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }

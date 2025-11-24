@@ -1,7 +1,15 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  Calendar as CalendarIcon,
+  User,
+  Percent,
+  FileText,
+  Briefcase,
+} from "lucide-react";
+import { RSCM_COLORS } from "@/components/charts/ChartComponents";
 
 const RequestResourceForm = ({
   userToRequest,
@@ -10,170 +18,247 @@ const RequestResourceForm = ({
   onCancel,
   isSubmittingRequest,
 }) => {
-  const [requestedRole, setRequestedRole] = useState("");
-  const [requestedPercentage, setRequestedPercentage] = useState("");
-  const [requestedStartDate, setRequestedStartDate] = useState("");
-  const [requestedEndDate, setRequestedEndDate] = useState("");
-  const [pmNotes, setPmNotes] = useState("");
-  const [formError, setFormError] = useState(null);
+  const [formData, setFormData] = useState({
+    role: userToRequest?.title || "Consultant",
+    percentage: 100,
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: "",
+    notes: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "percentage" ? parseInt(value) || 0 : value,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setFormError(null);
-
-    if (!requestedRole.trim()) {
-      setFormError("Role on project is required.");
-      return;
-    }
-    const percentageNum = parseInt(requestedPercentage, 10);
-    if (isNaN(percentageNum) || percentageNum < 1 || percentageNum > 100) {
-      setFormError("Allocation percentage must be a number between 1 and 100.");
-      return;
-    }
-
-    if (
-      requestedStartDate &&
-      requestedEndDate &&
-      new Date(requestedStartDate) > new Date(requestedEndDate)
-    ) {
-      setFormError("End date cannot be before start date.");
-      return;
-    }
-
-    onSubmit({
-      requestedRole: requestedRole.trim(),
-      requestedPercentage: percentageNum,
-      requestedStartDate: requestedStartDate || null,
-      requestedEndDate: requestedEndDate || null,
-      pmNotes: pmNotes.trim() || null,
-    });
+    onSubmit(formData);
   };
 
-  const inputBaseClasses =
-    "mt-1 block w-full rounded-[var(--radius)] border-[rgb(var(--border))] bg-[rgb(var(--background))] text-[rgb(var(--foreground))] shadow-sm focus:border-[rgb(var(--primary))] focus:ring-1 focus:ring-[rgb(var(--primary))] sm:text-sm p-2 placeholder:text-[rgb(var(--muted-foreground))] disabled:opacity-50 disabled:cursor-not-allowed";
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-1 md:p-2">
-      {formError && (
-        <div className="flex items-center p-3 text-sm rounded-[var(--radius)] bg-red-50 text-red-700 border border-red-200 shadow-sm">
-          <AlertCircle size={16} className="mr-2 flex-shrink-0" />
-          <span>{formError}</span>
+    <form onSubmit={handleSubmit} className="flex flex-col h-full relative">
+      {/* HEADER */}
+      <div
+        className="px-7 py-6 flex items-center gap-4 border-b"
+        style={{ borderColor: `${RSCM_COLORS.lilac}40` }}
+      >
+        <div className="relative h-14 w-14 shrink-0">
+          {userToRequest?.avatarUrl ? (
+            <img
+              src={userToRequest.avatarUrl}
+              alt={userToRequest.name}
+              className="h-full w-full rounded-2xl object-cover shadow-md"
+            />
+          ) : (
+            <div
+              className="h-full w-full rounded-2xl flex items-center justify-center shadow-inner"
+              style={{ backgroundColor: `${RSCM_COLORS.lilac}25` }}
+            >
+              <span
+                className="text-xl font-bold"
+                style={{ color: RSCM_COLORS.violet }}
+              >
+                {userToRequest?.name?.[0]}
+              </span>
+            </div>
+          )}
         </div>
-      )}
-      <div className="p-3 rounded-[var(--radius)] bg-[rgb(var(--muted))]">
-        <p className="text-sm font-medium text-[rgb(var(--muted-foreground))]">
-          Requesting Resource:
-        </p>
-        <p className="text-lg font-semibold text-[rgb(var(--foreground))]">
-          {userToRequest?.name || "Selected User"}
-        </p>
-      </div>
 
-      <div>
-        <label
-          htmlFor="requestedRole"
-          className="block text-sm font-medium text-[rgb(var(--foreground))]"
-        >
-          Role on Project*
-        </label>
-        <input
-          type="text"
-          id="requestedRole"
-          value={requestedRole}
-          onChange={(e) => setRequestedRole(e.target.value)}
-          required
-          className={inputBaseClasses}
-          placeholder="e.g., Lead Developer, QA Tester"
-        />
-      </div>
-
-      <div>
-        <label
-          htmlFor="requestedPercentage"
-          className="block text-sm font-medium text-[rgb(var(--foreground))]"
-        >
-          Allocation Percentage (1-100%)*
-        </label>
-        <input
-          type="number"
-          id="requestedPercentage"
-          value={requestedPercentage}
-          onChange={(e) => setRequestedPercentage(e.target.value)}
-          required
-          min="1"
-          max="100"
-          className={inputBaseClasses}
-          placeholder="e.g., 50"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label
-            htmlFor="requestedStartDate"
-            className="block text-sm font-medium text-[rgb(var(--foreground))]"
+        <div className="flex flex-col">
+          <h3
+            className="text-lg font-semibold"
+            style={{ color: RSCM_COLORS.darkPurple }}
           >
-            Requested Start Date (Optional)
-          </label>
-          <input
-            type="date"
-            id="requestedStartDate"
-            value={requestedStartDate}
-            onChange={(e) => setRequestedStartDate(e.target.value)}
-            className={inputBaseClasses}
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="requestedEndDate"
-            className="block text-sm font-medium text-[rgb(var(--foreground))]"
+            {userToRequest?.name}
+          </h3>
+
+          <span
+            className="text-[11px] mt-1 inline-flex items-center gap-1 px-2 py-1 rounded-md"
+            style={{
+              backgroundColor: `${RSCM_COLORS.violet}15`,
+              color: RSCM_COLORS.violet,
+            }}
           >
-            Requested End Date (Optional)
-          </label>
-          <input
-            type="date"
-            id="requestedEndDate"
-            value={requestedEndDate}
-            onChange={(e) => setRequestedEndDate(e.target.value)}
-            className={inputBaseClasses}
-          />
+            <Briefcase size={11} />
+            {userToRequest?.department || "Team Member"}
+          </span>
         </div>
       </div>
 
-      <div>
-        <label
-          htmlFor="pmNotes"
-          className="block text-sm font-medium text-[rgb(var(--foreground))]"
-        >
-          Notes for Approver (Optional)
-        </label>
-        <textarea
-          id="pmNotes"
-          value={pmNotes}
-          onChange={(e) => setPmNotes(e.target.value)}
-          rows={3}
-          className={inputBaseClasses}
-          placeholder="e.g., Specific expertise needed, critical phase..."
-        />
+      {/* FIELDS */}
+      <div className="flex-1 px-7 py-6 space-y-6 overflow-y-auto">
+        {/* Role */}
+        <div className="space-y-2">
+          <label className="text-[11px] font-semibold tracking-wider uppercase text-gray-400">
+            Role on Project
+          </label>
+          <div
+            className="relative rounded-xl overflow-hidden"
+            style={{
+              backgroundColor: `${RSCM_COLORS.lilac}10`,
+            }}
+          >
+            <User
+              size={16}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+            />
+            <input
+              type="text"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              placeholder="e.g. Lead Developer"
+              className="w-full pl-11 pr-4 py-3 bg-transparent text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-violet-200 transition-all duration-200"
+              required
+            />
+          </div>
+        </div>
+
+        {/* Allocation + Start */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="text-[11px] font-semibold tracking-wider uppercase text-gray-400">
+              Allocation %
+            </label>
+            <div
+              className="relative rounded-xl overflow-hidden"
+              style={{ backgroundColor: `${RSCM_COLORS.lilac}10` }}
+            >
+              <Percent
+                size={16}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              />
+              <input
+                type="number"
+                name="percentage"
+                min="1"
+                max="100"
+                value={formData.percentage}
+                onChange={handleChange}
+                className="w-full pl-11 pr-4 py-3 bg-transparent text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-violet-200 transition-all duration-200"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[11px] font-semibold tracking-wider uppercase text-gray-400">
+              Start Date
+            </label>
+            <div
+              className="relative rounded-xl overflow-hidden"
+              style={{ backgroundColor: `${RSCM_COLORS.lilac}10` }}
+            >
+              <CalendarIcon
+                size={16}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              />
+              <input
+                type="date"
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleChange}
+                className="w-full pl-11 pr-4 py-3 bg-transparent text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-violet-200 transition-all duration-200"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* End Date */}
+        <div className="space-y-2">
+          <label className="text-[11px] font-semibold tracking-wider uppercase text-gray-400">
+            End Date{" "}
+            <span className="normal-case font-normal text-xs text-gray-300">
+              (optional)
+            </span>
+          </label>
+          <div
+            className="relative rounded-xl overflow-hidden"
+            style={{ backgroundColor: `${RSCM_COLORS.lilac}10` }}
+          >
+            <CalendarIcon
+              size={16}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="date"
+              name="endDate"
+              value={formData.endDate}
+              onChange={handleChange}
+              className="w-full pl-11 pr-4 py-3 bg-transparent text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-violet-200 transition-all duration-200"
+            />
+          </div>
+        </div>
+
+        {/* Notes */}
+        <div className="space-y-2">
+          <label className="text-[11px] font-semibold tracking-wider uppercase text-gray-400">
+            Notes
+          </label>
+          <div
+            className="relative rounded-xl overflow-hidden"
+            style={{ backgroundColor: `${RSCM_COLORS.lilac}10` }}
+          >
+            <FileText
+              size={16}
+              className="absolute left-4 top-4 text-gray-400"
+            />
+            <textarea
+              name="notes"
+              rows="3"
+              value={formData.notes}
+              onChange={handleChange}
+              placeholder="Add any context about why this resource is needed..."
+              className="w-full pl-11 pr-4 py-3 bg-transparent text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-violet-200 transition-all duration-200 resize-none"
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-3 border-t border-[rgb(var(--border))] mt-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isSubmittingRequest}
-        >
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={isSubmittingRequest}
-          isLoading={isSubmittingRequest}
-        >
-          Submit Request
-        </Button>
+      {/* FOOTER */}
+      <div
+        className="px-7 py-4 flex items-center justify-between sticky bottom-0 backdrop-blur-xl border-t"
+        style={{
+          borderColor: `${RSCM_COLORS.lilac}40`,
+          backgroundColor: `rgba(255,255,255,0.8)`,
+        }}
+      >
+        <span className="text-[11px] text-gray-500 font-medium">
+          Requesting for {projectId ? "Current Project" : "Project"}
+        </span>
+
+        <div className="flex items-center gap-3">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onCancel}
+            disabled={isSubmittingRequest}
+            className="text-gray-600 hover:text-gray-900 hover:bg-transparent text-xs font-medium"
+          >
+            Cancel
+          </Button>
+
+          <Button
+            type="submit"
+            disabled={isSubmittingRequest}
+            className="text-white min-w-[140px] h-10 rounded-xl text-xs font-semibold tracking-wide shadow-md hover:shadow-lg transition-all active:scale-[.97]"
+            style={{ backgroundColor: RSCM_COLORS.violet }}
+          >
+            {isSubmittingRequest ? (
+              <>
+                <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              "Send Request"
+            )}
+          </Button>
+        </div>
       </div>
     </form>
   );

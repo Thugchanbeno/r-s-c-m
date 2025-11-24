@@ -1,8 +1,5 @@
-// lib/hooks/useAI.js
 "use client";
 import { useState, useCallback } from "react";
-import { useMutation, useAction } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { toast } from "sonner";
 
@@ -16,10 +13,7 @@ export const useAI = () => {
   const [quickAskError, setQuickAskError] = useState(null);
   const [showQuickAskSuggestions, setShowQuickAskSuggestions] = useState(false);
 
-  // Convex actions
-  const extractSkills = useAction(api.projects.extractSkillsFromDescription);
-
-  // QuickAsk (reuses extractSkills)
+  // QuickAsk (uses extract-skills proxy)
   const handleQuickAskSearch = useCallback(async () => {
     if (!quickAskQuery.trim() || !user?.email) return;
     setQuickAskLoading(true);
@@ -27,11 +21,16 @@ export const useAI = () => {
     setQuickAskSuggestions([]);
 
     try {
-      const result = await extractSkills({
-        email: user.email,
-        projectId: undefined,
-        description: quickAskQuery,
+      // PROXY CALL
+      const response = await fetch("/api/ai/extract-skills", {
+        method: "POST",
+        body: JSON.stringify({
+          description: quickAskQuery,
+        }),
       });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Failed");
 
       setQuickAskSuggestions(result.extractedSkills || []);
       setShowQuickAskSuggestions(true);
@@ -41,7 +40,7 @@ export const useAI = () => {
     } finally {
       setQuickAskLoading(false);
     }
-  }, [quickAskQuery, user?.email, extractSkills]);
+  }, [quickAskQuery, user?.email]);
 
   const handleQuickAskClear = useCallback(() => {
     setQuickAskQuery("");
@@ -50,30 +49,35 @@ export const useAI = () => {
     setQuickAskError(null);
   }, []);
 
-  // Project description analysis
+  // Project description analysis (uses extract-skills proxy)
   const handleExtractSkills = useCallback(
     async (projectId, description) => {
       if (!user?.email || !description) return [];
       try {
-        const result = await extractSkills({
-          email: user.email,
-          projectId,
-          description,
+        // PROXY CALL
+        const response = await fetch("/api/ai/extract-skills", {
+          method: "POST",
+          body: JSON.stringify({
+            description,
+            projectId,
+          }),
         });
+        const result = await response.json();
         return result.extractedSkills || [];
       } catch (err) {
         toast.error("Failed to extract skills.");
         return [];
       }
     },
-    [user?.email, extractSkills]
+    [user?.email]
   );
 
-  // Recommendations (on-demand fetch via proxy route)
+  // Recommendations (uses get-recommendations proxy)
   const handleGetRecommendations = useCallback(
     async (projectId, limit = 10) => {
       if (!user?.email) return [];
       try {
+        // PROXY CALL
         const response = await fetch("/api/ai/get-recommendations", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -87,6 +91,7 @@ export const useAI = () => {
 
         return result.users || [];
       } catch (err) {
+        console.error(err);
         toast.error("Failed to fetch recommendations.");
         return [];
       }

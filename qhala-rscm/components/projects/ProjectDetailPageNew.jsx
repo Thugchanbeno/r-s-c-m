@@ -1,23 +1,24 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  Briefcase, 
-  Users, 
-  Calendar, 
-  TrendingUp, 
-  ArrowLeft, 
+import {
+  Briefcase,
+  Users,
+  Calendar,
+  TrendingUp,
+  ArrowLeft,
   UserPlus,
   SearchCheck,
   CheckSquare,
   Wrench,
   Building2,
-  Lock
+  Lock,
 } from "lucide-react";
 import Image from "next/image";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { TaskManagerConvex } from "@/components/projects/TaskManagerNew";
 import { getSkillLevelName } from "@/components/common/CustomColors";
+import RecommendedUserList from "./RecommendedUserList";
 
 const ProjectDetailPageNew = ({
   project,
@@ -68,8 +69,15 @@ const ProjectDetailPageNew = ({
   const tabs = [
     { id: "overview", label: "Overview", icon: Briefcase },
     { id: "team", label: "Team", icon: Users, count: teamSize },
-    { id: "tasks", label: "Tasks", icon: CheckSquare, count: tasks?.length || 0 },
-    ...(canManageTeam ? [{ id: "resources", label: "Resources", icon: UserPlus }] : []),
+    {
+      id: "tasks",
+      label: "Tasks",
+      icon: CheckSquare,
+      count: tasks?.length || 0,
+    },
+    ...(canManageTeam
+      ? [{ id: "resources", label: "Resources", icon: UserPlus }]
+      : []),
   ];
 
   if (isLoading) {
@@ -84,7 +92,9 @@ const ProjectDetailPageNew = ({
   if (!project) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <p className="text-lg font-medium text-rscm-dark-purple">Project not found</p>
+        <p className="text-lg font-medium text-rscm-dark-purple">
+          Project not found
+        </p>
       </div>
     );
   }
@@ -115,13 +125,19 @@ const ProjectDetailPageNew = ({
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl font-bold text-rscm-dark-purple">{project.name}</h1>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
+              <h1 className="text-2xl font-bold text-rscm-dark-purple">
+                {project.name}
+              </h1>
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}
+              >
                 {project.status}
               </span>
             </div>
-            <p className="text-sm text-gray-600 mb-4">{project.description || "No description provided"}</p>
-            
+            <p className="text-sm text-gray-600 mb-4">
+              {project.description || "No description provided"}
+            </p>
+
             {/* Quick Stats */}
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-1.5 text-gray-600">
@@ -136,7 +152,9 @@ const ProjectDetailPageNew = ({
               )}
               <div className="flex items-center gap-1.5 text-gray-600">
                 <Users className="w-4 h-4 text-gray-400" />
-                <span>{teamSize} member{teamSize !== 1 ? "s" : ""}</span>
+                <span>
+                  {teamSize} member{teamSize !== 1 ? "s" : ""}
+                </span>
               </div>
               {utilizationPercentage > 0 && (
                 <div className="flex items-center gap-1.5 text-gray-600">
@@ -169,9 +187,13 @@ const ProjectDetailPageNew = ({
                   <Icon className="w-4 h-4" />
                   <span>{tab.label}</span>
                   {tab.count !== undefined && (
-                    <span className={`px-1.5 py-0.5 rounded text-xs ${
-                      isActive ? "bg-rscm-violet/10 text-rscm-violet" : "bg-gray-100 text-gray-600"
-                    }`}>
+                    <span
+                      className={`px-1.5 py-0.5 rounded text-xs ${
+                        isActive
+                          ? "bg-rscm-violet/10 text-rscm-violet"
+                          : "bg-gray-100 text-gray-600"
+                      }`}
+                    >
                       {tab.count}
                     </span>
                   )}
@@ -186,42 +208,54 @@ const ProjectDetailPageNew = ({
 
         {/* Tab Content */}
         <div className="p-6">
-          {/* Overview Tab */}
           {activeTab === "overview" && (
             <div className="space-y-6">
-              {/* Project Details Grid */}
+              {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-gray-50 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Calendar className="w-4 h-4 text-gray-400" />
-                    <h3 className="text-xs font-medium text-gray-500 uppercase">Timeline</h3>
+                    <h3 className="text-xs font-medium text-gray-500 uppercase">
+                      Timeline
+                    </h3>
                   </div>
                   <p className="text-sm text-rscm-dark-purple font-medium">
-                    {formatDate(project.startDate)} - {formatDate(project.endDate)}
+                    {formatDate(project.startDate)} -{" "}
+                    {formatDate(project.endDate)}
                   </p>
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Building2 className="w-4 h-4 text-gray-400" />
-                    <h3 className="text-xs font-medium text-gray-500 uppercase">Department</h3>
+                    <h3 className="text-xs font-medium text-gray-500 uppercase">
+                      Department
+                    </h3>
                   </div>
-                  <p className="text-sm text-rscm-dark-purple font-medium">{project.department}</p>
+                  <p className="text-sm text-rscm-dark-purple font-medium">
+                    {project.department}
+                  </p>
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <TrendingUp className="w-4 h-4 text-gray-400" />
-                    <h3 className="text-xs font-medium text-gray-500 uppercase">Utilization</h3>
+                    <h3 className="text-xs font-medium text-gray-500 uppercase">
+                      Utilization
+                    </h3>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <p className="text-sm text-rscm-dark-purple font-medium">{utilizationPercentage}%</p>
+                    <p className="text-sm text-rscm-dark-purple font-medium">
+                      {utilizationPercentage}%
+                    </p>
                     <span className="text-xs text-gray-500">avg</span>
                   </div>
                   <div className="mt-2 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-rscm-violet rounded-full transition-all duration-300"
-                      style={{ width: `${Math.min(utilizationPercentage, 100)}%` }}
+                      style={{
+                        width: `${Math.min(utilizationPercentage, 100)}%`,
+                      }}
                     />
                   </div>
                 </div>
@@ -232,7 +266,9 @@ const ProjectDetailPageNew = ({
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Wrench className="w-4 h-4 text-gray-400" />
-                    <h3 className="text-sm font-semibold text-rscm-dark-purple">Required Skills</h3>
+                    <h3 className="text-sm font-semibold text-rscm-dark-purple">
+                      Required Skills
+                    </h3>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {project.requiredSkills.map((skill, idx) => (
@@ -242,7 +278,9 @@ const ProjectDetailPageNew = ({
                       >
                         {skill.skillName}
                         {skill.proficiencyLevel && (
-                          <span className="ml-1 opacity-70">• {getSkillLevelName(skill.proficiencyLevel)}</span>
+                          <span className="ml-1 opacity-70">
+                            • {getSkillLevelName(skill.proficiencyLevel)}
+                          </span>
                         )}
                       </span>
                     ))}
@@ -252,14 +290,14 @@ const ProjectDetailPageNew = ({
             </div>
           )}
 
-          {/* Team Tab */}
           {activeTab === "team" && (
             <div className="space-y-4">
               {allocations.length > 0 ? (
                 allocations.map((alloc) => {
-                  const userName = alloc.userId?.name || alloc.userName || "Unknown User";
-                  const userAvatar = alloc.userId?.avatarUrl || alloc.userAvatar;
-                  
+                  const userName =
+                    alloc.userId?.name || alloc.userName || "Unknown User";
+                  const userAvatar =
+                    alloc.userId?.avatarUrl || alloc.userAvatar;
                   return (
                     <div
                       key={alloc._id}
@@ -286,12 +324,15 @@ const ProjectDetailPageNew = ({
                             {userName}
                           </h4>
                           <p className="text-xs text-gray-500">
-                            {alloc.role} • {formatDate(alloc.startDate)} - {formatDate(alloc.endDate)}
+                            {alloc.role} • {formatDate(alloc.startDate)} -{" "}
+                            {formatDate(alloc.endDate)}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-semibold text-rscm-violet">{alloc.allocationPercentage}%</p>
+                        <p className="text-lg font-semibold text-rscm-violet">
+                          {alloc.allocationPercentage}%
+                        </p>
                         <p className="text-xs text-gray-500">capacity</p>
                       </div>
                     </div>
@@ -300,16 +341,19 @@ const ProjectDetailPageNew = ({
               ) : (
                 <div className="text-center py-12">
                   <Users className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-                  <h3 className="font-medium text-rscm-dark-purple mb-1">No team members allocated</h3>
+                  <h3 className="font-medium text-rscm-dark-purple mb-1">
+                    No team members allocated
+                  </h3>
                   <p className="text-sm text-gray-500">
-                    {canManageTeam ? "Use the Resources tab to find and request team members" : "Team members will appear here once allocated"}
+                    {canManageTeam
+                      ? "Use the Resources tab to find and request team members"
+                      : "Team members will appear here once allocated"}
                   </p>
                 </div>
               )}
             </div>
           )}
 
-          {/* Tasks Tab */}
           {activeTab === "tasks" && (
             <div>
               <TaskManagerConvex
@@ -322,13 +366,16 @@ const ProjectDetailPageNew = ({
             </div>
           )}
 
-          {/* Resources Tab (only for PMs) */}
+          {/* RESOURCES TAB - INTEGRATED WITH AI RECOMMENDATIONS */}
           {activeTab === "resources" && canManageTeam && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-sm font-semibold text-rscm-dark-purple mb-3">Find Team Members</h3>
+                <h3 className="text-sm font-semibold text-rscm-dark-purple mb-3">
+                  Find Team Members
+                </h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  Use AI to find the best matching team members based on project requirements and skills.
+                  Use AI to find the best matching team members based on project
+                  requirements and skills.
                 </p>
                 <button
                   onClick={onGetRecommendations}
@@ -349,56 +396,25 @@ const ProjectDetailPageNew = ({
                 </button>
               </div>
 
-              {/* Recommendations */}
               {showRecommendations && (
-                <div className="space-y-3">
+                <div className="mt-6">
                   {recommendations.length > 0 ? (
                     <>
-                      <h4 className="text-sm font-semibold text-rscm-dark-purple">
+                      <h4 className="text-sm font-semibold text-rscm-dark-purple mb-4">
                         Recommended Team Members
                       </h4>
-                      {recommendations.map((user) => (
-                        <div
-                          key={user._id}
-                          className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                        >
-                          <div className="flex items-center gap-3">
-                            {user.avatarUrl ? (
-                              <Image
-                                src={user.avatarUrl}
-                                alt={user.name}
-                                width={40}
-                                height={40}
-                                className="w-10 h-10 rounded-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-10 h-10 rounded-full bg-rscm-violet flex items-center justify-center">
-                                <span className="text-sm font-medium text-white">
-                                  {user.name?.[0] || "?"}
-                                </span>
-                              </div>
-                            )}
-                            <div>
-                              <h5 className="font-medium text-rscm-dark-purple">{user.name}</h5>
-                              <p className="text-xs text-gray-500">
-                                {user.department} • Match: {Math.round((user.matchScore || 0) * 100)}%
-                              </p>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => onCreateResourceRequest?.(user)}
-                            className="px-4 py-2 bg-rscm-violet text-white text-sm font-medium rounded-lg hover:bg-rscm-plum transition-colors"
-                          >
-                            Request
-                          </button>
-                        </div>
-                      ))}
+                      <RecommendedUserList
+                        recommendedUsers={recommendations}
+                        projectId={project._id}
+                        onInitiateRequest={onCreateResourceRequest}
+                      />
                     </>
                   ) : (
                     <div className="text-center py-8 bg-gray-50 rounded-lg">
                       <SearchCheck className="w-8 h-8 mx-auto text-gray-300 mb-2" />
                       <p className="text-sm text-gray-500">
-                        No recommendations found. Try adjusting project requirements or search manually.
+                        No recommendations found. Try adjusting project
+                        requirements.
                       </p>
                     </div>
                   )}
