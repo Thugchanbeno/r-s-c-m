@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
-import { fetchMutation } from "convex/nextjs";
+import { fetchAction } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 
 export async function POST(req) {
@@ -15,7 +15,7 @@ export async function POST(req) {
     const body = await req.json();
     const { description, projectId } = body;
 
-    const result = await fetchMutation(
+    const result = await fetchAction(
       api.projects.extractSkillsFromDescription,
       {
         email: session.user.email,

@@ -18,9 +18,9 @@ async function getActor(ctx, email) {
 }
 
 export const getAll = query({
-  args: { 
+  args: {
     email: v.string(),
-    skill: v.optional(v.string()) 
+    skill: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
@@ -31,9 +31,7 @@ export const getAll = query({
     if (args.skill) {
       const regex = args.skill.toLowerCase();
       cvs = cvs.filter((cv) =>
-        cv.extractedSkills.some((s) =>
-          s.name.toLowerCase().includes(regex)
-        )
+        cv.extractedSkills.some((s) => s.name.toLowerCase().includes(regex))
       );
     }
 
@@ -85,7 +83,7 @@ export const extractEntities = action({
     }
 
     const nlpServiceUrl = `${
-      process.env.NLP_API_URL || "http://localhost:8000"
+      process.env.NLP_API_URL_LOCAL || "http://localhost:8000"
     }/nlp/extract-entities`;
 
     try {

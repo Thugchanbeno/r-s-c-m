@@ -15,6 +15,7 @@ import type {
 } from "convex/server";
 import type * as activities from "../activities.js";
 import type * as allocations from "../allocations.js";
+import type * as api_ from "../api.js";
 import type * as cvCache from "../cvCache.js";
 import type * as events from "../events.js";
 import type * as files from "../files.js";
@@ -41,6 +42,7 @@ import type * as workRequests from "../workRequests.js";
 declare const fullApi: ApiFromModules<{
   activities: typeof activities;
   allocations: typeof allocations;
+  api: typeof api_;
   cvCache: typeof cvCache;
   events: typeof events;
   files: typeof files;

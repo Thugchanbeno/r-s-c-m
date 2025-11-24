@@ -1,7 +1,16 @@
 import { v } from "convex/values";
-import { query, mutation, action, internalQuery, internalMutation } from "./_generated/server";
+import {
+  query,
+  mutation,
+  action,
+  internalQuery,
+  internalMutation,
+} from "./_generated/server";
 import { internal } from "./_generated/api";
-import { createNotification, createBulkNotifications } from "./notificationUtils";
+import {
+  createNotification,
+  createBulkNotifications,
+} from "./notificationUtils";
 
 function requireRole(user, allowed) {
   if (!user || !allowed.includes(user.role)) {
@@ -168,15 +177,14 @@ export const create = mutation({
     // Find HR and admin users who should know about new projects
     const stakeholders = await ctx.db
       .query("users")
-      .filter((q) => q.or(
-        q.eq(q.field("role"), "hr"),
-        q.eq(q.field("role"), "admin")
-      ))
+      .filter((q) =>
+        q.or(q.eq(q.field("role"), "hr"), q.eq(q.field("role"), "admin"))
+      )
       .collect();
 
     if (stakeholders.length > 0) {
       await createBulkNotifications(ctx, {
-        userIds: stakeholders.map(u => u._id),
+        userIds: stakeholders.map((u) => u._id),
         type: "project_status_changed",
         title: "New Project Created",
         message: `${actor.name} created new project: "${args.name}" in ${args.department}`,
@@ -250,7 +258,7 @@ export const update = mutation({
 
     const { id, email, ...updates } = args;
     const oldProject = { ...project }; // Keep reference to old state
-    
+
     await ctx.db.patch(id, {
       ...updates,
       updatedAt: Date.now(),
@@ -266,8 +274,8 @@ export const update = mutation({
         .collect();
 
       const teamMemberIds = allocations
-        .map(a => a.userId)
-        .filter(userId => userId !== actor._id); // Don't notify the actor
+        .map((a) => a.userId)
+        .filter((userId) => userId !== actor._id); // Don't notify the actor
 
       if (teamMemberIds.length > 0) {
         await createBulkNotifications(ctx, {
@@ -307,7 +315,7 @@ export const extractSkillsFromDescription = action({
     const actor = await ctx.runQuery(internal.projects.getActorByEmail, {
       email: args.email,
     });
-    
+
     if (!actor || !["pm", "hr", "admin"].includes(actor.role)) {
       throw new Error("You don't have permission to perform this action.");
     }
@@ -317,7 +325,7 @@ export const extractSkillsFromDescription = action({
     }
 
     const nlpServiceUrl = `${
-      process.env.NLP_API_URL || "http://localhost:8000"
+      process.env.NLP_API_URL_LOCAL || "http://localhost:8000"
     }/extract-skills`;
 
     try {
@@ -368,7 +376,7 @@ export const getRecommendations = action({
     const actor = await ctx.runQuery(internal.projects.getActorByEmail, {
       email: args.email,
     });
-    
+
     if (!actor || !["pm", "hr", "admin"].includes(actor.role)) {
       throw new Error("You don't have permission to perform this action.");
     }
@@ -379,20 +387,23 @@ export const getRecommendations = action({
     if (!project) throw new Error("Project not found");
 
     const nlpServiceUrl = `${
-      process.env.NLP_API_URL || "http://localhost:8000"
+      process.env.NLP_API_URL_LOCAL || "http://localhost:8000"
     }/recommend/users-for-project`;
 
     try {
       console.log(`Calling Python microservice for project: ${args.projectId}`);
-      
+
       // Use simple payload structure that matches working REST implementation
       const payload = {
         id: args.projectId,
         limit: args.limit || 10,
       };
-      
-      console.log('Payload to Python service:', JSON.stringify(payload, null, 2));
-      
+
+      console.log(
+        "Payload to Python service:",
+        JSON.stringify(payload, null, 2)
+      );
+
       const response = await fetch(nlpServiceUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -400,7 +411,7 @@ export const getRecommendations = action({
       });
 
       const result = await response.json();
-      console.log('Python service response:', JSON.stringify(result, null, 2));
+      console.log("Python service response:", JSON.stringify(result, null, 2));
 
       if (!response.ok) {
         console.error(
@@ -408,7 +419,9 @@ export const getRecommendations = action({
           result.detail || result.error || result
         );
         throw new Error(
-          result.detail || result.error || `Python service failed with status ${response.status}`
+          result.detail ||
+            result.error ||
+            `Python service failed with status ${response.status}`
         );
       }
 
@@ -418,9 +431,13 @@ export const getRecommendations = action({
             "Python response 'recommendations' field was not an array:",
             result
           );
-          throw new Error("Invalid recommendation data format from service (not an array).");
+          throw new Error(
+            "Invalid recommendation data format from service (not an array)."
+          );
         }
-        console.log(`Successfully got ${result.recommendations.length} recommendations`);
+        console.log(
+          `Successfully got ${result.recommendations.length} recommendations`
+        );
         return { success: true, users: result.recommendations };
       } else {
         console.error("Python response missing 'recommendations' key:", result);
@@ -432,12 +449,15 @@ export const getRecommendations = action({
         stack: err.stack,
         cause: err.cause,
       });
-      
+
       // More specific error handling
       if (err.cause && err.cause.code === "ECONNREFUSED") {
-        throw new Error("Could not connect to the recommendation service. Please ensure the Python microservice is running on " + (process.env.NLP_API_URL || "http://localhost:8000"));
+        throw new Error(
+          "Could not connect to the recommendation service. Please ensure the Python microservice is running on " +
+            (process.env.NLP_API_URL_LOCAL || "http://localhost:8000")
+        );
       }
-      
+
       throw new Error(err.message || "Failed to fetch recommendations.");
     }
   },
