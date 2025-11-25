@@ -55,7 +55,7 @@ export const submitFeedback = action({
     comments: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const nlpServiceUrl = process.env.NLP_API_URL_LOCAL;
+    const nlpServiceUrl = process.env.NLP_API_URL;
     if (!nlpServiceUrl) {
       throw new Error("NLP_API_URL_LOCAL not set");
     }
