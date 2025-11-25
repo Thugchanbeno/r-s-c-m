@@ -5,8 +5,6 @@ import { useProjectDetailsData } from "@/lib/hooks/useProjectDetailsData";
 import { useAI } from "@/lib/hooks/useAI";
 import ProjectDetailPageNew from "@/components/projects/ProjectDetailPageNew";
 import RequestResourceForm from "@/components/user/RequestResourceForm";
-
-// Shadcn Dialog Components
 import {
   Dialog,
   DialogContent,
@@ -18,15 +16,10 @@ import { RSCM_COLORS } from "@/components/charts/ChartComponents";
 export default function ProjectDetailPage() {
   const { projectId } = useParams();
 
-  // 1. Initialize AI Hook
   const { handleGetRecommendations } = useAI();
-
-  // 2. Local AI State
   const [aiRecommendations, setAiRecommendations] = useState([]);
   const [loadingAi, setLoadingAi] = useState(false);
   const [showAiResults, setShowAiResults] = useState(false);
-
-  // 3. Project Data Hook
   const {
     project,
     allocations,
@@ -45,7 +38,6 @@ export default function ProjectDetailPage() {
     onDeleteTask,
   } = useProjectDetailsData(projectId);
 
-  // 4. Bridge Handler
   const onGetRecommendations = async () => {
     setLoadingAi(true);
     setShowAiResults(false);
@@ -73,8 +65,6 @@ export default function ProjectDetailPage() {
         canManageTeam={canManageTeam}
         isLoading={loading}
       />
-
-      {/* Replaced Custom Modal with Shadcn Dialog */}
       <Dialog
         open={isRequestModalOpen}
         onOpenChange={(open) => !open && handleCloseRequestModal()}
