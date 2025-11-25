@@ -325,7 +325,7 @@ export const extractSkillsFromDescription = action({
     }
 
     const nlpServiceUrl = `${
-      process.env.NLP_API_URL_LOCAL || "http://localhost:8000"
+      process.env.NLP_API_URL || "http://localhost:8000"
     }/extract-skills`;
 
     try {
@@ -387,7 +387,7 @@ export const getRecommendations = action({
     if (!project) throw new Error("Project not found");
 
     const nlpServiceUrl = `${
-      process.env.NLP_API_URL_LOCAL || "http://localhost:8000"
+      process.env.NLP_API_URL || "http://localhost:8000"
     }/recommend/users-for-project`;
 
     try {
@@ -454,7 +454,7 @@ export const getRecommendations = action({
       if (err.cause && err.cause.code === "ECONNREFUSED") {
         throw new Error(
           "Could not connect to the recommendation service. Please ensure the Python microservice is running on " +
-            (process.env.NLP_API_URL_LOCAL || "http://localhost:8000")
+            (process.env.NLP_API_URL || "http://localhost:8000")
         );
       }
 
