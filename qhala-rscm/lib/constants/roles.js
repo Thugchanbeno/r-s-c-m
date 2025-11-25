@@ -1,0 +1,18 @@
+export const ALLOCATION_ROLES = [
+  "Developer",
+  "Senior Developer",
+  "Lead Developer",
+  "Tech Lead",
+  "Project Manager",
+  "Product Manager",
+  "Designer",
+  "UX Designer",
+  "UI Designer",
+  "Business Analyst",
+  "QA Engineer",
+  "DevOps Engineer",
+  "Data Scientist",
+  "Infrastructure",
+  "Consultant",
+  "Other",
+];

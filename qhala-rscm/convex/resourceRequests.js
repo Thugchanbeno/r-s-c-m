@@ -38,7 +38,8 @@ export const getAll = query({
         canAccess = true;
       }
     } else {
-      if (["admin", "hr", "line_manager"].includes(actor.role)) canAccess = true;
+      if (["admin", "hr", "line_manager"].includes(actor.role))
+        canAccess = true;
     }
     if (!canAccess) throw new Error("Forbidden: Insufficient permissions.");
 
@@ -87,7 +88,7 @@ export const getAll = query({
       const requestedUser = await ctx.db.get(req.requestedUserId);
       const project = await ctx.db.get(req.projectId);
       const requestedByPm = await ctx.db.get(req.requestedByPmId);
-      
+
       enrichedRequests.push({
         ...req,
         requestedUserId: requestedUser,
@@ -102,6 +103,7 @@ export const getAll = query({
 // POST request
 export const create = mutation({
   args: {
+    email: v.string(),
     projectId: v.id("projects"),
     requestedUserId: v.id("users"),
     requestedRole: v.string(),
@@ -111,14 +113,7 @@ export const create = mutation({
     pmNotes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-
-    const actor = await ctx.db
-      .query("users")
-      .withIndex("by_email", (ix) => ix.eq("email", identity.email))
-      .first();
-    if (!actor) throw new Error("User not found");
+    const actor = await getActor(ctx, args.email);
     requireRole(actor, ["pm", "admin", "hr"]);
 
     if (args.requestedPercentage < 1 || args.requestedPercentage > 100) {
@@ -137,16 +132,24 @@ export const create = mutation({
         ["pending_lm", "pending_hr", "approved"].includes(r.status)
     );
     if (duplicate) {
+      const requestedUser = await ctx.db.get(args.requestedUserId);
+      const statusText =
+        duplicate.status === "pending_lm"
+          ? "awaiting line manager approval"
+          : duplicate.status === "pending_hr"
+            ? "awaiting HR approval"
+            : "approved";
       throw new Error(
-        "A pending or approved request for this user already exists."
+        `A resource request for ${requestedUser?.name || "this user"} is already ${statusText}. Please wait for it to be processed or contact your administrator if you need to modify it.`
       );
     }
 
     const now = Date.now();
+    const { email, ...insertData } = args;
     const requestId = await ctx.db.insert("resourceRequests", {
-      ...args,
+      ...insertData,
       requestedByPmId: actor._id,
-      status: "pending_lm", // start with LM approval
+      status: "pending_lm",
       lineManagerApproval: { status: "pending", reason: "" },
       hrApproval: { status: "pending", reason: "" },
       createdAt: now,
@@ -159,8 +162,11 @@ export const create = mutation({
       await ctx.db.insert("notifications", {
         userId: requestedUser.lineManagerId,
         message: `New resource request for ${requestedUser.name} requires your approval.`,
+        title: "New Resource Request",
+        category: "approvals",
+        priority: "high",
+        type: "resource_request_pending_lm",
         link: "/resources?tab=requests",
-        type: "new_request",
         relatedResourceId: requestId,
         relatedResourceType: "resourceRequest",
         isRead: false,
@@ -188,6 +194,7 @@ export const processApproval = mutation({
 
     const now = Date.now();
     let updates = { updatedAt: now };
+    let bypassedLM = false;
 
     // LM approval
     if (request.status === "pending_lm" && actor.role === "line_manager") {
@@ -199,7 +206,55 @@ export const processApproval = mutation({
       };
       updates.status = args.action === "approve" ? "pending_hr" : "rejected";
     }
-    // HR approval
+    // Admin/HR bypassing LM stage
+    else if (
+      request.status === "pending_lm" &&
+      ["hr", "admin"].includes(actor.role)
+    ) {
+      bypassedLM = true;
+      updates.lineManagerApproval = {
+        status: args.action === "approve" ? "approved" : "rejected",
+        approvedBy: actor._id,
+        reason: args.reason,
+        approvedAt: now,
+      };
+      updates.status = args.action === "approve" ? "pending_hr" : "rejected";
+
+      if (args.action === "approve") {
+        updates.hrApproval = {
+          status: "approved",
+          approvedBy: actor._id,
+          reason: args.reason,
+          approvedAt: now,
+        };
+        updates.status = "approved";
+
+        const existingAlloc = await ctx.db
+          .query("allocations")
+          .withIndex("by_user", (ix) =>
+            ix.eq("userId", request.requestedUserId)
+          )
+          .collect();
+
+        const duplicate = existingAlloc.find(
+          (a) => a.projectId === request.projectId
+        );
+        if (!duplicate) {
+          await ctx.db.insert("allocations", {
+            userId: request.requestedUserId,
+            projectId: request.projectId,
+            allocationPercentage: request.requestedPercentage,
+            startDate: request.requestedStartDate || now,
+            endDate: request.requestedEndDate,
+            role: request.requestedRole,
+            status: "active",
+            createdAt: now,
+            updatedAt: now,
+          });
+        }
+      }
+    }
+    // HR approval (after LM approval)
     else if (
       request.status === "pending_hr" &&
       ["hr", "admin"].includes(actor.role)
@@ -240,26 +295,33 @@ export const processApproval = mutation({
       }
     } else {
       throw new Error(
-        "You don’t have permission to approve this request at this stage."
+        "You don't have permission to approve this request at this stage."
       );
     }
 
     await ctx.db.patch(args.requestId, updates);
 
     // Notify PM
+    const notificationType =
+      updates.status === "approved"
+        ? "resource_request_hr_approved"
+        : "resource_request_hr_rejected";
+
     await ctx.db.insert("notifications", {
       userId: request.requestedByPmId,
-      message: `Your resource request has been ${updates.status}.`,
+      message: `Your resource request has been ${updates.status === "approved" ? "approved" : "rejected"}.`,
+      title: `Resource Request ${updates.status === "approved" ? "Approved" : "Rejected"}.`,
+      category: "approvals",
+      priority: updates.status === "approved" ? "high" : "medium",
+      type: notificationType,
       link: `/projects/${request.projectId}`,
-      type:
-        updates.status === "approved" ? "request_approved" : "request_rejected",
       relatedResourceId: args.requestId,
       relatedResourceType: "resourceRequest",
       isRead: false,
       createdAt: now,
     });
 
-    return { success: true };
+    return { success: true, bypassedLM };
   },
 });
 

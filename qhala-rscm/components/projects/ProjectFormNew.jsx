@@ -22,6 +22,7 @@ import {
   ChevronDown,
   CheckCircle,
   Clock,
+  Loader2,
 } from "lucide-react";
 
 const ProjectFormNew = ({
@@ -34,13 +35,8 @@ const ProjectFormNew = ({
 }) => {
   const {
     projectData,
-    nlpSuggestedSkills,
-    isProcessingDescription,
-    nlpError,
-    descriptionProcessed,
     localSubmitError,
     handleChange,
-    handleProcessDescription,
     handleRequiredSkillsChange,
   } = useProjectFormData(initialData, isEditMode, onSubmit);
 
@@ -51,24 +47,23 @@ const ProjectFormNew = ({
     quickAskLoading,
     quickAskError,
     showQuickAskSuggestions,
-    handleQuickAskSearch, // This now uses Convex Action
+    handleQuickAskSearch,
     handleQuickAskClear,
+    handleExtractSkills,
   } = useAI();
 
   const [tasks, setTasks] = useState([]);
-  const [currentStep, setCurrentStep] = useState(1); // 1: Details, 2: Skills, 3: Tasks
+  const [currentStep, setCurrentStep] = useState(1);
   const [createConfirmation, setCreateConfirmation] = useState(false);
 
-  // Quick Ask state
-  // const [quickAskQuery, setQuickAskQuery] = useState("");
-  // const [quickAskSuggestions, setQuickAskSuggestions] = useState([]);
-  // const [quickAskLoading, setQuickAskLoading] = useState(false);
-  // const [quickAskError, setQuickAskError] = useState(null);
-  // const [showQuickAskSuggestions, setShowQuickAskSuggestions] = useState(false);
+  // Local state for Description Analysis UI
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [nlpErrorState, setNlpError] = useState(null);
+  const [nlpSuggestions, setNlpSuggestions] = useState([]);
+  const [analysisDone, setAnalysisDone] = useState(false);
 
   const displayError = submitError || localSubmitError;
 
-  // Reset confirmation after timeout
   useEffect(() => {
     if (createConfirmation) {
       const timer = setTimeout(() => {
@@ -101,7 +96,7 @@ const ProjectFormNew = ({
 
   const canProceedFromSkills = () => {
     return !isEditMode
-      ? projectData.requiredSkills.length > 0 || !descriptionProcessed
+      ? projectData.requiredSkills.length > 0 || analysisDone
       : true;
   };
 
@@ -119,50 +114,51 @@ const ProjectFormNew = ({
     }
   };
 
-  // const handleQuickAskSearch = async () => {
-  //   if (!quickAskQuery.trim()) return;
+  const onAnalyzeDescription = async () => {
+    if (!projectData.description.trim()) return;
 
-  //   setQuickAskLoading(true);
-  //   setQuickAskError(null);
-  //   setShowQuickAskSuggestions(false);
+    setIsAnalyzing(true);
+    setNlpError(null);
 
-  //   try {
-  //     const response = await fetch("/api/recommendations/skills", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ description: quickAskQuery }),
-  //     });
-  //     const result = await response.json();
+    try {
+      const skills = await handleExtractSkills(null, projectData.description);
 
-  //     if (!response.ok || !result.success) {
-  //       throw new Error(result.error || "Failed to find skills.");
-  //     }
-
-  //     setQuickAskSuggestions(result.data || []);
-  //     setShowQuickAskSuggestions(true);
-  //   } catch (err) {
-  //     setQuickAskError(err.message);
-  //   } finally {
-  //     setQuickAskLoading(false);
-  //   }
-  // };
+      if (skills && skills.length > 0) {
+        setNlpSuggestions(skills);
+        setAnalysisDone(true);
+      } else {
+        setNlpError("No skills identified. Try adding more technical details.");
+      }
+    } catch (err) {
+      console.error(err);
+      setNlpError("Failed to analyze description.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleQuickAskSkillSelected = (skill) => {
-    // Add skill to required skills if not already there
+    const skillId = skill.id || skill._id || `temp-${Date.now()}`;
+    const skillName = skill.name || skill;
+
     const isAlreadySelected = projectData.requiredSkills.some(
-      (s) => s.skillId === skill.id
+      (s) => s.skillId === skillId || s.skillName === skillName
     );
 
     if (!isAlreadySelected) {
       const newSkill = {
-        skillId: skill.id,
-        skillName: skill.name,
-        category: skill.category || "N/A",
+        skillId: skillId,
+        skillName: skillName,
+        category: skill.category || "General",
         proficiencyLevel: 3,
         isRequired: true,
       };
       handleRequiredSkillsChange([...projectData.requiredSkills, newSkill]);
     }
+  };
+
+  const handleAddSkill = (skill) => {
+    handleQuickAskSkillSelected(skill);
   };
 
   const handleFormSubmit = (e) => {
@@ -171,7 +167,6 @@ const ProjectFormNew = ({
       e.stopPropagation();
     }
 
-    // Only submit on Step 3 (Tasks)
     if (currentStep !== 3) {
       return;
     }
@@ -179,18 +174,16 @@ const ProjectFormNew = ({
     if (
       !isEditMode &&
       projectData.requiredSkills.length === 0 &&
-      descriptionProcessed
+      analysisDone
     ) {
       return;
     }
 
-    // Double-click confirmation
     if (!createConfirmation) {
       setCreateConfirmation(true);
       return;
     }
 
-    // Convert date strings to timestamps for Convex
     const startDateTimestamp = projectData.startDate
       ? new Date(projectData.startDate).getTime()
       : null;
@@ -231,7 +224,6 @@ const ProjectFormNew = ({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         {onCancel && (
           <div className="px-6 py-3 border-b border-gray-100">
@@ -265,13 +257,12 @@ const ProjectFormNew = ({
           </div>
         </div>
 
-        {/* Progress Steps */}
         <div className="px-6 pb-5">
           <div className="flex items-center justify-between">
             {steps.map((step, index) => {
-              const StepIcon = step.icon;
               const isActive = currentStep === step.number;
               const isCompleted = currentStep > step.number;
+              const Icon = step.icon;
 
               return (
                 <div key={step.number} className="flex items-center flex-1">
@@ -288,7 +279,7 @@ const ProjectFormNew = ({
                       {isCompleted ? (
                         <CheckCircle className="w-4 h-4" />
                       ) : (
-                        <StepIcon className="w-4 h-4" />
+                        <Icon className="w-4 h-4" />
                       )}
                     </div>
                     <span
@@ -317,7 +308,6 @@ const ProjectFormNew = ({
         </div>
       </div>
 
-      {/* Error Alert */}
       {displayError && (
         <div className="bg-red-50 rounded-lg px-4 py-3 flex items-start gap-2">
           <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
@@ -328,13 +318,10 @@ const ProjectFormNew = ({
         </div>
       )}
 
-      {/* Form Content */}
       <form onSubmit={handleFormSubmit}>
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          {/* Step 1: Details */}
           {currentStep === 1 && (
             <div className="p-6 space-y-6">
-              {/* Basic Information */}
               <div>
                 <h2 className="text-base font-semibold text-rscm-dark-purple mb-3">
                   Basic Information
@@ -448,7 +435,6 @@ const ProjectFormNew = ({
                 </div>
               </div>
 
-              {/* Description */}
               <div>
                 <h2 className="text-base font-semibold text-rscm-dark-purple mb-3">
                   Project Description
@@ -469,10 +455,8 @@ const ProjectFormNew = ({
             </div>
           )}
 
-          {/* Step 2: Skills */}
           {currentStep === 2 && (
             <div className="p-6 space-y-6">
-              {/* Project Description Display */}
               <div className="bg-gray-50 rounded-lg p-4">
                 <h3 className="text-xs font-semibold text-rscm-dark-purple mb-2">
                   Project Description
@@ -482,7 +466,6 @@ const ProjectFormNew = ({
                 </p>
               </div>
 
-              {/* AI Analysis */}
               <div>
                 <h2 className="text-base font-semibold text-rscm-dark-purple mb-3">
                   AI Skill Analysis
@@ -493,64 +476,56 @@ const ProjectFormNew = ({
                 </p>
                 <button
                   type="button"
-                  onClick={handleProcessDescription}
-                  disabled={
-                    isProcessingDescription || !projectData.description.trim()
-                  }
+                  onClick={onAnalyzeDescription}
+                  disabled={isAnalyzing || !projectData.description.trim()}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rscm-violet text-white text-xs font-medium rounded-lg hover:bg-rscm-plum transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isProcessingDescription ? (
+                  {isAnalyzing ? (
                     <>
-                      <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <Loader2 className="w-3 h-3 animate-spin" />
                       Analyzing...
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-3.5 h-3.5" />
-                      {descriptionProcessed && nlpSuggestedSkills.length > 0
+                      {analysisDone && nlpSuggestions.length > 0
                         ? "Re-analyze"
                         : "Analyze with AI"}
                     </>
                   )}
                 </button>
 
-                {nlpError && (
+                {nlpErrorState && (
                   <div className="mt-3 bg-red-50 rounded-lg px-3 py-2">
-                    <p className="text-xs text-red-700">{nlpError}</p>
+                    <p className="text-xs text-red-700">{nlpErrorState}</p>
                   </div>
                 )}
 
-                {descriptionProcessed &&
-                  nlpSuggestedSkills.length > 0 &&
-                  !isProcessingDescription && (
-                    <div className="mt-3 bg-rscm-lilac/10 rounded-lg px-4 py-3">
-                      <h3 className="flex items-center gap-1.5 text-xs font-semibold text-rscm-violet mb-2">
-                        <CheckCircle className="w-3.5 h-3.5" />
-                        AI Skill Suggestions
-                      </h3>
-                      <div className="flex flex-wrap gap-1.5">
-                        {nlpSuggestedSkills.map((skill) => (
-                          <span
-                            key={skill.id}
-                            className="px-2.5 py-1 bg-white text-rscm-violet text-xs font-medium rounded-full"
-                          >
-                            {skill.name}
-                            {skill.category && (
-                              <span className="ml-1 opacity-70">
-                                ({skill.category})
-                              </span>
-                            )}
-                          </span>
-                        ))}
-                      </div>
+                {analysisDone && nlpSuggestions.length > 0 && !isAnalyzing && (
+                  <div className="mt-3 bg-rscm-lilac/10 rounded-lg px-4 py-3">
+                    <h3 className="flex items-center gap-1.5 text-xs font-semibold text-rscm-violet mb-2">
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      AI Skill Suggestions
+                    </h3>
+                    <div className="flex flex-wrap gap-1.5">
+                      {nlpSuggestions.map((skill, idx) => (
+                        <button
+                          type="button"
+                          key={idx}
+                          onClick={() => handleAddSkill(skill)}
+                          className="px-2.5 py-1 bg-white text-rscm-violet text-xs font-medium rounded-full cursor-pointer hover:bg-gray-50 transition-colors border border-rscm-lilac/20"
+                        >
+                          {skill.name || skill}
+                        </button>
+                      ))}
                     </div>
-                  )}
+                  </div>
+                )}
               </div>
 
-              {/* Quick Ask - Additional Skill Search */}
               <div>
                 <h2 className="text-base font-semibold text-rscm-dark-purple mb-3">
-                  Quick Skill Search
+                  Manual Search
                 </h2>
                 <p className="text-xs text-gray-500 mb-3">
                   Search for additional skills beyond the project description
@@ -564,11 +539,10 @@ const ProjectFormNew = ({
                   loading={quickAskLoading}
                   error={quickAskError}
                   showSuggestions={showQuickAskSuggestions}
-                  onSkillSelected={handleQuickAskSkillSelected}
+                  onSkillSelected={handleAddSkill}
                 />
               </div>
 
-              {/* Required Skills */}
               <div>
                 <h2 className="flex items-center gap-1.5 text-base font-semibold text-rscm-dark-purple mb-3">
                   <Wrench className="w-4 h-4" />
@@ -579,14 +553,14 @@ const ProjectFormNew = ({
                 </p>
                 <SkillSelectorNew
                   initialSelectedSkills={projectData.requiredSkills}
-                  nlpSuggestedSkills={nlpSuggestedSkills}
+                  nlpSuggestedSkills={nlpSuggestions}
                   onChange={handleRequiredSkillsChange}
                   title="Project Skills"
                   description="Select the skills required for this project"
                 />
                 {projectData.requiredSkills.length === 0 &&
                   !isEditMode &&
-                  descriptionProcessed && (
+                  analysisDone && (
                     <div className="mt-2 bg-red-50 rounded-lg px-3 py-2">
                       <p className="text-xs text-red-700">
                         Please select at least one required skill.
@@ -597,14 +571,12 @@ const ProjectFormNew = ({
             </div>
           )}
 
-          {/* Step 3: Tasks */}
           {currentStep === 3 && (
             <div className="p-6">
               <TaskManagerLocal initialTasks={tasks} onTasksChange={setTasks} />
             </div>
           )}
 
-          {/* Action Buttons */}
           <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
             <div>
               {currentStep > 1 && (
@@ -647,7 +619,6 @@ const ProjectFormNew = ({
                 </button>
               ) : (
                 <div className="flex items-center gap-3">
-                  {/* Confirmation Status */}
                   {createConfirmation && (
                     <div className="flex items-center gap-2 text-sm animate-pulse">
                       <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
@@ -664,7 +635,7 @@ const ProjectFormNew = ({
                       isSubmitting ||
                       (!isEditMode &&
                         projectData.requiredSkills.length === 0 &&
-                        descriptionProcessed)
+                        analysisDone)
                     }
                     className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
                       createConfirmation

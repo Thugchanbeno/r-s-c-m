@@ -66,15 +66,22 @@ export default function ResourceRequestsTabNew({ user }) {
         return;
       }
 
-      await processRequest({
+      const result = await processRequest({
         email: session.user.email,
         requestId,
         action,
         reason,
       });
-      toast.success(
-        `Resource request ${action === "approve" ? "approved" : "rejected"} successfully`
-      );
+      
+      if (result?.bypassedLM && action === "approve") {
+        toast.success(
+          "Resource request approved - bypassed line manager approval"
+        );
+      } else {
+        toast.success(
+          `Resource request ${action === "approve" ? "approved" : "rejected"} successfully`
+        );
+      }
       setRejectionReasons((prev) => {
         const updated = { ...prev };
         delete updated[requestId];

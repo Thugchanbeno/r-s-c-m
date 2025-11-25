@@ -4,6 +4,7 @@ import { X, User, Briefcase, Calendar, Percent, Save } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { formatDatePickerDate, parseDatePickerDate } from "@/lib/dateUtils";
+import { ALLOCATION_ROLES } from "@/lib/constants/roles";
 
 const AllocationModal = ({
   isOpen,
@@ -146,14 +147,19 @@ const AllocationModal = ({
               <label className="text-xs font-medium text-rscm-dark-purple">
                 Role*
               </label>
-              <input
-                type="text"
+              <select
                 value={formData.role}
                 onChange={(e) => setFormData((prev) => ({ ...prev, role: e.target.value }))}
                 required
-                placeholder="e.g., Developer, Designer"
                 className="w-full px-3 py-2 bg-gray-50 rounded-md text-sm focus:ring-2 focus:ring-rscm-violet/20 focus:bg-white outline-none"
-              />
+              >
+                <option value="">Select a role</option>
+                {ALLOCATION_ROLES.map((role) => (
+                  <option key={role} value={role}>
+                    {role}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Allocation Percentage */}

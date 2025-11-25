@@ -1,6 +1,9 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
-import { createNotification, createBulkNotifications } from "./notificationUtils";
+import {
+  createNotification,
+  createBulkNotifications,
+} from "./notificationUtils";
 
 function requireRole(user, allowed) {
   if (!user || !allowed.includes(user.role)) {
@@ -8,7 +11,7 @@ function requireRole(user, allowed) {
   }
 }
 
-// Helper: fetch actor by email (from NextAuth session)
+//fetch actor by email
 async function getActor(ctx, email) {
   if (!email) throw new Error("Unauthorized: missing email");
   const actor = await ctx.db
@@ -22,7 +25,7 @@ async function getActor(ctx, email) {
 // GET allocations (with filters + pagination)
 export const getAll = query({
   args: {
-    email: v.string(), // ✅ pass from NextAuth session
+    email: v.string(),
     userId: v.optional(v.id("users")),
     projectId: v.optional(v.id("projects")),
     page: v.optional(v.number()),
@@ -59,13 +62,13 @@ export const getAll = query({
     const skip = (page - 1) * limit;
 
     const paginated = all.slice(skip, skip + limit);
-    
+
     // Enrich allocations with user and project details
     const enrichedAllocations = [];
     for (const allocation of paginated) {
       const user = await ctx.db.get(allocation.userId);
       const project = await ctx.db.get(allocation.projectId);
-      
+
       enrichedAllocations.push({
         ...allocation,
         userName: user?.name || "Unknown User",
@@ -108,6 +111,7 @@ export const create = mutation({
       v.literal("QA Engineer"),
       v.literal("DevOps Engineer"),
       v.literal("Data Scientist"),
+      v.literal("Infrastructure"),
       v.literal("Consultant"),
       v.literal("Other")
     ),
@@ -134,16 +138,21 @@ export const create = mutation({
       .collect();
 
     // Check if user is already allocated to this project
-    const existingProjectAllocation = existing.find(alloc => alloc.projectId === args.projectId);
-    
+    const existingProjectAllocation = existing.find(
+      (alloc) => alloc.projectId === args.projectId
+    );
+
     if (existingProjectAllocation) {
       const project = await ctx.db.get(args.projectId);
-      const existingEndDisplay = existingProjectAllocation.endDate ? 
-        new Date(existingProjectAllocation.endDate).toLocaleDateString() : 'ongoing';
-      
-      throw new Error(`User is already allocated to project "${project?.name || 'Unknown'}" as ${existingProjectAllocation.role} (${existingProjectAllocation.allocationPercentage}%) from ${new Date(existingProjectAllocation.startDate).toLocaleDateString()} to ${existingEndDisplay}. Users cannot be allocated to the same project twice.`);
+      const existingEndDisplay = existingProjectAllocation.endDate
+        ? new Date(existingProjectAllocation.endDate).toLocaleDateString()
+        : "ongoing";
+
+      throw new Error(
+        `User is already allocated to project "${project?.name || "Unknown"}" as ${existingProjectAllocation.role} (${existingProjectAllocation.allocationPercentage}%) from ${new Date(existingProjectAllocation.startDate).toLocaleDateString()} to ${existingEndDisplay}. Users cannot be allocated to the same project twice.`
+      );
     }
-    
+
     // Note: Over-allocation above 100% is allowed - it makes users unavailable for recommendations
 
     const now = Date.now();
@@ -200,15 +209,15 @@ export const create = mutation({
           relatedResourceType: "allocation",
           actionUserId: actor._id,
           actionUserRole: actor.role,
-        contextData: {
-          userId: args.userId,
-          userName: user.name,
-          projectName: project.name,
-          role: args.role,
-          allocationPercentage: args.allocationPercentage,
-          actionUserName: actor.name,
-          actionUserAvatar: actor.avatarUrl,
-        },
+          contextData: {
+            userId: args.userId,
+            userName: user.name,
+            projectName: project.name,
+            role: args.role,
+            allocationPercentage: args.allocationPercentage,
+            actionUserName: actor.name,
+            actionUserAvatar: actor.avatarUrl,
+          },
         });
       }
     }
@@ -223,23 +232,25 @@ export const update = mutation({
     email: v.string(),
     id: v.id("allocations"),
     allocationPercentage: v.optional(v.number()),
-    role: v.optional(v.union(
-      v.literal("Developer"),
-      v.literal("Senior Developer"),
-      v.literal("Lead Developer"),
-      v.literal("Tech Lead"),
-      v.literal("Project Manager"),
-      v.literal("Product Manager"),
-      v.literal("Designer"),
-      v.literal("UX Designer"),
-      v.literal("UI Designer"),
-      v.literal("Business Analyst"),
-      v.literal("QA Engineer"),
-      v.literal("DevOps Engineer"),
-      v.literal("Data Scientist"),
-      v.literal("Consultant"),
-      v.literal("Other")
-    )),
+    role: v.optional(
+      v.union(
+        v.literal("Developer"),
+        v.literal("Senior Developer"),
+        v.literal("Lead Developer"),
+        v.literal("Tech Lead"),
+        v.literal("Project Manager"),
+        v.literal("Product Manager"),
+        v.literal("Designer"),
+        v.literal("UX Designer"),
+        v.literal("UI Designer"),
+        v.literal("Business Analyst"),
+        v.literal("QA Engineer"),
+        v.literal("DevOps Engineer"),
+        v.literal("Data Scientist"),
+        v.literal("Consultant"),
+        v.literal("Other")
+      )
+    ),
     startDate: v.optional(v.number()),
     endDate: v.optional(v.union(v.number(), v.null())),
   },
@@ -263,7 +274,7 @@ export const update = mutation({
 
     const { id, email, ...updates } = args;
     const oldAllocation = { ...allocation };
-    
+
     await ctx.db.patch(id, {
       ...updates,
       updatedAt: Date.now(),
@@ -275,9 +286,12 @@ export const update = mutation({
 
     if (user && project) {
       // Check if allocation percentage changed significantly (>10%)
-      if (updates.allocationPercentage && 
-          Math.abs(updates.allocationPercentage - oldAllocation.allocationPercentage) > 10) {
-        
+      if (
+        updates.allocationPercentage &&
+        Math.abs(
+          updates.allocationPercentage - oldAllocation.allocationPercentage
+        ) > 10
+      ) {
         await createNotification(ctx, {
           userId: allocation.userId,
           type: "allocation_updated",
@@ -349,7 +363,8 @@ export const getSummary = query({
         .collect();
 
       const approvedLeave = leaveRequests.filter(
-        (lr) => lr.status === "approved" && lr.startDate <= now && lr.endDate >= now
+        (lr) =>
+          lr.status === "approved" && lr.startDate <= now && lr.endDate >= now
       );
 
       let leaveDays = 0;
@@ -443,7 +458,9 @@ export const getSummary = query({
 
     if (args.pmId) {
       if (actor._id !== args.pmId && !["admin", "hr"].includes(actor.role)) {
-        throw new Error("You can only view your own summary or have admin/hr privileges.");
+        throw new Error(
+          "You can only view your own summary or have admin/hr privileges."
+        );
       }
 
       const pmProjects = await ctx.db
