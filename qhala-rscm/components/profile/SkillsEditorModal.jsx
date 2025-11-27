@@ -39,7 +39,6 @@ const SkillsEditorModal = ({
     api.userSkills.getForCurrentUser,
     userEmail ? { email: userEmail } : "skip"
   );
-
   const currentUserSkills =
     userSkills?.filter((s) =>
       mode === "current" ? s.isCurrent : s.isDesired

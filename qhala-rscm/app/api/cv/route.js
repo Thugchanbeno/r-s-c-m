@@ -15,7 +15,6 @@ export async function POST(req) {
   try {
     const formData = await req.formData();
 
-    // IMPORTANT: Point to the stateless parser
     const response = await fetch(`${PYTHON_API_URL}/nlp/parse-cv`, {
       method: "POST",
       body: formData,

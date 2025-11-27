@@ -21,13 +21,12 @@ export default function UserCreationForm({ onSuccess }) {
     setLoading(true);
 
     try {
-      // Calls your existing Next.js API route for user creation
       const response = await fetch("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          newUserEmail: formData.email, // Matching your API payload structure
+          newUserEmail: formData.email,
         }),
       });
 

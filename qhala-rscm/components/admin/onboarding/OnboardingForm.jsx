@@ -79,7 +79,7 @@ export default function OnboardingForm({ selectedUser, onUserCreated }) {
     }
   };
 
-  // --- STATE 1: IDLE (Upload Hero) ---
+  //IDLE (Upload Hero)
   if (mode === "idle") {
     return (
       <div className="h-full flex flex-col items-center justify-center p-12 text-center bg-gray-50/30">
@@ -119,7 +119,7 @@ export default function OnboardingForm({ selectedUser, onUserCreated }) {
     );
   }
 
-  // --- STATE 2: REVIEW FORM (Matches Profile Screenshot) ---
+  // REVIEW FORM
   if (mode === "review") {
     const inputClass =
       "w-full text-sm text-[#251323] bg-white border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#4a2545]/10 focus:border-[#4a2545] transition-all outline-none";
@@ -315,7 +315,7 @@ export default function OnboardingForm({ selectedUser, onUserCreated }) {
     );
   }
 
-  // --- STATE 3: PROFILE VIEW (Matches "Profile Overview" Screenshot) ---
+  // PROFILE VIEW
   if (mode === "view" && selectedUser) {
     return (
       <div className="h-full flex flex-col bg-gray-50/30">
@@ -378,7 +378,7 @@ export default function OnboardingForm({ selectedUser, onUserCreated }) {
             </div>
           )}
 
-          {/* Skills Grid (Matches Screenshot) */}
+          {/* Skills Grid */}
           <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
             <h4 className="text-xs font-bold text-gray-400 uppercase mb-4 tracking-wider flex justify-between items-center">
               Current Skills

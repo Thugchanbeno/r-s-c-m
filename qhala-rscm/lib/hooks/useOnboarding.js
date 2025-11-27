@@ -8,7 +8,7 @@ export const useOnboarding = (onSuccess) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [extractedData, setExtractedData] = useState(null);
 
-  // Step 1: Handle File Upload
+  //Handle File Upload
   const handleFileUpload = async (file) => {
     setIsProcessing(true);
     try {
@@ -36,7 +36,7 @@ export const useOnboarding = (onSuccess) => {
     }
   };
 
-  // Step 2: Handle Final Submission
+  //Handle Final Submission
   const handleFinalize = async (finalData) => {
     setIsProcessing(true);
     try {

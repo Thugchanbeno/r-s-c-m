@@ -1,46 +1,41 @@
 "use client";
 import React, { useState } from "react";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Loader2 } from "lucide-react";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 
-const RecommendationFeedback = ({ projectId, userId, onFeedbackSubmit }) => {
+const RecommendationFeedback = ({ projectId, userId }) => {
   const [status, setStatus] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const logFeedback = useMutation(api.api.logFeedback);
 
   const handleFeedback = async (isPositive) => {
-    if (isSubmitting || status) return;
-    setIsSubmitting(true);
+    const newStatus = isPositive ? "up" : "down";
+    if (status === newStatus) return;
+
+    setStatus(newStatus);
+    setLoading(true);
 
     try {
-      if (!projectId || !userId) {
-        console.error("Missing IDs for feedback", { projectId, userId });
-        return;
-      }
-      const response = await fetch("/api/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId,
-          projectId,
-          recommendationType: "user",
-          rating: isPositive,
-          comments: isPositive
-            ? "User accepted via UI"
-            : "User rejected via UI",
-        }),
+      await logFeedback({
+        projectId,
+        userId,
+        recommendationType: "user_recommendation",
+        rating: isPositive ? 1 : 0,
+        comments: isPositive ? "Good match" : "Poor match",
+        timestamp: Date.now(),
       });
 
-      if (!response.ok) throw new Error("Failed to submit feedback");
-
-      setStatus(isPositive ? "up" : "down");
-      toast.success("Feedback received. The AI will learn from this.");
-
-      if (onFeedbackSubmit) onFeedbackSubmit(isPositive);
+      toast.success(
+        isPositive ? "Marked as good match" : "Marked as poor match"
+      );
     } catch (error) {
-      console.error(error);
-      toast.error("Could not save feedback");
+      console.error("Feedback failed:", error);
+      setStatus(null);
+      toast.error("Failed to save feedback");
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
@@ -48,11 +43,11 @@ const RecommendationFeedback = ({ projectId, userId, onFeedbackSubmit }) => {
     <div className="flex items-center gap-2">
       <button
         onClick={() => handleFeedback(false)}
-        disabled={isSubmitting || status === "up"}
-        className={`p-1.5 rounded-full transition-all duration-200 ${
+        disabled={loading}
+        className={`p-1.5 rounded-full transition-all duration-200 hover:bg-red-50 ${
           status === "down"
-            ? "bg-red-100 text-red-600 scale-110 ring-2 ring-red-200"
-            : "text-gray-300 hover:bg-red-50 hover:text-red-500"
+            ? "text-red-500 bg-red-50 scale-110"
+            : "text-gray-300 hover:text-red-400"
         }`}
         title="Not a good match"
       >
@@ -64,15 +59,22 @@ const RecommendationFeedback = ({ projectId, userId, onFeedbackSubmit }) => {
 
       <button
         onClick={() => handleFeedback(true)}
-        disabled={isSubmitting || status === "down"}
-        className={`p-1.5 rounded-full transition-all duration-200 ${
+        disabled={loading}
+        className={`p-1.5 rounded-full transition-all duration-200 hover:bg-green-50 ${
           status === "up"
-            ? "bg-green-100 text-green-600 scale-110 ring-2 ring-green-200"
-            : "text-gray-300 hover:bg-green-50 hover:text-green-500"
+            ? "text-green-600 bg-green-50 scale-110"
+            : "text-gray-300 hover:text-green-500"
         }`}
         title="Good match"
       >
-        <ThumbsUp size={14} className={status === "up" ? "fill-current" : ""} />
+        {loading && status === "up" ? (
+          <Loader2 size={14} className="animate-spin" />
+        ) : (
+          <ThumbsUp
+            size={14}
+            className={status === "up" ? "fill-current" : ""}
+          />
+        )}
       </button>
     </div>
   );

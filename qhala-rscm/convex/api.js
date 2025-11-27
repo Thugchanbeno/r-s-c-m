@@ -191,12 +191,6 @@ export const getProject = query({
   },
 });
 
-// Temporary query for backfill script
-export const debugGetAllUsers = query({
-  handler: async (ctx) => await ctx.db.query("users").collect(),
-});
-// Proxy for "Smart Onboarding" - Step 2: Save
-// Calls Python to generate embedding and save the final user
 export const finalizeOnboarding = action({
   args: {
     name: v.string(),
@@ -232,8 +226,6 @@ export const finalizeOnboarding = action({
   },
 });
 
-// Proxy for "Talent Pool" - Search CVs
-// Calls Python to embed query and search users (without availability filter)
 export const searchTalent = action({
   args: { query: v.string() },
   handler: async (ctx, args) => {
@@ -254,8 +246,6 @@ export const searchTalent = action({
   },
 });
 
-// Proxy for "Project Wizard" - Stateless Analysis
-// Calls Python to extract skills from text before project creation
 export const analyzeProjectText = action({
   args: { text: v.string() },
   handler: async (ctx, args) => {
