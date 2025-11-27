@@ -7,7 +7,14 @@ const RecommendedUserList = ({
   projectId,
   onInitiateRequest,
 }) => {
-  if (!recommendedUsers || recommendedUsers.length === 0) {
+  // --- THE FIX: Flatten the array ---
+  // Your console log showed `user: Array(2)`, meaning the data is nested inside an array.
+  // .flat() pulls the users out so we can map over them individually.
+  const flatUsers = Array.isArray(recommendedUsers)
+    ? recommendedUsers.flat()
+    : [];
+
+  if (flatUsers.length === 0) {
     return null;
   }
 
@@ -27,9 +34,11 @@ const RecommendedUserList = ({
         },
       }}
     >
-      {recommendedUsers.map((rec, index) => (
+      {flatUsers.map((rec, index) => (
         <RecommendedUserCard
           key={rec._id || index}
+          // Note: The Card component I gave you earlier handles
+          // both 'user' and 'userRecommendation' props safely.
           userRecommendation={rec}
           projectId={projectId}
           onInitiateRequest={onInitiateRequest}

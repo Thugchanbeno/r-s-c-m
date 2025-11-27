@@ -1,45 +1,34 @@
-import { convex, api } from "@/lib/convexServer";
-import {
-  getAuthenticatedEmail,
-  unauthorizedResponse,
-  successResponse,
-  errorResponse,
-} from "@/lib/auth-utils";
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/authOptions";
 
-// GET /api/cv?skill=...
-export async function GET(req) {
-  try {
-    const email = await getAuthenticatedEmail();
-    if (!email) return unauthorizedResponse();
+const PYTHON_API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-    const { searchParams } = new URL(req.url);
-    const skill = searchParams.get("skill") || undefined;
-
-    const data = await convex.query(api.cvCache.getAll, { 
-      email,
-      skill 
-    });
-
-    return successResponse({ data });
-  } catch (error) {
-    return errorResponse(error.message || "Unable to fetch CV cache.", 400);
-  }
-}
-
-// POST /api/cv (upload CV)
+// POST /api/cv -> Calls Python /nlp/parse-cv (Stateless)
 export async function POST(req) {
-  try {
-    const email = await getAuthenticatedEmail();
-    if (!email) return unauthorizedResponse();
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    const body = await req.json();
-    const result = await convex.mutation(api.cvCache.uploadCV, {
-      email,
-      ...body,
+  try {
+    const formData = await req.formData();
+
+    // IMPORTANT: Point to the stateless parser
+    const response = await fetch(`${PYTHON_API_URL}/nlp/parse-cv`, {
+      method: "POST",
+      body: formData,
     });
 
-    return successResponse(result, 201);
+    if (!response.ok) {
+      throw new Error(`Python API error: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return NextResponse.json(result); // Returns { extracted: ... }
   } catch (error) {
-    return errorResponse(error.message || "Unable to upload CV.", 400);
+    console.error("Proxy error /api/cv:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

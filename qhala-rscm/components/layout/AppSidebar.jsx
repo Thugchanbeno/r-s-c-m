@@ -28,10 +28,10 @@ const AppSidebar = () => {
     const handleHashChange = () => {
       setActiveHash(window.location.hash);
     };
-    
+
     // Set initial hash
     setActiveHash(window.location.hash);
-    
+
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
@@ -89,32 +89,109 @@ const AppSidebar = () => {
     const actionsByNav = {
       dashboard: [],
       profile: [
-        { label: "Overview", href: "/profile#overview", roles: ["admin", "hr", "pm", "employee", "line_manager"] },
-        { label: "Skills & Development", href: "/profile#skills", roles: ["admin", "hr", "pm", "employee", "line_manager"] },
-        { label: "Employment Details", href: "/profile#employment", roles: ["admin", "hr", "pm", "employee", "line_manager"] },
-        { label: "Line Manager", href: "/profile#manager", roles: ["admin", "hr", "pm", "employee", "line_manager"] },
-        { label: "Work Requests", href: "/profile#requests", roles: ["admin", "hr", "pm", "employee", "line_manager"] },
+        {
+          label: "Overview",
+          href: "/profile#overview",
+          roles: ["admin", "hr", "pm", "employee", "line_manager"],
+        },
+        {
+          label: "Skills & Development",
+          href: "/profile#skills",
+          roles: ["admin", "hr", "pm", "employee", "line_manager"],
+        },
+        {
+          label: "Employment Details",
+          href: "/profile#employment",
+          roles: ["admin", "hr", "pm", "employee", "line_manager"],
+        },
+        {
+          label: "Line Manager",
+          href: "/profile#manager",
+          roles: ["admin", "hr", "pm", "employee", "line_manager"],
+        },
+        {
+          label: "Work Requests",
+          href: "/profile#requests",
+          roles: ["admin", "hr", "pm", "employee", "line_manager"],
+        },
       ],
       projects: [
-        { label: "Create project", href: "/projects/new", roles: ["admin", "hr", "pm"] },
-        { label: "View all projects", href: "/projects", roles: ["admin", "hr", "pm", "employee", "line_manager"] },
-        { label: "My projects", href: "/projects?filter=mine", roles: ["employee", "pm", "line_manager"] },
-        { label: "Manage allocations", href: "/resources/allocations", roles: ["admin", "hr", "pm"] },
+        {
+          label: "Create project",
+          href: "/projects/new",
+          roles: ["admin", "hr", "pm"],
+        },
+        {
+          label: "View all projects",
+          href: "/projects",
+          roles: ["admin", "hr", "pm", "employee", "line_manager"],
+        },
+        {
+          label: "My projects",
+          href: "/projects?filter=mine",
+          roles: ["employee", "pm", "line_manager"],
+        },
+        {
+          label: "Manage allocations",
+          href: "/resources/allocations",
+          roles: ["admin", "hr", "pm"],
+        },
       ],
       resources: [
-        { label: "Resource planning", href: "/resources?tab=planning", roles: ["admin", "hr", "pm"] },
-        { label: "Capacity view", href: "/resources?tab=capacity", roles: ["admin", "hr", "pm"] },
-        { label: "Allocations", href: "/resources?tab=allocations", roles: ["admin", "hr", "pm"] },
-        { label: "Request resource", href: "/resources/requests", roles: ["pm"] },
+        {
+          label: "Resource planning",
+          href: "/resources?tab=planning",
+          roles: ["admin", "hr", "pm"],
+        },
+        {
+          label: "Capacity view",
+          href: "/resources?tab=capacity",
+          roles: ["admin", "hr", "pm"],
+        },
+        {
+          label: "Allocations",
+          href: "/resources?tab=allocations",
+          roles: ["admin", "hr", "pm"],
+        },
+        {
+          label: "Request resource",
+          href: "/resources/requests",
+          roles: ["pm"],
+        },
       ],
       approvals: [
-        { label: "Work Requests", href: "/approvals?tab=work", roles: ["admin", "hr", "pm", "line_manager"] },
-        { label: "Resource Requests", href: "/approvals?tab=resources", roles: ["admin", "hr", "pm", "line_manager"] },
-        { label: "Skill Verifications", href: "/approvals?tab=skills", roles: ["admin", "hr", "pm", "line_manager"] },
+        {
+          label: "Work Requests",
+          href: "/approvals?tab=work",
+          roles: ["admin", "hr", "pm", "line_manager"],
+        },
+        {
+          label: "Resource Requests",
+          href: "/approvals?tab=resources",
+          roles: ["admin", "hr", "pm", "line_manager"],
+        },
+        {
+          label: "Skill Verifications",
+          href: "/approvals?tab=skills",
+          roles: ["admin", "hr", "pm", "line_manager"],
+        },
       ],
       admin: [
-        { label: "Analytics & Insights", href: "/admin/analytics", roles: ["admin", "hr"] },
-        { label: "Skills Management", href: "/admin/skills", roles: ["admin", "hr"] },
+        {
+          label: "Onboarding & Talent",
+          href: "/admin/onboarding",
+          roles: ["admin", "hr"],
+        },
+        {
+          label: "Analytics & Insights",
+          href: "/admin/analytics",
+          roles: ["admin", "hr"],
+        },
+        {
+          label: "Skills Management",
+          href: "/admin/skills",
+          roles: ["admin", "hr"],
+        },
       ],
     };
 
@@ -160,7 +237,7 @@ const AppSidebar = () => {
             const isExpanded = expandedSection === item.id;
 
             const hasActions = getQuickActions(item.id).length > 0;
-            
+
             return (
               <div key={item.id} className="relative">
                 {item.id === "dashboard" ? (
@@ -233,7 +310,9 @@ const AppSidebar = () => {
               </h3>
               <div className="space-y-1">
                 {getQuickActions(expandedSection).map((action, index) => {
-                  const isActiveHash = action.href.includes("#") && action.href.endsWith(activeHash);
+                  const isActiveHash =
+                    action.href.includes("#") &&
+                    action.href.endsWith(activeHash);
                   return (
                     <Link
                       key={index}

@@ -33,17 +33,19 @@ export const getAll = query({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    const isAdminOrHR = ["admin", "hr"].includes(actor.role);
+    const role = actor.role.toLowerCase().replace(" ", "_");
+    const isAdminOrHR = ["admin", "hr"].includes(role);
+    const isPmOrLineManager = ["pm", "line_manager"].includes(role);
 
     if (args.userId || args.projectId) {
       let canAccess = false;
       if (args.userId && actor._id === args.userId) canAccess = true;
-      if (isAdminOrHR) canAccess = true;
+      if (isAdminOrHR || isPmOrLineManager) canAccess = true;
       if (!canAccess) {
         throw new Error("You don’t have permission to view these allocations.");
       }
     } else {
-      if (!isAdminOrHR) {
+      if (!isAdminOrHR && !isPmOrLineManager) {
         throw new Error("You don’t have permission to view all allocations.");
       }
     }

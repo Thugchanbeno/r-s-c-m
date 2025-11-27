@@ -1,8 +1,10 @@
+// app/api/ai/extract-skills/route.js
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
-import { fetchAction } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
+
+const PYTHON_API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function POST(req) {
   const session = await getServerSession(authOptions);
@@ -12,27 +14,30 @@ export async function POST(req) {
 
   try {
     const body = await req.json();
-    const { description, projectId } = body;
-    const args = {
-      email: session.user.email,
-      description,
-    };
+    const { description } = body;
 
-    if (projectId) {
-      args.projectId = projectId;
+    // Call Python Backend
+    const response = await fetch(`${PYTHON_API_URL}/nlp/analyze-project-text`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: description }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Python API error: ${response.statusText}`);
     }
 
-    const result = await fetchAction(
-      api.projects.extractSkillsFromDescription,
-      args
-    );
+    const result = await response.json();
 
-    return NextResponse.json(result);
+    // Return in the format frontend expects
+    return NextResponse.json({
+      extractedSkills: result.extractedSkills,
+    });
   } catch (error) {
     console.error("Proxy error /api/ai/extract-skills:", error);
-
-    const errorMessage = error.data?.message || error.message || "Server error";
-
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Server error" },
+      { status: 500 }
+    );
   }
 }
