@@ -17,39 +17,33 @@ import { RSCM_COLORS } from "@/components/charts/ChartComponents";
 
 const RecommendedUserCard = (props) => {
   const { projectId, onInitiateRequest } = props;
-
-  // Handle both prop structures
   const user = props.user || props.userRecommendation;
 
   if (!user) return null;
 
-  // 1. DIRECT MAPPING (Trust the Backend V4 0-100 Scale)
   const {
     _id,
     name,
     role,
     avatarUrl,
-    totalScore, // Backend sends e.g. 76.8
+    totalScore,
     breakdown,
     explanation,
     missingSkills,
     department,
   } = user;
 
-  // 2. Simple Rounding (No auto-detection magic)
   const displayScore = Math.round(totalScore || 0);
   const skillsScore = Math.round(breakdown?.skillMatch || 0);
   const availScore = Math.round(breakdown?.availability || 0);
   const growthScore = Math.round(breakdown?.growthPotential || 0);
 
-  // 3. Format Lists
   let explanationPoints = [];
   if (Array.isArray(explanation)) explanationPoints = explanation;
   else if (typeof explanation === "string") explanationPoints = [explanation];
 
   const skillGaps = Array.isArray(missingSkills) ? missingSkills : [];
 
-  // 4. Create Request Object
   const userToRequest = { _id, name, ...user };
   const generatedAt = new Date().toLocaleDateString("en-US", {
     month: "short",
@@ -110,7 +104,6 @@ const RecommendedUserCard = (props) => {
         <CardContent className="p-4 space-y-4 flex-grow flex flex-col">
           {/* Match Strength Bar */}
           <div className="mt-1">
-            {/* Passing explicit 0-100 integer */}
             <GradientScoreBar score={displayScore} label="Match Strength" />
           </div>
 

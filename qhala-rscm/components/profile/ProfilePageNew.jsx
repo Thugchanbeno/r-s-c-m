@@ -62,11 +62,9 @@ const ProfilePageNew = () => {
   const managerRef = useRef(null);
   const requestsRef = useRef(null);
 
-  // Add smooth scroll behavior
   useEffect(() => {
-    // Add smooth scroll to html element
     document.documentElement.style.scrollBehavior = "smooth";
-    
+
     return () => {
       document.documentElement.style.scrollBehavior = "auto";
     };
@@ -83,27 +81,58 @@ const ProfilePageNew = () => {
         { id: "requests", ref: requestsRef },
       ];
 
-      const scrollPosition = window.scrollY + 200;
+      const activeSections = sections.filter((section) => section.ref.current);
 
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = sections[i];
-        if (section.ref.current) {
-          const offsetTop = section.ref.current.offsetTop;
-          if (scrollPosition >= offsetTop) {
-            // Update URL hash for sidebar to detect
-            const newHash = `#${section.id}`;
-            if (window.location.hash !== newHash) {
-              window.history.replaceState(null, "", newHash);
-            }
+      if (activeSections.length === 0) return;
+
+      const scrollPosition = window.scrollY + 100;
+
+      let activeSection = activeSections[0];
+
+      for (const section of activeSections) {
+        const element = section.ref.current;
+        if (element) {
+          const offsetTop = element.offsetTop;
+          const offsetBottom = offsetTop + element.offsetHeight;
+
+          // Check if scroll position is within this section
+          if (scrollPosition >= offsetTop && scrollPosition < offsetBottom) {
+            activeSection = section;
             break;
+          }
+
+          // If we've scrolled past this section, it could be the active one
+          if (scrollPosition >= offsetTop) {
+            activeSection = section;
           }
         }
       }
+
+      // Update the hash if it changed
+      const newHash = `#${activeSection.id}`;
+      if (window.location.hash !== newHash) {
+        window.history.replaceState(null, "", newHash);
+      }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    // Run once on mount to set initial hash
+    handleScroll();
+
+    // Add scroll listener with throttling for better performance
+    let ticking = false;
+    const scrollListener = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", scrollListener);
+    return () => window.removeEventListener("scroll", scrollListener);
+  }, [userProfile?.lineManagerId]);
 
   if (isLoading) {
     return (
@@ -116,7 +145,6 @@ const ProfilePageNew = () => {
 
   return (
     <div className="space-y-6">
-
       {/* Profile Header */}
       <div ref={overviewRef} id="overview">
         <ProfileHeaderNew user={userProfile} capacityData={userAllocations} />

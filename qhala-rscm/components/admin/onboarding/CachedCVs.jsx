@@ -9,7 +9,6 @@ export default function CachedCVs() {
   const fetchCVs = async () => {
     setLoading(true);
     try {
-      // Uses your existing /api/cv endpoint which fetches getAll
       const res = await fetch("/api/cv");
       const data = await res.json();
       if (data.success) {

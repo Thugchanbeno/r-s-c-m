@@ -136,7 +136,6 @@ export const createUserSkill = mutation({
     isCurrent: v.boolean(),
     isDesired: v.boolean(),
     proficiency: v.optional(v.number()),
-    // NEW: Allow passing initial proof data
     initialProof: v.optional(
       v.object({
         proofType: v.union(

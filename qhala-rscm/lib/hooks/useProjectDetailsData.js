@@ -10,7 +10,7 @@ import { toast } from "sonner";
 export const useProjectDetailsData = (projectId) => {
   const { user } = useAuth();
 
-  // --- Convex Queries ---
+  // Convex Queries
   const project = useQuery(
     api.projects.getById,
     projectId ? { id: projectId } : "skip"
@@ -26,11 +26,11 @@ export const useProjectDetailsData = (projectId) => {
     user?.email && projectId ? { email: user.email, projectId } : "skip"
   );
 
-  // --- Tasks (CRUD via useTasks) ---
+  // Tasks (CRUD via useTasks)
   const { tasks, handleCreateTask, handleUpdateTask, handleDeleteTask } =
     useTasks(projectId);
 
-  // --- Local State for Recommendations & Resource Requests ---
+  // Local State for Recommendations & Resource Requests
   const [recommendedUsers, setRecommendedUsers] = useState([]);
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
   const [recommendationError, setRecommendationError] = useState(null);
@@ -40,13 +40,13 @@ export const useProjectDetailsData = (projectId) => {
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
   const [userToRequest, setUserToRequest] = useState(null);
 
-  // --- Convex Mutations ---
+  // Convex Mutations
   const createResourceRequest = useMutation(api.resourceRequests.create);
-  
-  // --- Convex Actions ---
+
+  // Convex Actions
   const getProjectRecommendations = useAction(api.projects.getRecommendations);
 
-  // --- Handlers ---
+  // Handlers
   const handleFetchRecommendations = useCallback(async () => {
     if (!user?.email || !projectId) return;
     setLoadingRecommendations(true);
@@ -57,7 +57,7 @@ export const useProjectDetailsData = (projectId) => {
       const result = await getProjectRecommendations({
         email: user.email,
         projectId: projectId,
-        limit: 5
+        limit: 5,
       });
 
       if (result.success) {
@@ -124,7 +124,7 @@ export const useProjectDetailsData = (projectId) => {
     ]
   );
 
-  // --- Derived State ---
+  // Derived State
   const loading =
     project === undefined ||
     allocations === undefined ||

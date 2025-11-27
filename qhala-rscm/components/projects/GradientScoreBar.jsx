@@ -7,7 +7,7 @@ const GradientScoreBar = ({ score, label = "Match" }) => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      const percentage = Math.min(Math.max(score * 100, 0), 100);
+      const percentage = Math.min(Math.max(score, 0), 100);
       setWidth(percentage);
     }, 100);
     return () => clearTimeout(timer);
