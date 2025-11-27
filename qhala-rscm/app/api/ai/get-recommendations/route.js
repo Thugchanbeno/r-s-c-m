@@ -2,8 +2,9 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
-import { fetchAction } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
+
+const PYTHON_API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function POST(req) {
   const session = await getServerSession(authOptions);
@@ -13,18 +14,26 @@ export async function POST(req) {
 
   try {
     const body = await req.json();
-    const { projectId, limit = 10 } = body;
+    const { projectId } = body;
 
-    const result = await fetchAction(api.projects.getRecommendations, {
-      email: session.user.email,
-      projectId,
-      limit,
+    // Call Python Backend
+    const response = await fetch(`${PYTHON_API_URL}/recommend/users`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ projectId }),
     });
 
+    if (!response.ok) {
+      throw new Error(`Python API error: ${response.statusText}`);
+    }
+
+    const result = await response.json();
     return NextResponse.json(result);
   } catch (error) {
     console.error("Proxy error /api/ai/get-recommendations:", error);
-    const errorMessage = error.message || "Server error";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Server error" },
+      { status: 500 }
+    );
   }
 }

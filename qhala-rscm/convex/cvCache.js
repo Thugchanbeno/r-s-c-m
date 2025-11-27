@@ -83,7 +83,7 @@ export const extractEntities = action({
     }
 
     const nlpServiceUrl = `${
-      process.env.NLP_API_URL || "http://localhost:8000"
+      process.env.NLP_API_URL_LOCAL || "http://localhost:8000"
     }/nlp/extract-entities`;
 
     try {

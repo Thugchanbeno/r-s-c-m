@@ -136,17 +136,46 @@ export const createUserSkill = mutation({
     isCurrent: v.boolean(),
     isDesired: v.boolean(),
     proficiency: v.optional(v.number()),
+    // NEW: Allow passing initial proof data
+    initialProof: v.optional(
+      v.object({
+        proofType: v.union(
+          v.literal("cv"),
+          v.literal("certification"),
+          v.literal("badge"),
+          v.literal("document"),
+          v.literal("portfolio"),
+          v.literal("link")
+        ),
+        url: v.optional(v.string()),
+        fileName: v.optional(v.string()),
+      })
+    ),
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-
     const now = Date.now();
+
+    // Construct proof documents array if initial proof is provided
+    let proofDocuments = [];
+    if (args.initialProof) {
+      proofDocuments.push({
+        proofType: args.initialProof.proofType,
+        url: args.initialProof.url,
+        fileName: args.initialProof.fileName,
+        verificationStatus: "pending",
+        uploadedAt: now,
+        // verifiedBy is null until manager approves
+      });
+    }
+
     return await ctx.db.insert("userSkills", {
       userId: actor._id,
       skillId: args.skillId,
       isCurrent: args.isCurrent,
       isDesired: args.isDesired,
       proficiency: args.proficiency || 1,
+      proofDocuments: proofDocuments, // Save the proof immediately
       createdAt: now,
       updatedAt: now,
     });

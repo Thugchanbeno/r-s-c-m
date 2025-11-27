@@ -9,15 +9,27 @@ export default defineSchema({
     authProviderId: v.optional(v.string()),
     department: v.optional(v.string()),
     annualLeaveEntitlement: v.optional(v.number()),
+    bio: v.optional(v.string()),
     annualLeaveUsed: v.optional(v.number()),
     leaveYearStartDate: v.optional(v.number()),
     compensatoryDaysBalance: v.optional(v.number()),
+    embedding: v.optional(v.array(v.float64())),
     role: v.union(
       v.literal("admin"),
       v.literal("pm"),
       v.literal("hr"),
       v.literal("employee"),
       v.literal("line_manager")
+    ),
+    extractedSkills: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          level: v.string(),
+          years: v.optional(v.number()),
+          proficiencyLevel: v.optional(v.float64()),
+        })
+      )
     ),
     avatarUrl: v.optional(v.string()),
     availabilityStatus: v.union(
@@ -54,7 +66,12 @@ export default defineSchema({
     .index("by_function", ["function"])
     .index("by_line_manager", ["lineManagerId"])
     .index("by_availability", ["availabilityStatus"])
-    .index("by_employee_type", ["employeeType"]),
+    .index("by_employee_type", ["employeeType"])
+    .vectorIndex("by_embedding", {
+      vectorField: "embedding",
+      dimensions: 768,
+    }),
+
   // SKILLS
   skills: defineTable({
     name: v.string(),
@@ -69,7 +86,7 @@ export default defineSchema({
     .index("by_category", ["category"])
     .vectorIndex("by_embedding", {
       vectorField: "embedding",
-      dimensions: 384,
+      dimensions: 768,
     }),
 
   // USER SKILLS
@@ -118,6 +135,7 @@ export default defineSchema({
     name: v.string(),
     description: v.string(),
     department: v.optional(v.string()),
+    embedding: v.optional(v.array(v.float64())),
     function: v.optional(
       v.union(
         v.literal("q-trust"),
@@ -154,7 +172,11 @@ export default defineSchema({
     .index("by_pm", ["pmId"])
     .index("by_status", ["status"])
     .index("by_department", ["department"])
-    .index("by_function", ["function"]),
+    .index("by_function", ["function"])
+    .vectorIndex("by_embedding", {
+      vectorField: "embedding",
+      dimensions: 768,
+    }),
   // ALLOCATIONS
   allocations: defineTable({
     userId: v.id("users"),

@@ -1,7 +1,53 @@
-import { query, mutation, action } from "./_generated/server";
+import { query, mutation, action, internalQuery } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { v } from "convex/values";
 
-//  Vector Search Action
+export const getUserInternal = internalQuery({
+  args: { id: v.id("users") },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.id);
+    if (!user) return null;
+
+    // Fetch allocations for Python's availability math
+    const allocations = await ctx.db
+      .query("allocations")
+      .withIndex("by_user", (q) => q.eq("userId", args.id))
+      .filter((q) => q.eq(q.field("status"), "active"))
+      .collect();
+
+    return { ...user, allocations };
+  },
+});
+
+export const searchUsers = action({
+  args: {
+    embedding: v.array(v.float64()),
+    limit: v.number(),
+  },
+  handler: async (ctx, args) => {
+    //  Vector Search
+    const results = await ctx.vectorSearch("users", "by_embedding", {
+      vector: args.embedding,
+      limit: args.limit * 2, // Fetch extra for filtering
+    });
+
+    //  Hydrate & Filter Availability
+    const users = await Promise.all(
+      results.map(async (result) => {
+        const user = await ctx.runQuery(internal.api.getUserInternal, {
+          id: result._id,
+        });
+        if (!user) return null;
+        if (user.availabilityStatus !== "available") return null;
+
+        return { ...user, _score: result._score };
+      })
+    );
+
+    return users.filter((u) => u !== null).slice(0, args.limit);
+  },
+});
+
 export const searchSkills = action({
   args: { embedding: v.array(v.float64()), limit: v.number() },
   handler: async (ctx, args) => {
@@ -12,65 +58,169 @@ export const searchSkills = action({
   },
 });
 
-//  Core Queries for Recommender
-export const getProjectAndCandidates = query({
-  args: { projectId: v.id("projects") },
+// Admin/HR uploads CV to create user
+export const saveUserFromCV = mutation({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    bio: v.string(),
+    skills: v.array(v.any()),
+    embedding: v.array(v.float64()),
+  },
   handler: async (ctx, args) => {
-    const project = await ctx.db.get(args.projectId);
-    if (!project) return null;
-
-    const users = await ctx.db
+    const existing = await ctx.db
       .query("users")
-      .withIndex("by_availability", (q) =>
-        q.eq("availabilityStatus", "available")
-      )
-      .collect();
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .first();
 
-    const candidates = await Promise.all(
-      users.map(async (user) => {
-        const [skills, allocations] = await Promise.all([
-          ctx.db
-            .query("userSkills")
-            .withIndex("by_user", (q) => q.eq("userId", user._id))
-            .collect(),
-          ctx.db
-            .query("allocations")
-            .withIndex("by_user", (q) => q.eq("userId", user._id))
-            .collect(),
-        ]);
-        return { ...user, skills, allocations };
-      })
-    );
-    return { project, candidates };
+    if (existing) {
+      // Update existing user profile with extracted data
+      await ctx.db.patch(existing._id, {
+        bio: args.bio,
+        extractedSkills: args.skills, // Store AI skills separately
+        embedding: args.embedding,
+        updatedAt: Date.now(),
+      });
+      return existing._id;
+    } else {
+      // Create new user
+      return await ctx.db.insert("users", {
+        name: args.name,
+        email: args.email,
+        bio: args.bio,
+        extractedSkills: args.skills,
+        embedding: args.embedding,
+        // Default fields required by schema
+        role: "employee",
+        authProviderId: "pending_invite",
+        availabilityStatus: "available",
+        weeklyHours: 40,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+    }
   },
 });
 
-// Submit Feedback to Python (which then updates weights + writes to DB)
-export const submitFeedback = action({
+// Existing User updates their own skills via CV
+export const updateUserSkillsFromCV = mutation({
+  args: {
+    userId: v.id("users"),
+    skills: v.array(v.any()),
+    embedding: v.array(v.float64()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.userId, {
+      extractedSkills: args.skills,
+      embedding: args.embedding,
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+// Save Project Analysis (Wizard Completion)
+export const saveProjectAnalysis = mutation({
+  args: {
+    id: v.id("projects"),
+    embedding: v.array(v.float64()),
+    requiredSkills: v.array(v.any()), // Names + Proficiency
+    nlpExtractedSkills: v.array(v.string()), // Just Names
+  },
+  handler: async (ctx, args) => {
+    // Resolve Skill Names to IDs
+    const resolvedSkills = await Promise.all(
+      args.requiredSkills.map(async (skill) => {
+        const name = skill.skillName.trim();
+
+        // Check exist
+        let existingSkill = await ctx.db
+          .query("skills")
+          .withIndex("by_name", (q) => q.eq("name", name))
+          .first();
+
+        let skillId;
+        if (existingSkill) {
+          skillId = existingSkill._id;
+        } else {
+          // Create missing skill
+          skillId = await ctx.db.insert("skills", {
+            name: name,
+            category: skill.category || "Uncategorized",
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          });
+        }
+
+        return {
+          skillId: skillId,
+          skillName: name,
+          proficiencyLevel: skill.proficiencyLevel || 1,
+          category: skill.category,
+          isRequired: true,
+        };
+      })
+    );
+
+    await ctx.db.patch(args.id, {
+      embedding: args.embedding,
+      requiredSkills: resolvedSkills,
+      nlpExtractedSkills: args.nlpExtractedSkills,
+    });
+  },
+});
+
+// Feedback Logging
+export const logFeedback = mutation({
   args: {
     userId: v.string(),
     projectId: v.string(),
     recommendationType: v.string(),
-    rating: v.number(), // 1 or 0
+    rating: v.number(),
     comments: v.optional(v.string()),
+    timestamp: v.number(),
   },
   handler: async (ctx, args) => {
-    const nlpServiceUrl = process.env.NLP_API_URL;
-    if (!nlpServiceUrl) {
-      throw new Error("NLP_API_URL_LOCAL not set");
-    }
+    await ctx.db.insert("recommendationFeedback", args);
+  },
+});
 
-    // Call Python
-    const response = await fetch(`${nlpServiceUrl}/feedback`, {
+export const getProject = query({
+  args: { id: v.id("projects") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
+// Temporary query for backfill script
+export const debugGetAllUsers = query({
+  handler: async (ctx) => await ctx.db.query("users").collect(),
+});
+// Proxy for "Smart Onboarding" - Step 2: Save
+// Calls Python to generate embedding and save the final user
+export const finalizeOnboarding = action({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    role: v.string(),
+    department: v.optional(v.string()),
+    bio: v.string(),
+    skills: v.array(
+      v.object({
+        name: v.string(),
+        level: v.string(),
+        proficiencyLevel: v.float64(),
+        years: v.optional(v.float64()),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    const nlpServiceUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!nlpServiceUrl) throw new Error("API_URL not set");
+
+    const response = await fetch(`${nlpServiceUrl}/onboard/finalize`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: args.userId,
-        projectId: args.projectId,
-        recommendationType: args.recommendationType,
-        rating: args.rating === 1, // Python expects boolean for 'rating' (True/False)
-        comments: args.comments,
-      }),
+      body: JSON.stringify(args),
     });
 
     if (!response.ok) {
@@ -82,109 +232,46 @@ export const submitFeedback = action({
   },
 });
 
-//  Helper Queries & Mutations
-export const getProject = query({
-  args: { id: v.id("projects") },
+// Proxy for "Talent Pool" - Search CVs
+// Calls Python to embed query and search users (without availability filter)
+export const searchTalent = action({
+  args: { query: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
-  },
-});
+    const nlpServiceUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!nlpServiceUrl) throw new Error("API_URL not set");
 
-export const getActiveProjects = query({
-  handler: async (ctx) =>
-    await ctx.db
-      .query("projects")
-      .filter((q) => q.eq(q.field("status"), "Active"))
-      .collect(),
-});
-
-export const getAllSkills = query({
-  handler: async (ctx) => await ctx.db.query("skills").collect(),
-});
-
-export const getUserSkills = query({
-  args: { userId: v.id("users") },
-  handler: async (ctx, args) =>
-    await ctx.db
-      .query("userSkills")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .collect(),
-});
-
-export const getProjectsNeedingSkills = query({
-  args: { statusFilter: v.optional(v.array(v.string())) },
-  handler: async (ctx, args) => {
-    let projects = await ctx.db.query("projects").collect();
-    if (args.statusFilter && args.statusFilter.length > 0) {
-      const filter = args.statusFilter;
-      projects = projects.filter((p) => filter.includes(p.status));
-    }
-    return projects.filter(
-      (p) => !p.requiredSkills || p.requiredSkills.length === 0
-    );
-  },
-});
-
-export const updateProjectSkills = mutation({
-  args: {
-    id: v.id("projects"),
-    requiredSkills: v.array(v.any()),
-    nlpExtractedSkills: v.array(v.string()),
-  },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.id, {
-      requiredSkills: args.requiredSkills,
-      nlpExtractedSkills: args.nlpExtractedSkills,
+    const response = await fetch(`${nlpServiceUrl}/search/talent`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: args.query }),
     });
+
+    if (!response.ok) {
+      throw new Error("Failed to search talent pool");
+    }
+
+    return await response.json();
   },
 });
 
-export const updateSkillEmbedding = mutation({
-  args: { id: v.id("skills"), embedding: v.array(v.float64()) },
+// Proxy for "Project Wizard" - Stateless Analysis
+// Calls Python to extract skills from text before project creation
+export const analyzeProjectText = action({
+  args: { text: v.string() },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.id, { embedding: args.embedding });
-  },
-});
+    const nlpServiceUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!nlpServiceUrl) throw new Error("API_URL not set");
 
-export const logFeedback = mutation({
-  args: {
-    userId: v.optional(v.string()),
-    projectId: v.optional(v.string()),
-    recommendationType: v.optional(v.string()),
-    feedbackType: v.optional(v.string()),
-    type: v.optional(v.string()),
+    const response = await fetch(`${nlpServiceUrl}/nlp/analyze-project-text`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: args.text }),
+    });
 
-    rating: v.number(),
-    comments: v.optional(v.string()),
-    timestamp: v.number(),
-  },
-  handler: async (ctx, args) => {
-    const cleanArgs = {
-      userId: args.userId,
-      projectId: args.projectId,
-      rating: args.rating,
-      comments: args.comments,
-      timestamp: args.timestamp,
-      recommendationType:
-        args.recommendationType || args.feedbackType || args.type || "user",
-    };
+    if (!response.ok) {
+      throw new Error("Analysis failed");
+    }
 
-    await ctx.db.insert("recommendationFeedback", cleanArgs);
-  },
-});
-
-export const getRecentFeedback = query({
-  handler: async (ctx) =>
-    await ctx.db.query("recommendationFeedback").order("desc").take(500),
-});
-
-export const getRecentProjects = query({
-  args: { cutoffTime: v.number() },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("projects")
-      .order("desc")
-      .filter((q) => q.gte(q.field("createdAt"), args.cutoffTime))
-      .collect();
+    return await response.json();
   },
 });
