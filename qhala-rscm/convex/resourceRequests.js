@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { canApproveResourceRequest } from "./rbac";
 
 async function getActor(ctx, email) {
   if (!email) throw new Error("Unauthorized: missing email");
@@ -11,11 +12,6 @@ async function getActor(ctx, email) {
   return actor;
 }
 
-function requireRole(user, allowed) {
-  if (!user || !allowed.includes(user.role)) {
-    throw new Error("You don’t have permission to perform this action.");
-  }
-}
 
 // GET requests
 export const getAll = query({
@@ -114,7 +110,9 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["pm", "admin", "hr"]);
+    if (!["pm", "admin", "hr"].includes(actor.role)) {
+      throw new Error("You don't have permission to perform this action.");
+    }
 
     if (args.requestedPercentage < 1 || args.requestedPercentage > 100) {
       throw new Error("Allocation percentage must be between 1 and 100.");
@@ -188,6 +186,7 @@ export const processApproval = mutation({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
+    canApproveResourceRequest(actor);
 
     const request = await ctx.db.get(args.requestId);
     if (!request) throw new Error("Resource request not found.");
@@ -196,7 +195,6 @@ export const processApproval = mutation({
     let updates = { updatedAt: now };
     let bypassedLM = false;
 
-    // LM approval
     if (request.status === "pending_lm" && actor.role === "line_manager") {
       updates.lineManagerApproval = {
         status: args.action === "approve" ? "approved" : "rejected",

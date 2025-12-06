@@ -4,14 +4,14 @@ import {
   createNotification,
   createBulkNotifications,
 } from "./notificationUtils";
+import { canManageAllocation, canViewAllocations } from "./rbac";
 
 function requireRole(user, allowed) {
   if (!user || !allowed.includes(user.role)) {
-    throw new Error("You don’t have permission to perform this action.");
+    throw new Error("You don't have permission to perform this action.");
   }
 }
 
-//fetch actor by email
 async function getActor(ctx, email) {
   if (!email) throw new Error("Unauthorized: missing email");
   const actor = await ctx.db
@@ -33,22 +33,7 @@ export const getAll = query({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    const role = actor.role.toLowerCase().replace(" ", "_");
-    const isAdminOrHR = ["admin", "hr"].includes(role);
-    const isPmOrLineManager = ["pm", "line_manager"].includes(role);
-
-    if (args.userId || args.projectId) {
-      let canAccess = false;
-      if (args.userId && actor._id === args.userId) canAccess = true;
-      if (isAdminOrHR || isPmOrLineManager) canAccess = true;
-      if (!canAccess) {
-        throw new Error("You don’t have permission to view these allocations.");
-      }
-    } else {
-      if (!isAdminOrHR && !isPmOrLineManager) {
-        throw new Error("You don’t have permission to view all allocations.");
-      }
-    }
+    canViewAllocations(actor);
 
     let q = ctx.db.query("allocations");
     if (args.userId) {
@@ -122,7 +107,7 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["admin", "hr"]);
+    canManageAllocation(actor);
 
     if (args.allocationPercentage < 0 || args.allocationPercentage > 100) {
       throw new Error("Allocation percentage must be between 0 and 100.");
@@ -258,7 +243,7 @@ export const update = mutation({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["admin", "hr"]);
+    canManageAllocation(actor);
 
     const allocation = await ctx.db.get(args.id);
     if (!allocation) throw new Error("Allocation not found.");
@@ -325,7 +310,7 @@ export const remove = mutation({
   args: { email: v.string(), id: v.id("allocations") },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["admin", "hr"]);
+    canManageAllocation(actor);
 
     await ctx.db.delete(args.id);
     return { success: true, message: "Allocation deleted successfully." };

@@ -5,6 +5,7 @@ import {
   successResponse, 
   errorResponse 
 } from "@/lib/auth-utils";
+import { handleConvexError } from "@/convex/errorHandler";
 
 // PUT /api/allocations/[allocationId]
 export async function PUT(req, { params }) {
@@ -21,11 +22,11 @@ export async function PUT(req, { params }) {
 
     return successResponse({ message: "Allocation updated successfully." });
   } catch (error) {
-    return errorResponse(error.message || "Unable to update allocation.", 400);
+    const parsed = handleConvexError(error);
+    return errorResponse(parsed.message, 400, parsed.code, parsed.field);
   }
 }
 
-// DELETE /api/allocations/[allocationId]
 export async function DELETE(_req, { params }) {
   try {
     const email = await getAuthenticatedEmail();
@@ -38,6 +39,7 @@ export async function DELETE(_req, { params }) {
 
     return successResponse({ message: "Allocation deleted successfully." });
   } catch (error) {
-    return errorResponse(error.message || "Unable to delete allocation.", 400);
+    const parsed = handleConvexError(error);
+    return errorResponse(parsed.message, 400, parsed.code, parsed.field);
   }
 }

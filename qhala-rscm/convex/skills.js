@@ -1,12 +1,7 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 import { createNotification } from "./notificationUtils";
-
-function requireRole(user, allowed) {
-  if (!user || !allowed.includes(user.role)) {
-    throw new Error("You don’t have permission to perform this action.");
-  }
-}
+import { canManageSkill } from "./rbac";
 
 async function getActor(ctx, email) {
   if (!email) throw new Error("Unauthorized: missing email");
@@ -55,7 +50,9 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["admin", "hr"]);
+    if (!["admin", "hr"].includes(actor.role)) {
+      throw new Error("You don't have permission to perform this action.");
+    }
 
     const existing = await ctx.db
       .query("skills")
@@ -79,7 +76,9 @@ export const deleteSkill = mutation({
   args: { email: v.string(), skillId: v.id("skills") },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["admin"]);
+    if (actor.role !== "admin") {
+      throw new Error("You don't have permission to perform this action.");
+    }
 
     const skill = await ctx.db.get(args.skillId);
     if (!skill) throw new Error("Skill not found.");
@@ -107,7 +106,9 @@ export const getDistribution = query({
   args: { email: v.string() },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["admin", "hr"]);
+    if (!["admin", "hr"].includes(actor.role)) {
+      throw new Error("You don't have permission to perform this action.");
+    }
 
     const allSkills = await ctx.db.query("skills").collect();
     if (allSkills.length === 0) return [];

@@ -14,6 +14,8 @@ import {
   TrendingDown
 } from "lucide-react";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import EventsTodayWidget from "./EventsTodayWidget";
+import ActivityFeedWidget from "./ActivityFeedWidget";
 
 const AdminDashboard = ({ user }) => {
   const router = useRouter();
@@ -266,95 +268,9 @@ const AdminDashboard = ({ user }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-semibold text-rscm-dark-purple">
-                Pending approvals
-              </h2>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Items requiring your attention
-              </p>
-            </div>
-            <button 
-              onClick={() => router.push("/approvals")}
-              className="text-xs text-rscm-violet hover:text-rscm-plum transition-colors font-medium flex items-center gap-1"
-            >
-              View all
-              <ChevronRight size={14} />
-            </button>
-          </div>
-
-          <div className="divide-y divide-gray-50">
-            {finalPendingApprovals.length > 0 ? (
-              finalPendingApprovals.map((approval, index) => (
-                <div
-                  key={index}
-                  className="px-6 py-3 hover:bg-rscm-dutch-white/20 transition-colors cursor-pointer group"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3 flex-1">
-                      <div className="p-1.5 bg-rscm-lilac/10 rounded mt-0.5">
-                        <Clock size={14} className="text-rscm-plum" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-rscm-dark-purple font-medium">
-                          {approval.title}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-0.5">
-                          {approval.description}
-                        </p>
-                      </div>
-                    </div>
-                    <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-rscm-dutch-white/30 rounded">
-                      <MoreHorizontal size={14} className="text-gray-400" />
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="px-6 py-12 text-center">
-                <CheckCircle2 size={32} className="mx-auto mb-2 text-rscm-violet opacity-50" />
-                <p className="text-sm text-gray-400">All caught up!</p>
-                <p className="text-xs text-gray-400 mt-1">No pending approvals</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="text-base font-semibold text-rscm-dark-purple">
-              Recent activity
-            </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Latest updates across the organization
-            </p>
-          </div>
-
-          <div className="divide-y divide-gray-50">
-            {recentActivity.length > 0 ? (
-              recentActivity.slice(0, 5).map((activity, index) => (
-                <div
-                  key={index}
-                  className="px-6 py-3 hover:bg-rscm-dutch-white/20 transition-colors cursor-pointer"
-                >
-                  <p className="text-sm text-rscm-dark-purple">
-                    {activity.description}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {activity.timestamp}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <div className="px-6 py-12 text-center">
-                <p className="text-sm text-gray-400">No recent activity</p>
-              </div>
-            )}
-          </div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <EventsTodayWidget />
+        <ActivityFeedWidget />
       </div>
 
       <div className="bg-white rounded-lg shadow-sm">

@@ -1,5 +1,6 @@
 import { convex, api } from "@/lib/convexServer";
 import { NextResponse } from "next/server";
+import { handleConvexError } from "@/convex/errorHandler";
 
 // GET /api/resourcerequests
 export async function GET(req) {
@@ -17,22 +18,23 @@ export async function GET(req) {
 
     return NextResponse.json({ success: true, data });
   } catch (error) {
+    const parsed = handleConvexError(error);
     return NextResponse.json(
-      { success: false, error: error.message || "Unable to fetch resource requests." },
+      { success: false, error: parsed.message, code: parsed.code, field: parsed.field },
       { status: 400 }
     );
   }
 }
 
-// POST /api/resourcerequests
 export async function POST(req) {
   try {
     const body = await req.json();
     const id = await convex.mutation(api.resourceRequests.create, body);
     return NextResponse.json({ success: true, id }, { status: 201 });
   } catch (error) {
+    const parsed = handleConvexError(error);
     return NextResponse.json(
-      { success: false, error: error.message || "Unable to create resource request." },
+      { success: false, error: parsed.message, code: parsed.code, field: parsed.field },
       { status: 400 }
     );
   }

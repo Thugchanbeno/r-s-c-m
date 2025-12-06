@@ -9,6 +9,7 @@ import SkillsSectionNew from "./SkillsSectionNew";
 import ProjectsEmploymentSectionNew from "./ProjectsEmploymentSectionNew";
 import LineManagerCardNew from "./LineManagerCardNew";
 import WorkRequestsSectionNew from "./WorkRequestsSectionNew";
+import EventsSectionNew from "./EventsSectionNew";
 import LeaveRequestModal from "./LeaveRequestModal";
 import OvertimeRequestModal from "./OvertimeRequestModal";
 import SkillsEditorModal from "./SkillsEditorModal";
@@ -61,6 +62,7 @@ const ProfilePageNew = () => {
   const employmentRef = useRef(null);
   const managerRef = useRef(null);
   const requestsRef = useRef(null);
+  const eventsRef = useRef(null);
 
   useEffect(() => {
     document.documentElement.style.scrollBehavior = "smooth";
@@ -79,6 +81,7 @@ const ProfilePageNew = () => {
         { id: "employment", ref: employmentRef },
         { id: "manager", ref: managerRef },
         { id: "requests", ref: requestsRef },
+        { id: "events", ref: eventsRef },
       ];
 
       const activeSections = sections.filter((section) => section.ref.current);
@@ -184,6 +187,11 @@ const ProfilePageNew = () => {
           onRequestLeave={() => setIsLeaveModalOpen(true)}
           onRequestOvertime={() => setIsOvertimeModalOpen(true)}
         />
+      </div>
+
+      {/* Events Section */}
+      <div ref={eventsRef} id="events">
+        <EventsSectionNew user={userProfile} />
       </div>
 
       {/* Modals */}

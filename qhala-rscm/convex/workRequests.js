@@ -1,12 +1,7 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 import { createNotification } from "./notificationUtils";
-
-function requireRole(user, allowed) {
-  if (!user || !allowed.includes(user.role)) {
-    throw new Error("You don't have permission to perform this action.");
-  }
-}
+import { canApproveWorkRequest } from "./rbac";
 
 async function getActor(ctx, email) {
   if (!email) throw new Error("Unauthorized: missing email");
@@ -35,7 +30,7 @@ function calculateBusinessDays(startDate, endDate) {
   return count;
 }
 
-// GET all work requests
+// GET all work requests for a specific user with filtering
 export const getAll = query({
   args: {
     email: v.string(),
@@ -100,6 +95,43 @@ export const getAll = query({
     const skip = args.skip ?? 0;
     const limit = args.limit ?? 50;
     return enrichedRequests.slice(skip, skip + limit);
+  },
+});
+
+// GET all pending work requests requiring approval (for HR/managers)
+export const getAllForApproval = query({
+  args: {
+    email: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const actor = await getActor(ctx, args.email);
+    canApproveWorkRequest(actor);
+
+    let allRequests = await ctx.db.query("workRequests").collect();
+
+    if (actor.role === "line_manager") {
+      const directReports = await ctx.db
+        .query("users")
+        .withIndex("by_line_manager", (q) => q.eq("lineManagerId", actor._id))
+        .collect();
+      const directReportIds = new Set(directReports.map((u) => u._id));
+      allRequests = allRequests.filter((r) => directReportIds.has(r.userId));
+    }
+
+    const pendingRequests = allRequests.filter(
+      (r) => r.status === "pending_lm" || r.status === "pending_pm" || r.status === "pending_hr"
+    );
+
+    const enrichedRequests = [];
+    for (const req of pendingRequests) {
+      const user = await ctx.db.get(req.userId);
+      enrichedRequests.push({
+        ...req,
+        userId: user,
+      });
+    }
+
+    return enrichedRequests.slice(0, 10);
   },
 });
 
@@ -199,6 +231,7 @@ export const processApproval = mutation({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
+    canApproveWorkRequest(actor);
 
     const request = await ctx.db.get(args.requestId);
     if (!request) throw new Error("Request not found.");

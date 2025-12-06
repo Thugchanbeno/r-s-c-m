@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ClipboardList, Briefcase, Award } from "lucide-react";
+import { ClipboardList, Briefcase, Award, Calendar } from "lucide-react";
 import WorkRequestsTabNew from "@/components/approvals/WorkRequestsTabNew";
 import ResourceRequestsTabNew from "@/components/approvals/ResourceRequestsTabNew";
 import SkillVerificationsTabNew from "@/components/approvals/SkillVerificationsTabNew";
+import EventsTab from "@/components/approvals/EventsTab";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const ApprovalsViewNew = ({ user }) => {
@@ -14,7 +15,7 @@ const ApprovalsViewNew = ({ user }) => {
 
   useEffect(() => {
     const tab = searchParams.get("tab");
-    if (tab && ["work", "resources", "skills"].includes(tab)) {
+    if (tab && ["work", "resources", "skills", "events"].includes(tab)) {
       setActiveTab(tab);
     }
   }, [searchParams]);
@@ -45,6 +46,13 @@ const ApprovalsViewNew = ({ user }) => {
       icon: Award,
       description: "Employee skill validations",
       roles: ["line_manager", "admin", "hr"],
+    },
+    {
+      id: "events",
+      label: "Events",
+      icon: Calendar,
+      description: "Team out-of-office events",
+      roles: ["admin", "hr"],
     },
   ];
 
@@ -100,6 +108,7 @@ const ApprovalsViewNew = ({ user }) => {
       {activeTab === "work" && <WorkRequestsTabNew user={user} />}
       {activeTab === "resources" && <ResourceRequestsTabNew user={user} />}
       {activeTab === "skills" && <SkillVerificationsTabNew user={user} />}
+      {activeTab === "events" && <EventsTab user={user} />}
     </div>
   );
 };

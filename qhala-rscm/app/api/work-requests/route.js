@@ -1,5 +1,6 @@
 import { convex, api } from "@/lib/convexServer";
 import { getAuthenticatedEmail, unauthorizedResponse, successResponse, errorResponse } from "@/lib/auth-utils";
+import { handleConvexError } from "@/convex/errorHandler";
 
 export async function GET(req) {
   try {
@@ -24,6 +25,7 @@ export async function GET(req) {
 
     return successResponse({ data });
   } catch (error) {
-    return errorResponse(error.message || "Unable to fetch work requests.", 400);
+    const parsed = handleConvexError(error);
+    return errorResponse(parsed.message, 400, parsed.code, parsed.field);
   }
 }

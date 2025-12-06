@@ -36,13 +36,14 @@ export function unauthorizedResponse() {
  * Standard error response
  * @param {string} message - Error message
  * @param {number} status - HTTP status code (default: 500)
+ * @param {string} code - Error code for frontend
+ * @param {string} field - Field that caused validation error
  * @returns {NextResponse} Error response
  */
-export function errorResponse(message, status = 500) {
-  return NextResponse.json(
-    { success: false, error: message }, 
-    { status }
-  );
+export function errorResponse(message, status = 500, code = "INTERNAL_ERROR", field = null) {
+  const response = { success: false, error: message, code };
+  if (field) response.field = field;
+  return NextResponse.json(response, { status });
 }
 
 /**

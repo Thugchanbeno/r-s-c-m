@@ -1,12 +1,8 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 import { createNotification, createBulkNotifications } from "./notificationUtils";
+import { canEditUser } from "./rbac";
 
-function requireRole(user, allowed) {
-  if (!user || !allowed.includes(user.role)) {
-    throw new Error("You don’t have permission to perform this action.");
-  }
-}
 
 async function getActor(ctx, email) {
   if (!email) throw new Error("Unauthorized: missing email");
@@ -29,7 +25,9 @@ export const getAll = query({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["hr", "admin", "pm", "line_manager"]);
+    if (!["hr", "admin", "pm", "line_manager"].includes(actor.role)) {
+      throw new Error("You don't have permission to perform this action.");
+    }
 
     let users = await ctx.db.query("users").collect();
 
@@ -100,7 +98,7 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["hr", "admin"]);
+    canEditUser(actor, args.newUserEmail);
 
     const existing = await ctx.db
       .query("users")
@@ -141,6 +139,7 @@ export const updateProfile = mutation({
   args: {
     email: v.string(),
     id: v.id("users"),
+    name: v.optional(v.string()),
     role: v.optional(v.string()),
     department: v.optional(v.string()),
     availabilityStatus: v.optional(
@@ -166,7 +165,7 @@ export const updateProfile = mutation({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["hr", "admin"]);
+    canEditUser(actor, args.id);
     const { id, email, ...updates } = args;
 
     // Get current user state before update

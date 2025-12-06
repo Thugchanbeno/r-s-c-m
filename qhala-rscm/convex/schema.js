@@ -303,6 +303,13 @@ export default defineSchema({
       v.literal("resource_request_hr_rejected"),
       v.literal("resource_request_expired"),
 
+      // Events Domain (5 types)
+      v.literal("event_created"),
+      v.literal("event_logged"),
+      v.literal("event_approved"),
+      v.literal("event_rejected"),
+      v.literal("event_acknowledged"),
+
       // Work Requests Domain (10 types)
       v.literal("leave_request_pending_lm"),
       v.literal("leave_request_pending_pm"),
@@ -386,7 +393,8 @@ export default defineSchema({
         v.literal("workRequest"),
         v.literal("skill"),
         v.literal("cvCache"),
-        v.literal("report")
+        v.literal("report"),
+        v.literal("event")
       )
     ),
 
@@ -676,18 +684,43 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_created_at", ["createdAt"]),
 
-  // EVENTS
+  // EVENTS - User out-of-office activity logging (seminars, meetings, webinars, conferences)
   events: defineTable({
     userId: v.id("users"),
     title: v.string(),
     description: v.optional(v.string()),
+    eventCategory: v.union(
+      v.literal("seminar"),
+      v.literal("meeting"),
+      v.literal("webinar"),
+      v.literal("conference"),
+      v.literal("training"),
+      v.literal("other")
+    ),
+    location: v.optional(v.string()),
+    startDateTime: v.number(),
+    endDateTime: v.number(),
+    notes: v.optional(v.string()),
+    attendees: v.optional(v.array(v.id("users"))),
+    acknowledgedBy: v.optional(v.array(v.id("users"))),
+    status: v.union(
+      v.literal("planned"),
+      v.literal("in_progress"),
+      v.literal("completed"),
+      v.literal("cancelled")
+    ),
     eventDate: v.number(),
-    eventType: v.string(),
-    priority: v.string(),
+    eventType: v.optional(v.string()),
+    priority: v.optional(v.string()),
     relatedResourceId: v.optional(v.string()),
     relatedResourceType: v.optional(v.string()),
     createdAt: v.number(),
+    updatedAt: v.number(),
   })
     .index("by_user", ["userId"])
-    .index("by_date", ["eventDate"]),
+    .index("by_date", ["eventDate"])
+    .index("by_start_time", ["startDateTime"])
+    .index("by_status", ["status"])
+    .index("by_category", ["eventCategory"])
+    .index("by_date_range", ["startDateTime", "endDateTime"]),
 });

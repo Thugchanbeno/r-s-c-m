@@ -5,6 +5,7 @@ import {
   successResponse,
   errorResponse
 } from "@/lib/auth-utils";
+import { handleConvexError } from "@/convex/errorHandler";
 
 // GET /api/skills
 export async function GET(req) {
@@ -23,11 +24,11 @@ export async function GET(req) {
 
     return successResponse({ count: skills.length, data: skills });
   } catch (error) {
-    return errorResponse(error.message || "Unable to fetch skills.", 400);
+    const parsed = handleConvexError(error);
+    return errorResponse(parsed.message, 400, parsed.code, parsed.field);
   }
 }
 
-// POST /api/skills
 export async function POST(req) {
   try {
     const email = await getAuthenticatedEmail();
@@ -41,6 +42,7 @@ export async function POST(req) {
 
     return successResponse({ id }, 201);
   } catch (error) {
-    return errorResponse(error.message || "Unable to create skill.", 400);
+    const parsed = handleConvexError(error);
+    return errorResponse(parsed.message, 400, parsed.code, parsed.field);
   }
 }

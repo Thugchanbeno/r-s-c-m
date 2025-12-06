@@ -1,5 +1,10 @@
 import { convex, api } from "@/lib/convexServer";
-import { getAuthenticatedEmail, unauthorizedResponse, successResponse, errorResponse } from "@/lib/auth-utils";
+import {
+  getAuthenticatedEmail,
+  unauthorizedResponse,
+  successResponse,
+  errorResponse,
+} from "@/lib/auth-utils";
 import { handleConvexError } from "@/convex/errorHandler";
 
 export async function GET(req) {
@@ -8,22 +13,19 @@ export async function GET(req) {
     if (!email) return unauthorizedResponse();
 
     const { searchParams } = new URL(req.url);
-    const search = searchParams.get("search") || undefined;
-    const skillName = searchParams.get("skillName") || undefined;
-    const countOnly = searchParams.get("countOnly") === "true";
-    const skip = Number(searchParams.get("skip") || 0);
-    const limit = Number(searchParams.get("limit") || 50);
+    const userId = searchParams.get("userId");
+    const days = Number(searchParams.get("days") || 7);
 
-    const data = await convex.query(api.users.getAll, {
+    if (!userId) {
+      return errorResponse("userId parameter is required", 400);
+    }
+
+    const data = await convex.query(api.events.getByUser, {
       email,
-      search,
-      skillName,
-      countOnly,
-      skip,
-      limit,
+      userId,
     });
 
-    return successResponse(data);
+    return successResponse({ data });
   } catch (error) {
     const parsed = handleConvexError(error);
     return errorResponse(parsed.message, 400, parsed.code, parsed.field);
@@ -36,12 +38,12 @@ export async function POST(req) {
     if (!email) return unauthorizedResponse();
 
     const body = await req.json();
-    const id = await convex.mutation(api.users.create, {
+    const eventId = await convex.mutation(api.events.createEvent, {
       email,
       ...body,
     });
-    
-    return successResponse({ id }, 201);
+
+    return successResponse({ id: eventId }, 201);
   } catch (error) {
     const parsed = handleConvexError(error);
     return errorResponse(parsed.message, 400, parsed.code, parsed.field);

@@ -1,5 +1,6 @@
 import { convex, api } from "@/lib/convexServer";
 import { NextResponse } from "next/server";
+import { handleConvexError } from "@/convex/errorHandler";
 
 export async function GET(_req, { params }) {
   try {
@@ -8,8 +9,9 @@ export async function GET(_req, { params }) {
     });
     return NextResponse.json({ success: true, data: project });
   } catch (error) {
+    const parsed = handleConvexError(error);
     return NextResponse.json(
-      { success: false, error: error.message || "Unable to fetch project." },
+      { success: false, error: parsed.message, code: parsed.code, field: parsed.field },
       { status: 400 }
     );
   }
@@ -24,8 +26,9 @@ export async function PUT(req, { params }) {
     });
     return NextResponse.json(result);
   } catch (error) {
+    const parsed = handleConvexError(error);
     return NextResponse.json(
-      { success: false, error: error.message || "Unable to update project." },
+      { success: false, error: parsed.message, code: parsed.code, field: parsed.field },
       { status: 400 }
     );
   }

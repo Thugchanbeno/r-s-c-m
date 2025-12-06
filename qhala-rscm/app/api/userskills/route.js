@@ -5,6 +5,7 @@ import {
   successResponse, 
   errorResponse 
 } from "@/lib/auth-utils";
+import { handleConvexError } from "@/convex/errorHandler";
 
 // GET /api/userskills
 export async function GET(req) {
@@ -22,11 +23,11 @@ export async function GET(req) {
 
     return successResponse({ data });
   } catch (error) {
-    return errorResponse(error.message || "Unable to fetch user skills.", 400);
+    const parsed = handleConvexError(error);
+    return errorResponse(parsed.message, 400, parsed.code, parsed.field);
   }
 }
 
-// PUT /api/userskills
 export async function PUT(req) {
   try {
     const email = await getAuthenticatedEmail();
@@ -40,6 +41,7 @@ export async function PUT(req) {
 
     return successResponse({ data });
   } catch (error) {
-    return errorResponse(error.message || "Unable to update user skills.", 400);
+    const parsed = handleConvexError(error);
+    return errorResponse(parsed.message, 400, parsed.code, parsed.field);
   }
 }

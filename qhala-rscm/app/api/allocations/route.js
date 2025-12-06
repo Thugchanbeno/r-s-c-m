@@ -5,6 +5,7 @@ import {
   successResponse, 
   errorResponse 
 } from "@/lib/auth-utils";
+import { handleConvexError } from "@/convex/errorHandler";
 
 // GET /api/allocations?userId=...&projectId=...&page=1&limit=10
 export async function GET(req) {
@@ -28,11 +29,11 @@ export async function GET(req) {
 
     return successResponse(data);
   } catch (error) {
-    return errorResponse(error.message || "Unable to fetch allocations.", 400);
+    const parsed = handleConvexError(error);
+    return errorResponse(parsed.message, 400, parsed.code, parsed.field);
   }
 }
 
-// POST /api/allocations
 export async function POST(req) {
   try {
     const email = await getAuthenticatedEmail();
@@ -46,6 +47,7 @@ export async function POST(req) {
 
     return successResponse({ id }, 201);
   } catch (error) {
-    return errorResponse(error.message || "Unable to create allocation.", 400);
+    const parsed = handleConvexError(error);
+    return errorResponse(parsed.message, 400, parsed.code, parsed.field);
   }
 }

@@ -11,6 +11,7 @@ import {
   createNotification,
   createBulkNotifications,
 } from "./notificationUtils";
+import { canEditProject } from "./rbac";
 
 function requireRole(user, allowed) {
   if (!user || !allowed.includes(user.role)) {
@@ -153,7 +154,9 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["pm", "hr", "admin"]);
+    if (!["pm", "hr", "admin"].includes(actor.role)) {
+      throw new Error("You don't have permission to perform this action.");
+    }
 
     if (!args.name || !args.description || !args.department) {
       throw new Error(
@@ -252,9 +255,7 @@ export const update = mutation({
     const project = await ctx.db.get(args.id);
     if (!project) throw new Error("Project not found.");
 
-    if (project.pmId !== actor._id && !["admin", "hr"].includes(actor.role)) {
-      throw new Error("You can only update your own projects.");
-    }
+    canEditProject(actor, project);
 
     const { id, email, ...updates } = args;
     const oldProject = { ...project }; // Keep reference to old state

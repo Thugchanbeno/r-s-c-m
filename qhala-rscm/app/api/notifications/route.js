@@ -5,6 +5,7 @@ import {
   successResponse, 
   errorResponse 
 } from "@/lib/auth-utils";
+import { handleConvexError } from "@/convex/errorHandler";
 
 // GET /api/notifications
 export async function GET(req) {
@@ -32,11 +33,11 @@ export async function GET(req) {
 
     return successResponse(data);
   } catch (error) {
-    return errorResponse(error.message || "Unable to fetch notifications.", 400);
+    const parsed = handleConvexError(error);
+    return errorResponse(parsed.message, 400, parsed.code, parsed.field);
   }
 }
 
-// POST /api/notifications (mark as read)
 export async function POST(req) {
   try {
     const email = await getAuthenticatedEmail();
@@ -50,11 +51,11 @@ export async function POST(req) {
 
     return successResponse(result);
   } catch (error) {
-    return errorResponse(error.message || "Unable to mark notifications as read.", 400);
+    const parsed = handleConvexError(error);
+    return errorResponse(parsed.message, 400, parsed.code, parsed.field);
   }
 }
 
-// DELETE /api/notifications
 export async function DELETE(req) {
   try {
     const email = await getAuthenticatedEmail();
@@ -68,6 +69,7 @@ export async function DELETE(req) {
 
     return successResponse(result);
   } catch (error) {
-    return errorResponse(error.message || "Unable to delete notifications.", 400);
+    const parsed = handleConvexError(error);
+    return errorResponse(parsed.message, 400, parsed.code, parsed.field);
   }
 }

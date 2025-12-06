@@ -1,0 +1,1772 @@
+[
+  {
+    "name": "Python",
+    "description": "A versatile, high-level programming language with extensive libraries for web development (Django, Flask), data science, machine learning, automation, scientific computing, and scripting. Known for readability, rapid development, and strong community support.",
+    "category": "Programming Language",
+    "aliases": ["py", "python3", "python programming", "cpython", "anaconda python"]
+  },
+  {
+    "name": "JavaScript",
+    "description": "A dynamic, high-level scripting language essential for front-end web development and interactive UIs. With Node.js, enables server-side programming. Supports event-driven, functional, and imperative paradigms, with powerful async/await patterns.",
+    "category": "Programming Language",
+    "aliases": ["js", "ecmascript", "es6+", "vanilla js", "node.js", "javascript programming"]
+  },
+  {
+    "name": "TypeScript",
+    "description": "A statically typed superset of JavaScript adding optional types, interfaces, and classes. Compiles to plain JavaScript, improving code quality, maintainability, and IDE support for large-scale applications.",
+    "category": "Programming Language",
+    "aliases": ["ts", "typescript lang"]
+  },
+  {
+    "name": "Java",
+    "description": "A robust, object-oriented, platform-independent language widely used for enterprise applications, Android development, and backend systems with Spring Boot, Hibernate, and Jakarta EE.",
+    "category": "Programming Language",
+    "aliases": ["j2ee", "jee", "java se", "java ee", "spring framework", "jvm programming"]
+  },
+  {
+    "name": "C#",
+    "description": "A modern, object-oriented language by Microsoft, used for Windows applications, web services with .NET/ASP.NET, game development with Unity, and enterprise solutions.",
+    "category": "Programming Language",
+    "aliases": ["c sharp", "csharp", ".net framework", "dotnet core", "asp.net", "c# programming"]
+  },
+  {
+    "name": "C++",
+    "description": "A powerful, high-performance language offering low-level memory manipulation. Used for system software, game engines (Unreal Engine), embedded systems, real-time processing, and performance-critical applications.",
+    "category": "Programming Language",
+    "aliases": ["cpp", "c plus plus", "cplusplus"]
+  },
+  {
+    "name": "Go",
+    "description": "A statically typed, compiled language by Google designed for efficiency, concurrency, and simplicity. Widely used for cloud infrastructure, microservices, networking tools, CLI applications, and backend services.",
+    "category": "Programming Language",
+    "aliases": ["golang", "go lang"]
+  },
+  {
+    "name": "Ruby",
+    "description": "A dynamic, expressive language prioritizing developer productivity and happiness. Popular for rapid web development, especially with Ruby on Rails, metaprogramming, and DevOps scripting.",
+    "category": "Programming Language",
+    "aliases": ["ruby programming", "ruby lang"]
+  },
+  {
+    "name": "PHP",
+    "description": "A widely-used, open-source server-side scripting language tailored for web development. Powers content management systems like WordPress, Drupal, and Laravel applications.",
+    "category": "Programming Language",
+    "aliases": ["php scripting", "php web"]
+  },
+  {
+    "name": "Swift",
+    "description": "A powerful, modern language by Apple for macOS, iOS, watchOS, and tvOS development. Known for safety features, performance optimization, and modern syntax combining readability with type safety.",
+    "category": "Programming Language",
+    "aliases": ["ios swift programming", "swift development"]
+  },
+  {
+    "name": "Kotlin",
+    "description": "A modern, statically typed language targeting JVM, Android, JavaScript, and Native platforms. Offers concise syntax, null safety, and seamless Java interoperability. Official Android development language.",
+    "category": "Programming Language",
+    "aliases": ["android kotlin programming", "kotlin development"]
+  },
+  {
+    "name": "Rust",
+    "description": "A systems programming language emphasizing safety, speed, and concurrency without garbage collection. Used for systems software, WebAssembly, embedded systems, and performance-critical applications.",
+    "category": "Programming Language",
+    "aliases": ["rustlang", "cargo", "tokio", "actix", "rust systems programming"]
+  },
+  {
+    "name": "C",
+    "description": "A procedural, low-level language providing direct memory access and minimal overhead. Fundamental for embedded systems, operating systems, compilers, and performance-critical applications.",
+    "category": "Programming Language",
+    "aliases": ["c programming", "c lang"]
+  },
+  {
+    "name": "Bash",
+    "description": "A Unix shell and command language widely used for system administration scripting, automation, and DevOps workflows on Linux and macOS systems.",
+    "category": "Programming Language",
+    "aliases": ["bash scripting", "shell scripting", "unix shell"]
+  },
+  {
+    "name": "Scala",
+    "description": "A statically typed language combining object-oriented and functional programming paradigms on the JVM. Used in big data frameworks like Apache Spark.",
+    "category": "Programming Language",
+    "aliases": ["scala programming", "scala lang"]
+  },
+  {
+    "name": "Elixir",
+    "description": "A functional language built on the Erlang VM (BEAM) designed for distributed, fault-tolerant, real-time systems. Popular for backend services with Phoenix framework.",
+    "category": "Programming Language",
+    "aliases": ["elixir programming", "erlang vm"]
+  },
+  {
+    "name": "Erlang",
+    "description": "A functional language designed for concurrent, distributed, fault-tolerant systems. Powers telecom infrastructure and real-time messaging systems.",
+    "category": "Programming Language",
+    "aliases": ["erlang programming", "erlang otp"]
+  },
+  {
+    "name": "Haskell",
+    "description": "A purely functional, statically typed language emphasizing immutability and lazy evaluation. Used for financial systems, compilers, and academic research.",
+    "category": "Programming Language",
+    "aliases": ["haskell programming", "haskell lang"]
+  },
+  {
+    "name": "Dart",
+    "description": "An object-oriented, statically typed language developed by Google. Used primarily with Flutter for building cross-platform mobile, web, and desktop applications.",
+    "category": "Programming Language",
+    "aliases": ["dart programming", "flutter dart"]
+  },
+  {
+    "name": "HTML",
+    "description": "HyperText Markup Language standardizing web page structure. Essential foundation for web development, defining semantic meaning and content hierarchy.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["html5", "web structure", "html markup"]
+  },
+  {
+    "name": "CSS",
+    "description": "Cascading Style Sheets language for visual styling, layout, animations, and responsive design. Critical for modern web development and user experience.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["css3", "web styling", "css styling"]
+  },
+  {
+    "name": "Sass/SCSS",
+    "description": "A CSS preprocessor adding variables, nesting, mixins, and functions, making stylesheets more maintainable, scalable, and DRY.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["sass", "scss", "css preprocessor"]
+  },
+  {
+    "name": "Tailwind CSS",
+    "description": "A utility-first CSS framework enabling rapid UI development through composable, low-level CSS classes without leaving HTML.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["tailwind", "utility css", "tailwind framework"]
+  },
+  {
+    "name": "React",
+    "description": "A JavaScript library for building dynamic, component-based UIs and single-page applications (SPAs). Provides efficient state management, hooks, context API, and ecosystem tools.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["react.js", "reactjs", "react hooks", "react library"]
+  },
+  {
+    "name": "Angular",
+    "description": "A comprehensive TypeScript-based framework by Google for building large-scale, feature-rich SPAs. Includes dependency injection, RxJS integration, and CLI tooling.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["angular framework", "angular 2+", "typescript angular"]
+  },
+  {
+    "name": "Vue.js",
+    "description": "A progressive JavaScript framework for building user interfaces and SPAs. Known for approachability, flexibility, progressive enhancement, and gentle learning curve.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["vue", "vuejs", "vue framework"]
+  },
+  {
+    "name": "Svelte",
+    "description": "A radical new approach to building UIs that compiles components at build time, resulting in highly optimized, less JavaScript sent to browser.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["sveltekit", "svelte framework"]
+  },
+  {
+    "name": "SolidJS",
+    "description": "A JavaScript library for building user interfaces combining JSX syntax with fine-grained reactivity and minimal overhead.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["solid.js", "solidjs framework"]
+  },
+  {
+    "name": "Astro",
+    "description": "A modern web framework for building fast, static-first websites with island architecture and partial hydration for optimal performance.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["astro framework", "static site generation"]
+  },
+  {
+    "name": "Remix",
+    "description": "A modern web framework focusing on full-stack JavaScript development, server-side rendering (SSR), and leveraging HTTP standards.",
+    "category": "Web Development (Fullstack)",
+    "aliases": ["remix framework", "full stack remix"]
+  },
+  {
+    "name": "Next.js",
+    "description": "A React-based framework enabling server-side rendering (SSR), static site generation (SSG), API routes, and optimized production builds for performant web applications.",
+    "category": "Web Development (Fullstack)",
+    "aliases": ["nextjs", "react ssr", "next framework"]
+  },
+  {
+    "name": "Nuxt.js",
+    "description": "A Vue-based framework for building universal applications with SSR, static generation, and integrated routing and state management.",
+    "category": "Web Development (Fullstack)",
+    "aliases": ["nuxtjs", "vue ssr", "nuxt framework"]
+  },
+  {
+    "name": "Node.js",
+    "description": "A JavaScript runtime environment using Chrome's V8 engine, enabling server-side JavaScript execution. Powers backend services, APIs, real-time applications, and command-line tools.",
+    "category": "Web Development (Backend)",
+    "aliases": ["node", "nodejs server-side", "node runtime"]
+  },
+  {
+    "name": "Express.js",
+    "description": "A minimal, flexible Node.js web framework providing routing, middleware, and core web server functionality for building APIs and web applications.",
+    "category": "Web Development (Backend)",
+    "aliases": ["express", "expressjs framework"]
+  },
+  {
+    "name": "Fastify",
+    "description": "A fast and low-overhead Node.js web framework focused on performance, with schema validation, plugin system, and built-in logger.",
+    "category": "Web Development (Backend)",
+    "aliases": ["fastify framework", "nodejs fastify"]
+  },
+  {
+    "name": "NestJS",
+    "description": "A progressive Node.js framework for building scalable, maintainable backend applications. Combines TypeScript, decorators, and modular architecture with dependency injection.",
+    "category": "Web Development (Backend)",
+    "aliases": ["nestjs framework", "typescript backend"]
+  },
+  {
+    "name": "Django",
+    "description": "A high-level Python web framework emphasizing rapid development and clean design. Follows MTV pattern with built-in ORM, admin panel, authentication, and security features.",
+    "category": "Web Development (Backend)",
+    "aliases": ["python django framework", "django framework"]
+  },
+  {
+    "name": "Flask",
+    "description": "A lightweight, extensible Python microframework for building smaller applications, APIs, and prototypes quickly with maximum flexibility.",
+    "category": "Web Development (Backend)",
+    "aliases": ["python flask microframework", "flask framework"]
+  },
+  {
+    "name": "FastAPI",
+    "description": "A modern, high-performance Python web framework for building fast APIs with automatic documentation, data validation, and async support.",
+    "category": "Web Development (Backend)",
+    "aliases": ["fast api", "fastapi framework", "python fastapi"]
+  },
+  {
+    "name": "Spring Boot",
+    "description": "A Java framework simplifying creation of production-grade, stand-alone Spring applications with auto-configuration, embedded servers, and microservices support.",
+    "category": "Web Development (Backend)",
+    "aliases": ["spring framework", "java spring", "spring boot framework"]
+  },
+  {
+    "name": "Ruby on Rails",
+    "description": "A server-side web framework emphasizing convention over configuration, enabling rapid development of database-driven web applications.",
+    "category": "Web Development (Backend)",
+    "aliases": ["rails", "ror framework", "ruby on rails"]
+  },
+  {
+    "name": ".NET Core / ASP.NET Core",
+    "description": "Microsoft's modern, cross-platform framework for building web applications, APIs, and microservices using C#. Includes Blazor for server and client-side development.",
+    "category": "Web Development (Backend)",
+    "aliases": ["asp.net core", "dotnet core", ".net framework"]
+  },
+  {
+    "name": "Laravel",
+    "description": "A PHP web framework prioritizing elegant syntax and rapid development. Includes ORM (Eloquent), routing, authentication, and extensive ecosystem.",
+    "category": "Web Development (Backend)",
+    "aliases": ["laravel framework", "php laravel"]
+  },
+  {
+    "name": "Gin (Go)",
+    "description": "A lightweight, fast web framework for Go with middleware support, routing, and JSON serialization for building APIs and services.",
+    "category": "Web Development (Backend)",
+    "aliases": ["gin framework", "go web framework"]
+  },
+  {
+    "name": "Fiber (Go)",
+    "description": "A high-performance web framework for Go inspired by Express.js, designed for building fast microservices and APIs.",
+    "category": "Web Development (Backend)",
+    "aliases": ["fiber framework", "go fiber"]
+  },
+  {
+    "name": "Ktor (Kotlin)",
+    "description": "A lightweight, asynchronous web framework for Kotlin for building web services and microservices with coroutines.",
+    "category": "Web Development (Backend)",
+    "aliases": ["ktor framework", "kotlin web"]
+  },
+  {
+    "name": "Phoenix (Elixir)",
+    "description": "A web framework for Elixir enabling real-time applications with WebSockets, built-in ORM (Ecto), and functional programming patterns.",
+    "category": "Web Development (Backend)",
+    "aliases": ["phoenix framework", "elixir web framework"]
+  },
+  {
+    "name": "REST API Design",
+    "description": "Designing RESTful web services leveraging HTTP semantics, resource-oriented architecture, stateless communication, and standard methods (GET, POST, PUT, DELETE).",
+    "category": "API Development",
+    "aliases": ["restful api development", "rest principles", "api design"]
+  },
+  {
+    "name": "GraphQL",
+    "description": "A query language and runtime for APIs enabling clients to request only required data, reducing over-fetching and under-fetching compared to REST.",
+    "category": "API Development",
+    "aliases": ["graphql api", "graphql development"]
+  },
+  {
+    "name": "gRPC",
+    "description": "A high-performance RPC framework by Google using Protocol Buffers for serialization, enabling efficient microservice communication with multiplexing.",
+    "category": "API Development",
+    "aliases": ["grpc", "protobuf rpc"]
+  },
+  {
+    "name": "Protocol Buffers",
+    "description": "A method of serializing structured data by Google, enabling language and platform-independent data interchange for APIs and microservices.",
+    "category": "API Development",
+    "aliases": ["protobuf", "proto3"]
+  },
+  {
+    "name": "OpenAPI / Swagger",
+    "description": "A standardized specification for describing RESTful APIs, enabling automatic documentation, client generation, and testing.",
+    "category": "API Development",
+    "aliases": ["openapi", "swagger", "api specification"]
+  },
+  {
+    "name": "AsyncAPI",
+    "description": "A specification for describing asynchronous APIs, supporting event-driven and message-based communication patterns.",
+    "category": "API Development",
+    "aliases": ["asyncapi", "async messaging"]
+  },
+  {
+    "name": "API Integration",
+    "description": "Connecting software applications via APIs to enable data exchange and functionality sharing across systems and platforms.",
+    "category": "API Development",
+    "aliases": ["system integration", "third-party api consumption", "api connectivity"]
+  },
+  {
+    "name": "Webhook Development",
+    "description": "Implementing callback mechanisms allowing external services to trigger actions in your application through HTTP callbacks.",
+    "category": "API Development",
+    "aliases": ["webhooks", "event callbacks", "reverse api"]
+  },
+  {
+    "name": "PostgreSQL",
+    "description": "A powerful open-source relational database supporting complex queries, advanced data types, and strong reliability for enterprise applications.",
+    "category": "Database Management",
+    "aliases": ["postgres", "pgsql rdbms", "postgresql"]
+  },
+  {
+    "name": "MySQL",
+    "description": "An open-source RDBMS widely used in web applications, known for ease of use, reliability, and scalability.",
+    "category": "Database Management",
+    "aliases": ["mysql rdbms", "mysql database"]
+  },
+  {
+    "name": "MongoDB",
+    "description": "A popular NoSQL document-oriented database storing flexible JSON-like documents (BSON), designed for scalability and agile development.",
+    "category": "Database Management",
+    "aliases": ["mongo", "nosql document db", "mongodb"]
+  },
+  {
+    "name": "Redis",
+    "description": "An in-memory key-value data store used for high-performance caching, session management, real-time analytics, and message brokering.",
+    "category": "Database Management",
+    "aliases": ["redis cache", "key-value store", "redis server"]
+  },
+  {
+    "name": "Elasticsearch",
+    "description": "A distributed search and analytics engine supporting full-text search, log analytics, real-time monitoring with Kibana visualization.",
+    "category": "Search & Analytics",
+    "aliases": ["elastic search engine", "elk stack", "elasticsearch"]
+  },
+  {
+    "name": "SQL",
+    "description": "The standard language for querying, manipulating, and managing data in relational databases across MySQL, PostgreSQL, SQL Server, and Oracle.",
+    "category": "Database Management",
+    "aliases": ["structured query language", "database querying"]
+  },
+  {
+    "name": "Snowflake",
+    "description": "A cloud-native data platform optimized for analytics and data warehousing with separation of compute and storage, and native support for semi-structured data.",
+    "category": "Database Management",
+    "aliases": ["snowflake data cloud", "snowflake platform"]
+  },
+  {
+    "name": "BigQuery",
+    "description": "Google Cloud's serverless, scalable data warehouse for analytics and machine learning on large datasets.",
+    "category": "Database Management",
+    "aliases": ["gcp bigquery", "bigquery analytics"]
+  },
+  {
+    "name": "Redshift",
+    "description": "Amazon's fully managed data warehouse service for analytics and business intelligence on large-scale datasets.",
+    "category": "Database Management",
+    "aliases": ["aws redshift", "redshift warehouse"]
+  },
+  {
+    "name": "Databricks",
+    "description": "A unified analytics platform combining Apache Spark with Delta Lake for data engineering, analytics, and machine learning workflows.",
+    "category": "Database Management",
+    "aliases": ["databricks platform", "delta lake"]
+  },
+  {
+    "name": "Cassandra",
+    "description": "A distributed NoSQL database designed for high-availability, horizontal scalability, and fault tolerance across multiple data centers.",
+    "category": "Database Management",
+    "aliases": ["apache cassandra", "cassandra database"]
+  },
+  {
+    "name": "DynamoDB",
+    "description": "AWS's fully managed NoSQL database offering fast, scalable performance with automatic scaling for unpredictable workloads.",
+    "category": "Database Management",
+    "aliases": ["aws dynamodb", "dynamodb"]
+  },
+  {
+    "name": "CouchDB",
+    "description": "A distributed NoSQL database offering document storage, replication, and easy HTTP API for building offline-first applications.",
+    "category": "Database Management",
+    "aliases": ["couchdb", "couchbase"]
+  },
+  {
+    "name": "Firestore",
+    "description": "Google's cloud-hosted NoSQL database with real-time synchronization, offline support, and strong consistency guarantees.",
+    "category": "Database Management",
+    "aliases": ["firestore", "google firestore"]
+  },
+  {
+    "name": "Docker",
+    "description": "A containerization platform enabling developers to package applications with dependencies into isolated containers, ensuring consistency across environments.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["containerization", "docker containers", "docker platform"]
+  },
+  {
+    "name": "Kubernetes",
+    "description": "An open-source orchestration system automating deployment, scaling, and management of containerized applications across clusters.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["k8s", "container orchestration", "kubernetes platform"]
+  },
+  {
+    "name": "Helm",
+    "description": "A package manager for Kubernetes enabling templating, deployment automation, and release management of applications.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["helm charts", "helm package manager"]
+  },
+  {
+    "name": "Kustomize",
+    "description": "A template-free customization tool for Kubernetes YAML manifests enabling configuration management without templating.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["kustomize", "kubernetes customization"]
+  },
+  {
+    "name": "Argo CD",
+    "description": "A GitOps continuous deployment tool for Kubernetes enabling declarative application management synced from Git repositories.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["argo workflow cd", "gitops argo", "argocd"]
+  },
+  {
+    "name": "Flux",
+    "description": "A GitOps tool for Kubernetes automating application deployment and cluster configuration through Git-driven workflows.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["fluxcd", "gitops flux"]
+  },
+  {
+    "name": "AWS (Amazon Web Services)",
+    "description": "Amazon's comprehensive cloud platform offering compute (EC2), storage (S3), databases (RDS), machine learning, networking, and 200+ services.",
+    "category": "Cloud Computing",
+    "aliases": ["amazon web services", "aws cloud", "aws platform"]
+  },
+  {
+    "name": "AWS EC2",
+    "description": "Amazon's elastic compute cloud service providing resizable virtual machines (instances) with flexible pricing and scaling options.",
+    "category": "Cloud Computing",
+    "aliases": ["ec2 instances", "aws ec2 compute"]
+  },
+  {
+    "name": "AWS S3",
+    "description": "Amazon's object storage service offering scalable, durable storage for data of any size with built-in redundancy and security.",
+    "category": "Cloud Computing",
+    "aliases": ["s3 storage", "aws s3 buckets"]
+  },
+  {
+    "name": "AWS Lambda",
+    "description": "AWS's serverless compute service enabling execution of code without provisioning or managing servers, billing by usage.",
+    "category": "Cloud Computing",
+    "aliases": ["lambda functions", "aws lambda serverless"]
+  },
+  {
+    "name": "AWS RDS",
+    "description": "AWS's managed relational database service supporting MySQL, PostgreSQL, MariaDB, Oracle, SQL Server with automated backups and scaling.",
+    "category": "Cloud Computing",
+    "aliases": ["rds database", "aws rds"]
+  },
+  {
+    "name": "AWS DynamoDB",
+    "description": "AWS's fully managed NoSQL database with automatic scaling and consistent performance for applications with variable workloads.",
+    "category": "Cloud Computing",
+    "aliases": ["dynamodb", "aws nosql"]
+  },
+  {
+    "name": "AWS ECS",
+    "description": "Amazon's container orchestration service for managing Docker containers with auto-scaling and load balancing.",
+    "category": "Cloud Computing",
+    "aliases": ["ecs containers", "aws container service"]
+  },
+  {
+    "name": "AWS EKS",
+    "description": "Amazon's managed Kubernetes service handling cluster provisioning, scaling, and operations.",
+    "category": "Cloud Computing",
+    "aliases": ["eks kubernetes", "aws managed kubernetes"]
+  },
+  {
+    "name": "Microsoft Azure",
+    "description": "Microsoft's cloud platform offering virtual machines, AI/ML, storage, analytics, IoT, and enterprise integration services.",
+    "category": "Cloud Computing",
+    "aliases": ["azure cloud", "ms azure", "azure platform"]
+  },
+  {
+    "name": "Azure App Service",
+    "description": "Microsoft's managed service for hosting web apps, mobile backends, and RESTful APIs with built-in CI/CD and scaling.",
+    "category": "Cloud Computing",
+    "aliases": ["app service", "azure web apps"]
+  },
+  {
+    "name": "Azure Functions",
+    "description": "Microsoft's serverless compute service for event-driven application development without infrastructure management.",
+    "category": "Cloud Computing",
+    "aliases": ["azure functions", "serverless azure"]
+  },
+  {
+    "name": "Azure Cosmos DB",
+    "description": "Microsoft's globally distributed, multi-model database supporting SQL, MongoDB, Cassandra, and Gremlin APIs.",
+    "category": "Cloud Computing",
+    "aliases": ["cosmos db", "azure database"]
+  },
+  {
+    "name": "Azure AKS",
+    "description": "Azure's managed Kubernetes service simplifying deployment and management of containerized applications.",
+    "category": "Cloud Computing",
+    "aliases": ["aks kubernetes", "azure managed kubernetes"]
+  },
+  {
+    "name": "Google Cloud Platform (GCP)",
+    "description": "Google's cloud platform with compute, storage, big data, machine learning, and analytics services built on Google's infrastructure.",
+    "category": "Cloud Computing",
+    "aliases": ["gcp", "google cloud"]
+  },
+  {
+    "name": "Google Compute Engine",
+    "description": "GCP's scalable computing service providing virtual machines with custom machine types and per-minute billing.",
+    "category": "Cloud Computing",
+    "aliases": ["gce", "google compute"]
+  },
+  {
+    "name": "Google Cloud Functions",
+    "description": "Google's serverless execution environment for event-driven code with automatic scaling and simplified operations.",
+    "category": "Cloud Computing",
+    "aliases": ["cloud functions", "gcp serverless"]
+  },
+  {
+    "name": "Google Cloud Storage",
+    "description": "GCP's object storage service with global redundancy, strong consistency, and unified namespace.",
+    "category": "Cloud Computing",
+    "aliases": ["gcs storage", "google storage"]
+  },
+  {
+    "name": "Google Cloud SQL",
+    "description": "GCP's managed relational database service supporting MySQL, PostgreSQL, and SQL Server.",
+    "category": "Cloud Computing",
+    "aliases": ["cloud sql", "gcp sql"]
+  },
+  {
+    "name": "Google Cloud Pub/Sub",
+    "description": "GCP's scalable messaging service enabling asynchronous, distributed communication for event-driven applications.",
+    "category": "Cloud Computing",
+    "aliases": ["pubsub", "google pubsub messaging"]
+  },
+  {
+    "name": "Google Kubernetes Engine (GKE)",
+    "description": "GCP's managed Kubernetes service with automatic upgrades, scaling, and multi-zone clusters.",
+    "category": "Cloud Computing",
+    "aliases": ["gke", "gcp kubernetes"]
+  },
+  {
+    "name": "CI/CD Pipelines",
+    "description": "Continuous Integration and Continuous Deployment practices automating build, test, and deployment using tools like Jenkins, GitLab CI, GitHub Actions.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["cicd", "continuous integration", "continuous deployment"]
+  },
+  {
+    "name": "GitHub Actions",
+    "description": "GitHub's native CI/CD platform enabling automated workflows triggered by repository events for testing, building, and deploying code.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["github actions", "github workflows"]
+  },
+  {
+    "name": "GitLab CI/CD",
+    "description": "GitLab's integrated CI/CD platform with pipelines, runners, and artifact management for automated testing and deployment.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["gitlab ci", "gitlab pipeline"]
+  },
+  {
+    "name": "Jenkins",
+    "description": "An open-source automation server enabling complex CI/CD pipelines with extensive plugin ecosystem for build, test, and deployment automation.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["jenkins ci", "jenkins automation"]
+  },
+  {
+    "name": "CircleCI",
+    "description": "A cloud-based CI/CD platform with fast builds, parallel job execution, and integration with VCS and deployment tools.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["circleci", "circleci ci"]
+  },
+  {
+    "name": "Terraform",
+    "description": "An infrastructure-as-code tool enabling declarative provisioning and management of cloud resources across AWS, Azure, GCP, and others.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["iac", "infrastructure as code", "terraform provisioning"]
+  },
+  {
+    "name": "Ansible",
+    "description": "An open-source automation and configuration management tool using YAML playbooks for infrastructure provisioning and application deployment.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["configuration management", "ansible automation"]
+  },
+  {
+    "name": "Packer",
+    "description": "A tool by HashiCorp for building machine images automatically from configuration for multiple cloud platforms.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["packer", "image building"]
+  },
+  {
+    "name": "Vagrant",
+    "description": "A tool for building and managing portable development environments using virtual machines with infrastructure-as-code approach.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["vagrant", "development environment"]
+  },
+  {
+    "name": "HashiCorp Vault",
+    "description": "A tool for managing secrets, encryption keys, and sensitive data with centralized access control and audit logging.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["vault secrets", "hashicorp vault"]
+  },
+  {
+    "name": "Consul",
+    "description": "HashiCorp's service mesh and configuration management tool enabling service discovery, health checking, and dynamic configuration.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["consul service mesh", "hashicorp consul"]
+  },
+  {
+    "name": "Git",
+    "description": "A distributed version control system for tracking code changes, enabling collaboration, branching, and version history management.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["version control system", "github", "gitlab", "bitbucket"]
+  },
+  {
+    "name": "GitHub",
+    "description": "A cloud-based Git repository hosting service with collaboration features, pull requests, issues, and CI/CD integration.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["github platform", "github hosting"]
+  },
+  {
+    "name": "GitLab",
+    "description": "A DevOps platform providing Git hosting, CI/CD, container registry, and project management in one integrated system.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["gitlab platform", "gitlab hosting"]
+  },
+  {
+    "name": "Bitbucket",
+    "description": "Atlassian's Git-based repository hosting with built-in CI/CD, security features, and Jira integration.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["bitbucket platform", "bitbucket hosting"]
+  },
+  {
+    "name": "Linux Administration",
+    "description": "Managing Linux systems including user management, package installation, shell scripting, system monitoring, and server maintenance.",
+    "category": "Operating Systems & Administration",
+    "aliases": ["linux server admin", "unix admin", "linux management"]
+  },
+  {
+    "name": "Windows Server Administration",
+    "description": "Managing Windows Server systems including Active Directory, Group Policy, IIS, user management, and security configuration.",
+    "category": "Operating Systems & Administration",
+    "aliases": ["win server admin", "active directory", "windows server"]
+  },
+  {
+    "name": "Shell Scripting (Bash/Sh)",
+    "description": "Writing Unix/Linux shell scripts for task automation, system administration, and DevOps workflows.",
+    "category": "Operating Systems & Administration",
+    "aliases": ["bash scripting", "sh scripting", "linux scripting"]
+  },
+  {
+    "name": "PowerShell Scripting",
+    "description": "Microsoft's command-line shell and scripting language built on .NET for system administration and automation on Windows.",
+    "category": "Operating Systems & Administration",
+    "aliases": ["powershell", "windows scripting"]
+  },
+  {
+    "name": "Machine Learning (ML)",
+    "description": "Building systems that learn from data to identify patterns, make predictions, and improve decision-making with minimal human intervention.",
+    "category": "AI & Machine Learning",
+    "aliases": ["ml modeling", "predictive analytics", "machine learning"]
+  },
+  {
+    "name": "Deep Learning (DL)",
+    "description": "Subset of ML using artificial neural networks with multiple layers for complex tasks like image recognition and NLP.",
+    "category": "AI & Machine Learning",
+    "aliases": ["dl models", "deep neural networks", "ann"]
+  },
+  {
+    "name": "Natural Language Processing (NLP)",
+    "description": "AI field enabling computers to process, understand, and generate human language for applications like sentiment analysis and chatbots.",
+    "category": "AI & Machine Learning",
+    "aliases": ["nlp techniques", "text analytics", "nlp processing"]
+  },
+  {
+    "name": "Computer Vision (CV)",
+    "description": "AI field training computers to interpret visual information from images and videos for object detection, classification, and recognition.",
+    "category": "AI & Machine Learning",
+    "aliases": ["cv algorithms", "image processing", "vision"]
+  },
+  {
+    "name": "PyTorch",
+    "description": "An open-source machine learning library by Meta for deep learning with dynamic computation graphs and strong Python integration.",
+    "category": "AI & Machine Learning",
+    "aliases": ["torch", "pytorch framework"]
+  },
+  {
+    "name": "TensorFlow",
+    "description": "Google's end-to-end machine learning platform with Keras API for building and deploying ML applications across devices.",
+    "category": "AI & Machine Learning",
+    "aliases": ["tf", "google tensorflow", "keras api"]
+  },
+  {
+    "name": "Scikit-learn",
+    "description": "Python library providing tools for data mining and machine learning including classification, regression, clustering, and dimensionality reduction.",
+    "category": "AI & Machine Learning",
+    "aliases": ["sklearn", "python machine learning library"]
+  },
+  {
+    "name": "LangChain",
+    "description": "A framework for developing applications with LLMs, enabling chaining of language model calls with memory, tools, and agents.",
+    "category": "AI & Machine Learning",
+    "aliases": ["langchain", "llm framework"]
+  },
+  {
+    "name": "Hugging Face",
+    "description": "A platform providing pre-trained transformer models and datasets for NLP, computer vision, and audio tasks with easy integration.",
+    "category": "AI & Machine Learning",
+    "aliases": ["huggingface", "transformers library"]
+  },
+  {
+    "name": "Weights & Biases",
+    "description": "A platform for experiment tracking, hyperparameter optimization, and model management for machine learning projects.",
+    "category": "AI & Machine Learning",
+    "aliases": ["wandb", "weights biases"]
+  },
+  {
+    "name": "MLflow",
+    "description": "An open-source platform for managing ML lifecycle including experiment tracking, model packaging, and deployment.",
+    "category": "AI & Machine Learning",
+    "aliases": ["mlflow", "ml lifecycle"]
+  },
+  {
+    "name": "Kubeflow",
+    "description": "A Kubernetes-based platform for deploying and managing machine learning workflows with ML pipeline orchestration.",
+    "category": "AI & Machine Learning",
+    "aliases": ["kubeflow", "ml pipeline orchestration"]
+  },
+  {
+    "name": "Vertex AI",
+    "description": "Google Cloud's managed ML platform providing tools for building, training, and deploying ML models with AutoML capabilities.",
+    "category": "AI & Machine Learning",
+    "aliases": ["vertex ai", "gcp ml platform"]
+  },
+  {
+    "name": "SageMaker",
+    "description": "Amazon's fully managed ML service providing tools for building, training, and deploying models with reduced infrastructure overhead.",
+    "category": "AI & Machine Learning",
+    "aliases": ["sagemaker", "aws ml platform"]
+  },
+  {
+    "name": "Pandas",
+    "description": "Powerful Python library for data manipulation with DataFrames, enabling data cleaning, transformation, and analysis workflows.",
+    "category": "Data Science & Analysis",
+    "aliases": ["python pandas library", "dataframes"]
+  },
+  {
+    "name": "NumPy",
+    "description": "Fundamental Python library for numerical computing with arrays and matrices supporting fast mathematical operations.",
+    "category": "Data Science & Analysis",
+    "aliases": ["python numpy library", "numerical python"]
+  },
+  {
+    "name": "Matplotlib",
+    "description": "Comprehensive Python library for creating static, animated, and interactive visualizations in publication quality.",
+    "category": "Data Science & Analysis",
+    "aliases": ["python matplotlib plotting", "data visualization python"]
+  },
+  {
+    "name": "Seaborn",
+    "description": "High-level Python visualization library built on Matplotlib for creating attractive statistical graphics.",
+    "category": "Data Science & Analysis",
+    "aliases": ["python seaborn plotting", "statistical visualization"]
+  },
+  {
+    "name": "R Language",
+    "description": "Programming language and environment specifically designed for statistical computing, data analysis, and graphics.",
+    "category": "Data Science & Analysis",
+    "aliases": ["r programming", "statistical r"]
+  },
+  {
+    "name": "Statistical Analysis",
+    "description": "Science of collecting, exploring, and interpreting data to discover patterns and insights through hypothesis testing and statistical methods.",
+    "category": "Data Science & Analysis",
+    "aliases": ["statistics", "data interpretation", "statistical methods"]
+  },
+  {
+    "name": "Data Engineering",
+    "description": "Designing and building systems for collecting, storing, processing, and analyzing data at scale with robust data pipelines.",
+    "category": "Data Engineering",
+    "aliases": ["big data engineering", "data pipeline development"]
+  },
+  {
+    "name": "Data Warehousing",
+    "description": "Designing central repositories of integrated data from multiple sources for reporting and analytical queries.",
+    "category": "Data Engineering",
+    "aliases": ["dwh design", "data storage solutions"]
+  },
+  {
+    "name": "ETL Development",
+    "description": "Extract, Transform, Load processes for extracting data from sources, transforming into usable format, and loading into target systems.",
+    "category": "Data Engineering",
+    "aliases": ["extract transform load", "data integration"]
+  },
+  {
+    "name": "Apache Spark",
+    "description": "Distributed processing system for big data analytics with fast in-memory processing for analytics, ML, and stream processing.",
+    "category": "Data Engineering",
+    "aliases": ["spark big data", "distributed computing", "spark framework"]
+  },
+  {
+    "name": "Apache Kafka",
+    "description": "Distributed event streaming platform for building real-time data pipelines and streaming applications with high throughput.",
+    "category": "Data Engineering",
+    "aliases": ["kafka streaming", "message queue", "kafka broker"]
+  },
+  {
+    "name": "Apache Airflow",
+    "description": "Workflow orchestration platform for authoring, scheduling, and monitoring data pipelines as directed acyclic graphs (DAGs).",
+    "category": "Data Engineering",
+    "aliases": ["airflow", "data build tool dag"]
+  },
+  {
+    "name": "Dagster",
+    "description": "A data orchestrator for building, testing, and monitoring data pipelines with asset-oriented programming.",
+    "category": "Data Engineering",
+    "aliases": ["dagster", "data pipeline"]
+  },
+  {
+    "name": "dbt",
+    "description": "Data build tool enabling data analysts to write modular SQL transformations for data warehousing and analytics workflows.",
+    "category": "Data Engineering",
+    "aliases": ["dbt", "data build tool"]
+  },
+  {
+    "name": "Apache NiFi",
+    "description": "Data routing and transformation platform with web-based UI for building real-time data flow systems.",
+    "category": "Data Engineering",
+    "aliases": ["nifi", "data flow platform"]
+  },
+  {
+    "name": "Airbyte",
+    "description": "Open-source data integration platform providing pre-built connectors for extracting and loading data across sources and destinations.",
+    "category": "Data Engineering",
+    "aliases": ["airbyte", "data integration platform"]
+  },
+  {
+    "name": "Fivetran",
+    "description": "Cloud-based data integration platform with pre-built connectors for automated data pipeline from sources to data warehouses.",
+    "category": "Data Engineering",
+    "aliases": ["fivetran", "data pipeline service"]
+  },
+  {
+    "name": "Apache Pulsar",
+    "description": "Distributed messaging system supporting multi-tenancy, geo-replication, and real-time stream processing.",
+    "category": "Data Engineering",
+    "aliases": ["pulsar", "messaging platform"]
+  },
+  {
+    "name": "RabbitMQ",
+    "description": "Open-source message broker supporting multiple messaging protocols for asynchronous communication and task queuing.",
+    "category": "Data Engineering",
+    "aliases": ["rabbitmq", "message broker"]
+  },
+  {
+    "name": "NATS",
+    "description": "Cloud-native messaging platform with high performance and low latency for distributed systems.",
+    "category": "Data Engineering",
+    "aliases": ["nats messaging", "nats platform"]
+  },
+  {
+    "name": "Delta Lake",
+    "description": "Open-source storage layer providing ACID transactions, schema enforcement, and time travel capabilities for data lakes.",
+    "category": "Data Engineering",
+    "aliases": ["delta", "delta lake format"]
+  },
+  {
+    "name": "Apache Iceberg",
+    "description": "Open-source table format for data lakes providing ACID transactions, hidden partitioning, and schema evolution.",
+    "category": "Data Engineering",
+    "aliases": ["iceberg", "table format"]
+  },
+  {
+    "name": "Apache Hudi",
+    "description": "Incremental processing framework for Hadoop with support for incremental extraction, upserts, and deletes.",
+    "category": "Data Engineering",
+    "aliases": ["hudi", "incremental processing"]
+  },
+  {
+    "name": "Web Scraping & Crawling",
+    "description": "Automated extraction of large amounts of data from websites using tools like Beautiful Soup, Scrapy, and Selenium.",
+    "category": "Data Engineering",
+    "aliases": ["data scraping techniques", "web crawler development"]
+  },
+  {
+    "name": "Tableau",
+    "description": "Interactive data visualization software for creating dashboards, reports, and exploring data for business insights.",
+    "category": "Business Intelligence & Visualization",
+    "aliases": ["tableau dashboards", "tableau platform"]
+  },
+  {
+    "name": "Microsoft Power BI",
+    "description": "Business analytics service by Microsoft providing interactive visualizations and reporting for data-driven insights.",
+    "category": "Business Intelligence & Visualization",
+    "aliases": ["powerbi reports", "ms power bi"]
+  },
+  {
+    "name": "Google Data Studio",
+    "description": "Google's free interactive data visualization and dashboard creation tool connecting to various data sources.",
+    "category": "Business Intelligence & Visualization",
+    "aliases": ["data studio", "google looker studio"]
+  },
+  {
+    "name": "Looker",
+    "description": "BI and data visualization platform by Google for creating dashboards, reports, and insights with embedded analytics.",
+    "category": "Business Intelligence & Visualization",
+    "aliases": ["looker", "google looker"]
+  },
+  {
+    "name": "Excel (Advanced)",
+    "description": "Advanced Excel skills including pivot tables, complex formulas, VBA macros, Power Query for business intelligence.",
+    "category": "Business Intelligence & Visualization",
+    "aliases": ["advanced excel", "excel vba", "excel data analysis"]
+  },
+  {
+    "name": "Jira",
+    "description": "Issue tracking and project management tool by Atlassian widely used by agile development teams for bug tracking and sprint planning.",
+    "category": "Project & Product Management",
+    "aliases": ["jira agile", "issue tracking", "jira platform"]
+  },
+  {
+    "name": "Confluence",
+    "description": "Team collaboration and knowledge management platform by Atlassian for documentation, meeting notes, and team wikis.",
+    "category": "Project & Product Management",
+    "aliases": ["confluence wiki", "documentation platform"]
+  },
+  {
+    "name": "Monday.com",
+    "description": "Work management platform providing project tracking, collaboration, and automation tools for teams.",
+    "category": "Project & Product Management",
+    "aliases": ["monday", "project management"]
+  },
+  {
+    "name": "Asana",
+    "description": "Work management platform enabling task tracking, team collaboration, and project organization across teams.",
+    "category": "Project & Product Management",
+    "aliases": ["asana", "asana project management"]
+  },
+  {
+    "name": "Notion",
+    "description": "All-in-one workspace combining notes, databases, kanban boards, and wikis for team organization.",
+    "category": "Project & Product Management",
+    "aliases": ["notion workspace", "notion database"]
+  },
+  {
+    "name": "Agile Methodologies",
+    "description": "Iterative software development principles emphasizing collaboration, customer feedback, and rapid adaptation to change.",
+    "category": "Project & Product Management",
+    "aliases": ["agile project management", "agile principles"]
+  },
+  {
+    "name": "Scrum Framework",
+    "description": "Agile framework for managing complex projects using iterative cycles (sprints), defined roles, and specific ceremonies.",
+    "category": "Project & Product Management",
+    "aliases": ["scrum master", "agile scrum"]
+  },
+  {
+    "name": "Kanban System",
+    "description": "Lean method visualizing workflow, limiting WIP, and focusing on continuous flow and efficiency.",
+    "category": "Project & Product Management",
+    "aliases": ["kanban board", "lean workflow"]
+  },
+  {
+    "name": "Lean Six Sigma",
+    "description": "Methodology combining lean principles with statistical process improvement for reducing waste and improving quality.",
+    "category": "Project & Product Management",
+    "aliases": ["six sigma", "process improvement"]
+  },
+  {
+    "name": "Product Management",
+    "description": "Strategic process of guiding product lifecycle from conception through launch with market research, roadmapping, and cross-functional collaboration.",
+    "category": "Project & Product Management",
+    "aliases": ["pm", "product strategy", "product roadmap"]
+  },
+  {
+    "name": "Business Analysis",
+    "description": "Identifying business needs, analyzing problems, and determining solutions to bridge the gap between business and IT.",
+    "category": "Project & Product Management",
+    "aliases": ["ba", "requirements analysis", "process improvement"]
+  },
+  {
+    "name": "UI (User Interface) Design",
+    "description": "Designing visual look, feel, layout, and interactive elements of software applications and websites.",
+    "category": "Design (UI/UX)",
+    "aliases": ["user interface design", "visual design"]
+  },
+  {
+    "name": "UX (User Experience) Design",
+    "description": "Enhancing user satisfaction through improved usability, accessibility, and interaction design with research and testing.",
+    "category": "Design (UI/UX)",
+    "aliases": ["user experience design", "usability"]
+  },
+  {
+    "name": "User Research",
+    "description": "Systematic study of target users through interviews, surveys, usability testing, and persona creation to inform design.",
+    "category": "Design (UI/UX)",
+    "aliases": ["ux research", "customer research"]
+  },
+  {
+    "name": "Figma",
+    "description": "Collaborative, web-based interface design tool for UI/UX design, prototyping, design systems, and team collaboration.",
+    "category": "Design (UI/UX)",
+    "aliases": ["figma design tool", "figma platform"]
+  },
+  {
+    "name": "Adobe XD",
+    "description": "Vector-based UX design tool for designing, prototyping, and sharing user experiences for web and mobile apps.",
+    "category": "Design (UI/UX)",
+    "aliases": ["xd prototyping", "adobe xd"]
+  },
+  {
+    "name": "Sketch",
+    "description": "Mac-based UI design tool focused on interface design with powerful layers, symbols, and design systems support.",
+    "category": "Design (UI/UX)",
+    "aliases": ["sketch design", "sketch app"]
+  },
+  {
+    "name": "Adobe Photoshop",
+    "description": "Powerful raster graphics editor for image editing, photo retouching, and graphic design.",
+    "category": "Design (Graphics & Media)",
+    "aliases": ["photoshop editing", "ps graphics"]
+  },
+  {
+    "name": "Adobe Illustrator",
+    "description": "Vector graphics editor for creating logos, icons, illustrations, typography, and scalable graphics.",
+    "category": "Design (Graphics & Media)",
+    "aliases": ["illustrator vector", "ai graphics"]
+  },
+  {
+    "name": "Adobe InDesign",
+    "description": "Desktop publishing software for creating layouts, brochures, magazines, and other print and digital publications.",
+    "category": "Design (Graphics & Media)",
+    "aliases": ["indesign", "desktop publishing"]
+  },
+  {
+    "name": "Blender",
+    "description": "Free, open-source 3D creation suite supporting modeling, animation, rendering, and visual effects.",
+    "category": "Design (Graphics & Media)",
+    "aliases": ["blender 3d", "3d modeling"]
+  },
+  {
+    "name": "Quality Assurance (QA)",
+    "description": "Systematic process ensuring software products meet specified requirements and quality standards through testing.",
+    "category": "Software Testing & QA",
+    "aliases": ["software testing", "qa testing"]
+  },
+  {
+    "name": "Manual Testing",
+    "description": "Manually testing software by executing test cases and verifying actual results against expected results.",
+    "category": "Software Testing & QA",
+    "aliases": ["manual qa", "manual testing"]
+  },
+  {
+    "name": "Automated Testing",
+    "description": "Using software tools to execute pre-scripted tests on applications including unit, integration, and end-to-end tests.",
+    "category": "Software Testing & QA",
+    "aliases": ["test automation", "qa automation"]
+  },
+  {
+    "name": "Unit Testing",
+    "description": "Testing individual units or components of source code in isolation to ensure fitness for use.",
+    "category": "Software Testing & QA",
+    "aliases": ["code unit tests", "unit tests"]
+  },
+  {
+    "name": "Integration Testing",
+    "description": "Testing where individual software modules are combined and tested as a group to ensure proper integration.",
+    "category": "Software Testing & QA",
+    "aliases": ["module integration tests", "integration tests"]
+  },
+  {
+    "name": "End-to-End (E2E) Testing",
+    "description": "Testing complete application workflows from user perspective to ensure all integrated components work correctly.",
+    "category": "Software Testing & QA",
+    "aliases": ["e2e testing", "functional testing"]
+  },
+  {
+    "name": "Performance Testing",
+    "description": "Testing application performance under various load conditions to ensure responsiveness and stability.",
+    "category": "Software Testing & QA",
+    "aliases": ["load testing", "stress testing"]
+  },
+  {
+    "name": "Selenium WebDriver",
+    "description": "Open-source framework for automating web browser interactions for automated testing across browsers.",
+    "category": "Software Testing & QA",
+    "aliases": ["selenium automation", "browser automation"]
+  },
+  {
+    "name": "Jest",
+    "description": "JavaScript testing framework focused on simplicity, widely used for testing React, Node.js, and JavaScript codebases.",
+    "category": "Software Testing & QA",
+    "aliases": ["jest js testing", "jest framework"]
+  },
+  {
+    "name": "Cypress.io",
+    "description": "Modern end-to-end JavaScript testing framework for web applications with easy syntax and debugging.",
+    "category": "Software Testing & QA",
+    "aliases": ["cypress e2e testing", "cypress"]
+  },
+  {
+    "name": "Playwright",
+    "description": "End-to-end testing framework by Microsoft supporting multiple browsers with powerful automation capabilities.",
+    "category": "Software Testing & QA",
+    "aliases": ["playwright testing", "playwright"]
+  },
+  {
+    "name": "Vitest",
+    "description": "Unit testing framework for JavaScript with Vite support, providing fast test execution and modern syntax.",
+    "category": "Software Testing & QA",
+    "aliases": ["vitest", "vitest framework"]
+  },
+  {
+    "name": "Mocha",
+    "description": "JavaScript testing framework with flexible test runner, assertion library, and plugin support.",
+    "category": "Software Testing & QA",
+    "aliases": ["mocha framework", "mocha testing"]
+  },
+  {
+    "name": "Chai",
+    "description": "Assertion library for JavaScript supporting BDD and TDD testing styles with expressive assertions.",
+    "category": "Software Testing & QA",
+    "aliases": ["chai assertions", "chai library"]
+  },
+  {
+    "name": "Mobile Application Development",
+    "description": "Creating software applications for mobile devices including native, cross-platform, and progressive web approaches.",
+    "category": "Mobile Development",
+    "aliases": ["mobile app dev", "app development"]
+  },
+  {
+    "name": "Android Development (Native)",
+    "description": "Creating native Android applications using Kotlin or Java and Android SDK with platform-specific features.",
+    "category": "Mobile Development",
+    "aliases": ["native android apps", "android sdk"]
+  },
+  {
+    "name": "iOS Development (Native)",
+    "description": "Creating native iOS applications using Swift or Objective-C and iOS SDK with platform-specific features.",
+    "category": "Mobile Development",
+    "aliases": ["native ios apps", "ios sdk"]
+  },
+  {
+    "name": "React Native",
+    "description": "JavaScript framework for building natively rendering mobile applications for iOS and Android from single codebase.",
+    "category": "Mobile Development",
+    "aliases": ["rn cross-platform", "react mobile"]
+  },
+  {
+    "name": "Flutter",
+    "description": "UI framework by Google for building natively compiled applications for mobile, web, and desktop from single codebase.",
+    "category": "Mobile Development",
+    "aliases": ["flutter cross-platform", "dart mobile"]
+  },
+  {
+    "name": "SwiftUI",
+    "description": "Apple's modern UI framework for building user interfaces for iOS, macOS, watchOS, and tvOS with declarative syntax.",
+    "category": "Mobile Development",
+    "aliases": ["swiftui", "ios ui framework"]
+  },
+  {
+    "name": "Jetpack Compose",
+    "description": "Android's modern UI framework for building native interfaces with Kotlin using declarative programming.",
+    "category": "Mobile Development",
+    "aliases": ["compose", "android ui framework"]
+  },
+  {
+    "name": "Kotlin Multiplatform",
+    "description": "Kotlin framework for sharing code across iOS, Android, web, and desktop applications.",
+    "category": "Mobile Development",
+    "aliases": ["kmp", "multiplatform mobile"]
+  },
+  {
+    "name": "Ionic",
+    "description": "Cross-platform mobile framework for building iOS, Android, and web applications with web technologies.",
+    "category": "Mobile Development",
+    "aliases": ["ionic framework", "hybrid mobile"]
+  },
+  {
+    "name": "Capacitor",
+    "description": "JavaScript bridge for building iOS, Android, and web apps with access to native APIs.",
+    "category": "Mobile Development",
+    "aliases": ["capacitor", "cross-platform bridge"]
+  },
+  {
+    "name": "Cybersecurity Fundamentals",
+    "description": "Core principles and practices for protecting systems, networks, and data from digital attacks and unauthorized access.",
+    "category": "Security",
+    "aliases": ["information security basics", "network security principles"]
+  },
+  {
+    "name": "Penetration Testing",
+    "description": "Simulated cyber attacks to identify vulnerabilities before attackers do, also known as ethical hacking.",
+    "category": "Security",
+    "aliases": ["pen testing", "ethical hacking", "vulnerability assessment"]
+  },
+  {
+    "name": "OAuth 2.0 / OpenID Connect",
+    "description": "Open standards for access delegation and authentication widely used for authorization and SSO protocols.",
+    "category": "Security",
+    "aliases": ["oauth2", "oidc", "sso protocols"]
+  },
+  {
+    "name": "Auth0",
+    "description": "Cloud-based identity and access management platform providing authentication and authorization services.",
+    "category": "Security",
+    "aliases": ["auth zero", "auth0 platform"]
+  },
+  {
+    "name": "Okta",
+    "description": "Identity and access management platform providing single sign-on, MFA, and lifecycle management.",
+    "category": "Security",
+    "aliases": ["okta idp", "okta platform"]
+  },
+  {
+    "name": "Keycloak",
+    "description": "Open-source identity and access management solution providing SSO and user federation.",
+    "category": "Security",
+    "aliases": ["red hat sso", "keycloak iam"]
+  },
+  {
+    "name": "Burp Suite",
+    "description": "Web vulnerability scanner and testing framework for security testing of web applications.",
+    "category": "Security",
+    "aliases": ["burp", "web security testing"]
+  },
+  {
+    "name": "OWASP ZAP",
+    "description": "Open source web application security scanner identifying vulnerabilities in web applications.",
+    "category": "Security",
+    "aliases": ["zap", "owasp security"]
+  },
+  {
+    "name": "Snyk",
+    "description": "Developer security platform for finding and fixing vulnerabilities in code, dependencies, and containers.",
+    "category": "Security",
+    "aliases": ["snyk", "vulnerability scanner"]
+  },
+  {
+    "name": "Trivy",
+    "description": "Open source vulnerability scanner for containers and code focusing on simplicity and speed.",
+    "category": "Security",
+    "aliases": ["trivy", "container scanner"]
+  },
+  {
+    "name": "HashiCorp Vault",
+    "description": "Secrets management tool for protecting credentials, encryption keys, and sensitive data with centralized access control.",
+    "category": "Security",
+    "aliases": ["vault secrets", "hashicorp vault"]
+  },
+  {
+    "name": "OPA (Open Policy Agent)",
+    "description": "General-purpose policy engine enabling fine-grained, context-aware authorization across applications.",
+    "category": "Security",
+    "aliases": ["opa", "open policy agent"]
+  },
+  {
+    "name": "Kyverno",
+    "description": "Kubernetes policy management engine for enforcing security policies and compliance requirements.",
+    "category": "Security",
+    "aliases": ["kyverno", "kubernetes policy"]
+  },
+  {
+    "name": "Splunk",
+    "description": "Security information and event management (SIEM) platform for log aggregation, monitoring, and security analytics.",
+    "category": "Security",
+    "aliases": ["splunk siem", "log management"]
+  },
+  {
+    "name": "Salesforce CRM",
+    "description": "Customer relationship management platform for sales, service, and marketing operations.",
+    "category": "Business Systems",
+    "aliases": ["sfdc", "salesforce administration", "salesforce development"]
+  },
+  {
+    "name": "SAP ERP",
+    "description": "Enterprise resource planning system for managing business operations including finance, supply chain, and HR.",
+    "category": "Business Systems",
+    "aliases": ["sap fico", "sap s/4hana"]
+  },
+  {
+    "name": "HubSpot",
+    "description": "Customer relationship management and marketing automation platform for sales, marketing, and service teams.",
+    "category": "Business Systems",
+    "aliases": ["hubspot crm", "hubspot platform"]
+  },
+  {
+    "name": "Zendesk",
+    "description": "Customer service platform providing ticketing, knowledge base, and multi-channel support.",
+    "category": "Business Systems",
+    "aliases": ["zendesk support", "zendesk platform"]
+  },
+  {
+    "name": "Intercom",
+    "description": "Customer communication platform providing live chat, messaging, and customer data platform.",
+    "category": "Business Systems",
+    "aliases": ["intercom", "customer messaging"]
+  },
+  {
+    "name": "Slack Admin",
+    "description": "Administration and management of Slack workspaces including user management, security, and integrations.",
+    "category": "Business Systems",
+    "aliases": ["slack administration", "slack management"]
+  },
+  {
+    "name": "Stripe",
+    "description": "Payment processing platform enabling businesses to accept online payments and manage transactions.",
+    "category": "Business Systems",
+    "aliases": ["stripe payments", "stripe platform"]
+  },
+  {
+    "name": "Shopify",
+    "description": "E-commerce platform for building and managing online stores with payments, inventory, and marketing.",
+    "category": "Business Systems",
+    "aliases": ["shopify plus", "shopify platform"]
+  },
+  {
+    "name": "Communication Skills",
+    "description": "Effectively conveying information verbally and in writing including active listening, clarity, and audience adaptation.",
+    "category": "Soft Skills",
+    "aliases": ["interpersonal communication", "verbal skills", "written skills", "presentation skills"]
+  },
+  {
+    "name": "Problem-Solving",
+    "description": "Identifying, analyzing, and resolving complex issues through critical thinking, creativity, and analytical skills.",
+    "category": "Soft Skills",
+    "aliases": ["analytical thinking", "critical thinking skills", "troubleshooting"]
+  },
+  {
+    "name": "Teamwork & Collaboration",
+    "description": "Working effectively with others to achieve common goals through cooperation and shared responsibility.",
+    "category": "Soft Skills",
+    "aliases": ["collaboration skills", "team player"]
+  },
+  {
+    "name": "Leadership & Management",
+    "description": "Guiding, motivating, and managing individuals or teams to achieve objectives with decision-making and delegation.",
+    "category": "Soft Skills",
+    "aliases": ["team leadership", "people management", "project leadership"]
+  },
+  {
+    "name": "Time Management & Organization",
+    "description": "Planning and controlling time for activities to increase efficiency through prioritization and scheduling.",
+    "category": "Soft Skills",
+    "aliases": ["organizational skills", "prioritization"]
+  },
+  {
+    "name": "Adaptability & Learning",
+    "description": "Quickly learning new skills and adapting to changing circumstances, technologies, and work environments.",
+    "category": "Soft Skills",
+    "aliases": ["continuous learning", "adaptability"]
+  },
+  {
+    "name": "Conflict Resolution",
+    "description": "Resolving disputes and disagreements between team members through mediation, negotiation, and collaborative problem-solving.",
+    "category": "Soft Skills",
+    "aliases": ["conflict management", "mediation skills"]
+  },
+  {
+    "name": "Data Structures & Algorithms (DSA)",
+    "description": "Fundamental CS concepts for designing efficient ways to store, process, and solve computational problems.",
+    "category": "Computer Science Fundamentals",
+    "aliases": ["dsa principles", "algorithm design", "data structure implementation"]
+  },
+  {
+    "name": "System Design & Architecture",
+    "description": "Defining architecture, components, and interfaces for systems ensuring scalability, reliability, and maintainability.",
+    "category": "Software Architecture",
+    "aliases": ["software architecture design", "solution architecture"]
+  },
+  {
+    "name": "Microservices Architecture",
+    "description": "Structuring applications as collection of small, autonomous, independently deployable services for scalability.",
+    "category": "Software Architecture",
+    "aliases": ["microservice design patterns", "microservices"]
+  },
+  {
+    "name": "Service Mesh",
+    "description": "Infrastructure layer managing service-to-service communication in microservices architectures with observability and security.",
+    "category": "Software Architecture",
+    "aliases": ["istio", "service mesh patterns"]
+  },
+  {
+    "name": "Istio",
+    "description": "Service mesh platform providing traffic management, security policies, and observability for Kubernetes microservices.",
+    "category": "Cloud Computing",
+    "aliases": ["istio service mesh", "istio platform"]
+  },
+  {
+    "name": "Linkerd",
+    "description": "Lightweight service mesh for Kubernetes providing reliability, performance, and security for microservices.",
+    "category": "Cloud Computing",
+    "aliases": ["linkerd", "service mesh"]
+  },
+  {
+    "name": "Envoy",
+    "description": "Proxy and communication bus designed for large distributed systems at microservice and service mesh level.",
+    "category": "Cloud Computing",
+    "aliases": ["envoy proxy", "envoy"]
+  },
+  {
+    "name": "Serverless Computing",
+    "description": "Cloud execution model where providers manage servers, developers focus on code as Functions as a Service (FaaS).",
+    "category": "Cloud Computing",
+    "aliases": ["serverless architecture patterns", "aws lambda", "azure functions"]
+  },
+  {
+    "name": "Edge Computing",
+    "description": "Computing architecture processing data closer to data source reducing latency and bandwidth requirements.",
+    "category": "Cloud Computing",
+    "aliases": ["edge devices", "edge processing"]
+  },
+  {
+    "name": "Cloudflare Workers",
+    "description": "Serverless computing platform running JavaScript at Cloudflare's edge network for minimal latency.",
+    "category": "Cloud Computing",
+    "aliases": ["cf workers", "edge workers"]
+  },
+  {
+    "name": "Vercel",
+    "description": "Platform for deploying and hosting frontend applications with serverless functions and edge network.",
+    "category": "Cloud Computing",
+    "aliases": ["vercel deploy", "vercel hosting"]
+  },
+  {
+    "name": "Netlify",
+    "description": "Platform for deploying and hosting web applications with serverless functions and edge computing.",
+    "category": "Cloud Computing",
+    "aliases": ["netlify hosting", "netlify platform"]
+  },
+  {
+    "name": "Akamai",
+    "description": "Content delivery network and edge computing platform for performance, security, and reliability.",
+    "category": "Cloud Computing",
+    "aliases": ["akamai cdn", "edge platform"]
+  },
+  {
+    "name": "Fastly",
+    "description": "CDN and edge computing platform for fast content delivery and real-time performance.",
+    "category": "Cloud Computing",
+    "aliases": ["fastly cdn", "fastly platform"]
+  },
+  {
+    "name": "Blockchain Technology",
+    "description": "Decentralized, distributed ledger technology for secure transaction recording and building decentralized applications.",
+    "category": "Emerging Technologies",
+    "aliases": ["distributed ledger technology", "smart contracts"]
+  },
+  {
+    "name": "Internet of Things (IoT)",
+    "description": "Network of interconnected physical devices collecting and exchanging data with embedded sensors and connectivity.",
+    "category": "Emerging Technologies",
+    "aliases": ["iot solutions", "iot platforms"]
+  },
+  {
+    "name": "Technical Writing & Documentation",
+    "description": "Creating clear, accurate technical documentation including API guides, user manuals, and specifications.",
+    "category": "Communication & Documentation",
+    "aliases": ["software documentation", "api documentation"]
+  },
+  {
+    "name": "A/B Testing & Experimentation",
+    "description": "Comparing two versions to determine which performs better based on metrics for data-driven product decisions.",
+    "category": "Product Management & Analytics",
+    "aliases": ["split testing", "conversion rate optimization", "experiment design"]
+  },
+  {
+    "name": "Search Engine Optimization (SEO)",
+    "description": "Improving website visibility in search results through on-page optimization, keyword research, and link building.",
+    "category": "Digital Marketing",
+    "aliases": ["seo strategy", "keyword analysis"]
+  },
+  {
+    "name": "Digital Marketing Strategy",
+    "description": "Planning and executing marketing campaigns using digital channels like search, social media, and email.",
+    "category": "Digital Marketing",
+    "aliases": ["online marketing", "content marketing strategy"]
+  },
+  {
+    "name": "Content Creation (Technical & Marketing)",
+    "description": "Developing engaging content including blog posts, articles, videos, and social media for technical or marketing audiences.",
+    "category": "Digital Marketing",
+    "aliases": ["technical content writing", "marketing content development"]
+  },
+  {
+    "name": "Google Analytics (GA4)",
+    "description": "Web analytics service tracking website and app traffic with event-based data model for user behavior insights.",
+    "category": "Digital Marketing",
+    "aliases": ["ga4", "web analytics", "user behavior tracking"]
+  },
+  {
+    "name": "Video Editing & Production",
+    "description": "Manipulating and arranging video shots to create coherent narratives using software like Adobe Premiere Pro.",
+    "category": "Media & Content Creation",
+    "aliases": ["video production", "post-production"]
+  },
+  {
+    "name": "3D Modeling & Animation",
+    "description": "Creating three-dimensional digital representations and bringing them to life through animation.",
+    "category": "Design (Graphics & Media)",
+    "aliases": ["3d graphics", "character animation"]
+  },
+  {
+    "name": "Game Development (Unity)",
+    "description": "Using Unity game engine to design and deploy video games for PC, consoles, and mobile devices.",
+    "category": "Game Development",
+    "aliases": ["unity3d game dev", "c# game development"]
+  },
+  {
+    "name": "Game Development (Unreal Engine)",
+    "description": "Using Unreal Engine by Epic Games for high-fidelity 3D games and interactive experiences.",
+    "category": "Game Development",
+    "aliases": ["ue game dev", "unreal engine blueprints"]
+  },
+  {
+    "name": "Prometheus",
+    "description": "Open-source monitoring and alerting system for time-series metrics collection and visualization.",
+    "category": "Observability",
+    "aliases": ["prom", "prometheus monitoring"]
+  },
+  {
+    "name": "Grafana",
+    "description": "Open-source visualization and analytics platform for dashboards and monitoring across data sources.",
+    "category": "Observability",
+    "aliases": ["grafana dashboards", "grafana platform"]
+  },
+  {
+    "name": "OpenTelemetry",
+    "description": "Open-source observability framework for metrics, traces, and logs collection and instrumentation.",
+    "category": "Observability",
+    "aliases": ["otel", "telemetry framework"]
+  },
+  {
+    "name": "Loki",
+    "description": "Log aggregation system by Grafana for storing and querying logs with label-based approach.",
+    "category": "Observability",
+    "aliases": ["loki logs", "log aggregation"]
+  },
+  {
+    "name": "Datadog",
+    "description": "Cloud monitoring platform providing infrastructure monitoring, APM, and log management.",
+    "category": "Observability",
+    "aliases": ["ddog", "datadog platform"]
+  },
+  {
+    "name": "New Relic",
+    "description": "Application performance monitoring and observability platform for application insights.",
+    "category": "Observability",
+    "aliases": ["newrelic", "apm platform"]
+  },
+  {
+    "name": "Sentry",
+    "description": "Error tracking platform for real-time error monitoring and debugging for applications.",
+    "category": "Observability",
+    "aliases": ["sentry io", "error tracking"]
+  },
+  {
+    "name": "Honeycomb",
+    "description": "Observability platform for debugging complex systems with structured data and event querying.",
+    "category": "Observability",
+    "aliases": ["honeycomb", "observability platform"]
+  },
+  {
+    "name": "PagerDuty",
+    "description": "Incident response platform managing on-call schedules, escalations, and incident management.",
+    "category": "Observability",
+    "aliases": ["pagerduty", "incident management"]
+  },
+  {
+    "name": "Opsgenie",
+    "description": "Alert and on-call management platform by Atlassian for incident response coordination.",
+    "category": "Observability",
+    "aliases": ["opsgenie", "alert management"]
+  },
+  {
+    "name": "NGINX",
+    "description": "High-performance web server and reverse proxy handling concurrent connections efficiently.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["nginx server", "nginx reverse proxy"]
+  },
+  {
+    "name": "HAProxy",
+    "description": "Open-source load balancer and proxy server providing high availability and performance.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["haproxy", "load balancer"]
+  },
+  {
+    "name": "Traefik",
+    "description": "Modern reverse proxy and load balancer for containerized and microservices environments.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["traefik", "api gateway"]
+  },
+  {
+    "name": "Kong",
+    "description": "API gateway platform providing routing, authentication, rate limiting, and plugin ecosystem.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["kong gateway", "api gateway"]
+  },
+  {
+    "name": "Webpack",
+    "description": "Module bundler for JavaScript managing dependencies and assets for optimized builds.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["webpack bundler", "module bundling"]
+  },
+  {
+    "name": "Vite",
+    "description": "Modern build tool for frontend projects providing fast development server and optimized builds.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["vite bundler", "build tool"]
+  },
+  {
+    "name": "Rollup",
+    "description": "Module bundler for JavaScript libraries and applications producing optimized bundles.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["rollup bundler", "bundle tool"]
+  },
+  {
+    "name": "esbuild",
+    "description": "Extremely fast JavaScript bundler supporting bundle, transpile, and minification.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["esbuild", "fast bundler"]
+  },
+  {
+    "name": "Babel",
+    "description": "JavaScript compiler enabling use of modern JavaScript features with backward compatibility.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["babel compiler", "transpiler"]
+  },
+  {
+    "name": "Radix UI",
+    "description": "Unstyled, accessible component library for building design systems and UIs.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["radix components", "ui library"]
+  },
+  {
+    "name": "Chakra UI",
+    "description": "Component library for React with accessible, customizable components following design system principles.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["chakra components", "react ui library"]
+  },
+  {
+    "name": "Storybook",
+    "description": "Development environment for building UI components in isolation with documentation and testing.",
+    "category": "Web Development (Frontend)",
+    "aliases": ["storybook", "component development"]
+  },
+  {
+    "name": "Postman",
+    "description": "API development and testing tool for designing, testing, and documenting APIs.",
+    "category": "API Development",
+    "aliases": ["postman api", "api testing"]
+  },
+  {
+    "name": "Insomnia",
+    "description": "REST and GraphQL API client for designing, testing, and debugging APIs.",
+    "category": "API Development",
+    "aliases": ["insomnia client", "api testing tool"]
+  },
+  {
+    "name": "Nix",
+    "description": "Declarative package manager and build system enabling reproducible development environments.",
+    "category": "DevOps & CI/CD",
+    "aliases": ["nix package", "reproducible builds"]
+  },
+  {
+    "name": "Feat Flags / LaunchDarkly",
+    "description": "Feature management platform enabling safe feature releases, experimentation, and progressive rollouts.",
+    "category": "Product Management & Analytics",
+    "aliases": ["feature flags", "launchdarkly", "progressive delivery"]
+  },
+  {
+    "name": "Amplitude",
+    "description": "Product analytics platform providing user behavior analysis and insights for data-driven decisions.",
+    "category": "Product Management & Analytics",
+    "aliases": ["amplitude analytics", "product analytics"]
+  },
+  {
+    "name": "Mixpanel",
+    "description": "Analytics platform tracking user interactions and providing product insights.",
+    "category": "Product Management & Analytics",
+    "aliases": ["mixpanel analytics", "event tracking"]
+  },
+  {
+    "name": "Segment",
+    "description": "Customer data platform collecting, unifying, and routing data to business tools.",
+    "category": "Product Management & Analytics",
+    "aliases": ["segment cdp", "data collection"]
+  },
+  {
+    "name": "Optimizely",
+    "description": "Experimentation platform for A/B testing, multivariate testing, and feature experimentation.",
+    "category": "Product Management & Analytics",
+    "aliases": ["optimizely", "experimentation platform"]
+  },
+  {
+    "name": "PostHog",
+    "description": "Open-source product analytics platform providing user data, feature flags, and experimentation.",
+    "category": "Product Management & Analytics",
+    "aliases": ["posthog", "product analytics"]
+  },
+  {
+    "name": "Google Tag Manager",
+    "description": "Tag management system for implementing tracking and marketing pixels without code changes.",
+    "category": "Product Management & Analytics",
+    "aliases": ["gtm", "tag manager"]
+  },
+  {
+    "name": "Solr",
+    "description": "Enterprise search platform built on Apache Lucene for full-text search and analytics.",
+    "category": "Search & Analytics",
+    "aliases": ["solr search", "search platform"]
+  },
+  {
+    "name": "Meilisearch",
+    "description": "Fast, open-source search engine providing typo-tolerance and instant search.",
+    "category": "Search & Analytics",
+    "aliases": ["meilisearch", "search engine"]
+  },
+  {
+    "name": "Typesense",
+    "description": "Typo-tolerant search engine for instant search experiences.",
+    "category": "Search & Analytics",
+    "aliases": ["typesense", "fast search"]
+  },
+  {
+    "name": "Convex",
+    "description": "Backend platform providing real-time database, serverless functions, and file storage.",
+    "category": "Web Development (Backend)",
+    "aliases": ["convex backend", "backend platform"]
+  },
+  {
+    "name": "Supabase",
+    "description": "Open-source Firebase alternative providing PostgreSQL database, authentication, and real-time features.",
+    "category": "Web Development (Backend)",
+    "aliases": ["supabase", "firebase alternative"]
+  },
+  {
+    "name": "Firebase",
+    "description": "Google's platform for building applications with real-time database, authentication, and hosting.",
+    "category": "Web Development (Backend)",
+    "aliases": ["firebase platform", "google firebase"]
+  }
+]

@@ -131,11 +131,6 @@ const AppSidebar = () => {
           href: "/projects?filter=mine",
           roles: ["employee", "pm", "line_manager"],
         },
-        {
-          label: "Manage allocations",
-          href: "/resources/allocations",
-          roles: ["admin", "hr", "pm"],
-        },
       ],
       resources: [
         {

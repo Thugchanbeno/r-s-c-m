@@ -5,6 +5,7 @@ import {
   successResponse, 
   errorResponse 
 } from "@/lib/auth-utils";
+import { handleConvexError } from "@/convex/errorHandler";
 
 export async function GET(req) {
   try {
@@ -31,7 +32,8 @@ export async function GET(req) {
 
     return successResponse({ data });
   } catch (error) {
-    return errorResponse(error.message || "Unable to fetch tasks.", 400);
+    const parsed = handleConvexError(error);
+    return errorResponse(parsed.message, 400, parsed.code, parsed.field);
   }
 }
 
@@ -48,6 +50,7 @@ export async function POST(req) {
 
     return successResponse({ id }, 201);
   } catch (error) {
-    return errorResponse(error.message || "Unable to create task.", 400);
+    const parsed = handleConvexError(error);
+    return errorResponse(parsed.message, 400, parsed.code, parsed.field);
   }
 }
