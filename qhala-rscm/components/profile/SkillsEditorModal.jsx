@@ -178,6 +178,7 @@ const SkillsEditorModal = ({
           skillId,
           isCurrent: mode === "current",
           isDesired: mode === "desired",
+          embedding: vector,
           proficiency: parseInt(details.proficiency),
           initialProof:
             mode === "current"

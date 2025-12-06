@@ -46,6 +46,7 @@ export const create = mutation({
     name: v.string(),
     category: v.optional(v.string()),
     description: v.optional(v.string()),
+    embedding: v.array(v.float64()),
     aliases: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
@@ -65,6 +66,7 @@ export const create = mutation({
     return await ctx.db.insert("skills", {
       ...skillData,
       aliases: args.aliases?.map((a) => a.trim().toLowerCase()) || [],
+      embedding: args.embedding,
       createdAt: now,
       updatedAt: now,
     });
@@ -213,8 +215,11 @@ export const verifyUserSkill = mutation({
     });
 
     const skill = await ctx.db.get(userSkill.skillId);
-    const notificationType = args.action === "approve" ? "skill_verification_approved" : "skill_verification_rejected";
-    
+    const notificationType =
+      args.action === "approve"
+        ? "skill_verification_approved"
+        : "skill_verification_rejected";
+
     await createNotification(ctx, {
       userId: userSkill.userId,
       type: notificationType,
@@ -337,7 +342,7 @@ export const uploadProofDocument = mutation({
     const user = await ctx.db.get(userSkill.userId);
     if (user?.lineManagerId) {
       const skill = await ctx.db.get(userSkill.skillId);
-      
+
       await createNotification(ctx, {
         userId: user.lineManagerId,
         type: "skill_verification_requested",
@@ -346,7 +351,7 @@ export const uploadProofDocument = mutation({
         link: `/skills/verifications`,
         actionUrl: `/skills/verifications`,
         requiresAction: true,
-        expiresAt: now + (7 * 24 * 60 * 60 * 1000), // Expire in 7 days
+        expiresAt: now + 7 * 24 * 60 * 60 * 1000, // Expire in 7 days
         relatedResourceId: args.userSkillId,
         relatedResourceType: "userSkill",
         actionUserId: user._id,

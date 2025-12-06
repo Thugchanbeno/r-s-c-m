@@ -8,7 +8,6 @@ export const getUserInternal = internalQuery({
     const user = await ctx.db.get(args.id);
     if (!user) return null;
 
-    // Fetch allocations for Python's availability math
     const allocations = await ctx.db
       .query("allocations")
       .withIndex("by_user", (q) => q.eq("userId", args.id))
@@ -25,13 +24,11 @@ export const searchUsers = action({
     limit: v.number(),
   },
   handler: async (ctx, args) => {
-    //  Vector Search
     const results = await ctx.vectorSearch("users", "by_embedding", {
       vector: args.embedding,
-      limit: args.limit * 2, // Fetch extra for filtering
+      limit: args.limit * 2,
     });
 
-    //  Hydrate & Filter Availability
     const users = await Promise.all(
       results.map(async (result) => {
         const user = await ctx.runQuery(internal.api.getUserInternal, {
@@ -58,7 +55,6 @@ export const searchSkills = action({
   },
 });
 
-// Admin/HR uploads CV to create user
 export const saveUserFromCV = mutation({
   args: {
     name: v.string(),
@@ -74,23 +70,20 @@ export const saveUserFromCV = mutation({
       .first();
 
     if (existing) {
-      // Update existing user profile with extracted data
       await ctx.db.patch(existing._id, {
         bio: args.bio,
-        extractedSkills: args.skills, // Store AI skills separately
+        extractedSkills: args.skills,
         embedding: args.embedding,
         updatedAt: Date.now(),
       });
       return existing._id;
     } else {
-      // Create new user
       return await ctx.db.insert("users", {
         name: args.name,
         email: args.email,
         bio: args.bio,
         extractedSkills: args.skills,
         embedding: args.embedding,
-        // Default fields required by schema
         role: "employee",
         authProviderId: "pending_invite",
         availabilityStatus: "available",
@@ -102,7 +95,6 @@ export const saveUserFromCV = mutation({
   },
 });
 
-// Existing User updates their own skills via CV
 export const updateUserSkillsFromCV = mutation({
   args: {
     userId: v.id("users"),
@@ -118,21 +110,17 @@ export const updateUserSkillsFromCV = mutation({
   },
 });
 
-// Save Project Analysis (Wizard Completion)
 export const saveProjectAnalysis = mutation({
   args: {
     id: v.id("projects"),
     embedding: v.array(v.float64()),
-    requiredSkills: v.array(v.any()), // Names + Proficiency
-    nlpExtractedSkills: v.array(v.string()), // Just Names
+    requiredSkills: v.array(v.any()),
+    nlpExtractedSkills: v.array(v.string()),
   },
   handler: async (ctx, args) => {
-    // Resolve Skill Names to IDs
     const resolvedSkills = await Promise.all(
       args.requiredSkills.map(async (skill) => {
         const name = skill.skillName.trim();
-
-        // Check exist
         let existingSkill = await ctx.db
           .query("skills")
           .withIndex("by_name", (q) => q.eq("name", name))
@@ -142,7 +130,6 @@ export const saveProjectAnalysis = mutation({
         if (existingSkill) {
           skillId = existingSkill._id;
         } else {
-          // Create missing skill
           skillId = await ctx.db.insert("skills", {
             name: name,
             category: skill.category || "Uncategorized",
@@ -169,7 +156,6 @@ export const saveProjectAnalysis = mutation({
   },
 });
 
-// Feedback Logging
 export const logFeedback = mutation({
   args: {
     userId: v.string(),
@@ -184,11 +170,56 @@ export const logFeedback = mutation({
   },
 });
 
+export const updateSkillEmbedding = mutation({
+  args: {
+    skillId: v.id("skills"),
+    embedding: v.array(v.float64()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.skillId, {
+      embedding: args.embedding,
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+export const saveSkill = mutation({
+  args: {
+    name: v.string(),
+    category: v.string(),
+    description: v.optional(v.string()),
+    aliases: v.optional(v.array(v.string())),
+    embedding: v.array(v.float64()),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("skills")
+      .withIndex("by_name", (q) => q.eq("name", args.name))
+      .first();
+
+    if (existing) throw new Error("Skill already exists");
+
+    await ctx.db.insert("skills", {
+      name: args.name,
+      category: args.category,
+      description: args.description || "",
+      aliases: args.aliases || [],
+      embedding: args.embedding,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+  },
+});
+
 export const getProject = query({
   args: { id: v.id("projects") },
   handler: async (ctx, args) => {
     return await ctx.db.get(args.id);
   },
+});
+
+export const debugGetAllUsers = query({
+  handler: async (ctx) => await ctx.db.query("users").collect(),
 });
 
 export const finalizeOnboarding = action({
@@ -198,17 +229,10 @@ export const finalizeOnboarding = action({
     role: v.string(),
     department: v.optional(v.string()),
     bio: v.string(),
-    skills: v.array(
-      v.object({
-        name: v.string(),
-        level: v.string(),
-        proficiencyLevel: v.float64(),
-        years: v.optional(v.float64()),
-      })
-    ),
+    skills: v.array(v.any()),
   },
   handler: async (ctx, args) => {
-    const nlpServiceUrl = process.env.NEXT_PUBLIC_API_URL;
+    const nlpServiceUrl = process.env.API_URL;
     if (!nlpServiceUrl) throw new Error("API_URL not set");
 
     const response = await fetch(`${nlpServiceUrl}/onboard/finalize`, {
@@ -218,10 +242,8 @@ export const finalizeOnboarding = action({
     });
 
     if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Python service error: ${text}`);
+      throw new Error(`Python service error: ${await response.text()}`);
     }
-
     return await response.json();
   },
 });
@@ -229,7 +251,7 @@ export const finalizeOnboarding = action({
 export const searchTalent = action({
   args: { query: v.string() },
   handler: async (ctx, args) => {
-    const nlpServiceUrl = process.env.NEXT_PUBLIC_API_URL;
+    const nlpServiceUrl = process.env.API_URL;
     if (!nlpServiceUrl) throw new Error("API_URL not set");
 
     const response = await fetch(`${nlpServiceUrl}/search/talent`, {
@@ -238,10 +260,7 @@ export const searchTalent = action({
       body: JSON.stringify({ query: args.query }),
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to search talent pool");
-    }
-
+    if (!response.ok) throw new Error("Failed to search talent pool");
     return await response.json();
   },
 });
@@ -249,7 +268,7 @@ export const searchTalent = action({
 export const analyzeProjectText = action({
   args: { text: v.string() },
   handler: async (ctx, args) => {
-    const nlpServiceUrl = process.env.NEXT_PUBLIC_API_URL;
+    const nlpServiceUrl = process.env.API_URL;
     if (!nlpServiceUrl) throw new Error("API_URL not set");
 
     const response = await fetch(`${nlpServiceUrl}/nlp/analyze-project-text`, {
@@ -258,8 +277,52 @@ export const analyzeProjectText = action({
       body: JSON.stringify({ text: args.text }),
     });
 
+    if (!response.ok) throw new Error("Analysis failed");
+    return await response.json();
+  },
+});
+
+export const createSkill = action({
+  args: {
+    name: v.string(),
+    category: v.string(),
+    description: v.optional(v.string()),
+    aliases: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
+    const nlpServiceUrl = process.env.API_URL;
+    if (!nlpServiceUrl) throw new Error("API_URL not set");
+
+    const response = await fetch(`${nlpServiceUrl}/skills/create`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(args),
+    });
+
     if (!response.ok) {
-      throw new Error("Analysis failed");
+      const text = await response.text();
+      throw new Error(`Python Error: ${text}`);
+    }
+
+    return await response.json();
+  },
+});
+
+export const generateSkillEmbeddings = action({
+  args: { skills: v.array(v.string()) },
+  handler: async (ctx, args) => {
+    const nlpServiceUrl = process.env.API_URL;
+    if (!nlpServiceUrl) throw new Error("API_URL not set");
+
+    const response = await fetch(`${nlpServiceUrl}/skills/embed-list`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ skills: args.skills }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Python Error (${response.status}): ${errorText}`);
     }
 
     return await response.json();

@@ -35,10 +35,43 @@ export async function POST(req) {
     if (!email) return unauthorizedResponse();
 
     const body = await req.json();
+    console.log("[Skills POST] Creating skill:", body.name);
+    
     const id = await convex.mutation(api.skills.create, { 
       email,
       ...body 
     });
+    console.log("[Skills POST] Skill created with ID:", id);
+
+    const pythonApiUrl = process.env.NEXT_PUBLIC_API_URL;
+    console.log("[Skills POST] Python API URL:", pythonApiUrl);
+    
+    if (pythonApiUrl && id) {
+      console.log("[Skills POST] Triggering populate for skill:", id, body.name);
+      try {
+        const populateUrl = `${pythonApiUrl}/skills/populate`;
+        const response = await fetch(populateUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            skillId: id,
+            skillName: body.name,
+            description: body.description,
+          }),
+        });
+        console.log("[Skills POST] Populate response status:", response.status);
+        if (!response.ok) {
+          const text = await response.text();
+          console.error("[Skills POST] Populate error:", response.status, text);
+        } else {
+          console.log("[Skills POST] Populate succeeded");
+        }
+      } catch (populateError) {
+        console.error("[Skills POST] Populate fetch failed:", populateError.message);
+      }
+    } else {
+      console.log("[Skills POST] Skipping populate - pythonApiUrl:", !!pythonApiUrl, "id:", !!id);
+    }
 
     return successResponse({ id }, 201);
   } catch (error) {
