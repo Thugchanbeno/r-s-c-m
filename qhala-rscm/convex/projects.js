@@ -28,7 +28,6 @@ async function getActor(ctx, email) {
   if (!actor) throw new Error("User not found");
   return actor;
 }
-
 // GET /api/projects
 export const getAll = query({
   args: {
@@ -81,7 +80,6 @@ export const getAll = query({
     return projects.sort((a, b) => a.name.localeCompare(b.name));
   },
 });
-
 // GET /api/projects/for-user
 export const getForUser = query({
   args: { email: v.string(), userId: v.id("users") },
@@ -110,7 +108,6 @@ export const getForUser = query({
     return projects.sort((a, b) => a.name.localeCompare(b.name));
   },
 });
-
 // GET /api/projects/[id]
 export const getById = query({
   args: { id: v.id("projects") },
@@ -120,14 +117,13 @@ export const getById = query({
     return project;
   },
 });
-
 // POST /api/projects
 export const create = mutation({
   args: {
     email: v.string(),
     name: v.string(),
     description: v.string(),
-    department: v.string(),
+    department: v.optional(v.string()),
     status: v.optional(
       v.union(
         v.literal("Planning"),
@@ -139,45 +135,67 @@ export const create = mutation({
     ),
     startDate: v.optional(v.number()),
     endDate: v.optional(v.number()),
-    requiredSkills: v.optional(
-      v.array(
-        v.object({
-          skillId: v.id("skills"),
-          skillName: v.string(),
-          proficiencyLevel: v.number(),
-          isRequired: v.boolean(),
-          category: v.optional(v.string()),
-        })
-      )
-    ),
+    embedding: v.optional(v.array(v.float64())),
     nlpExtractedSkills: v.optional(v.array(v.string())),
+    requiredSkills: v.optional(v.array(v.any())),
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
     if (!["pm", "hr", "admin"].includes(actor.role)) {
       throw new Error("You don't have permission to perform this action.");
     }
+    let resolvedSkills = [];
+    if (args.requiredSkills && args.requiredSkills.length > 0) {
+      resolvedSkills = await Promise.all(
+        args.requiredSkills.map(async (skill) => {
+          if (skill.skillId) return skill;
 
-    if (!args.name || !args.description || !args.department) {
-      throw new Error(
-        "Project name, description, and department are required."
+          const name = skill.skillName || skill.name;
+          if (!name) return null;
+
+          let existingSkill = await ctx.db
+            .query("skills")
+            .withIndex("by_name", (q) => q.eq("name", name))
+            .first();
+
+          let skillId = existingSkill
+            ? existingSkill._id
+            : await ctx.db.insert("skills", {
+                name: name,
+                category: skill.category || "Uncategorized",
+                description: "Auto-generated from Project",
+                aliases: [],
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+              });
+
+          return {
+            skillId,
+            skillName: name,
+            proficiencyLevel: skill.proficiencyLevel || 1,
+            isRequired: skill.isRequired !== false,
+            category: skill.category,
+          };
+        })
       );
+      resolvedSkills = resolvedSkills.filter((s) => s !== null);
     }
 
     const now = Date.now();
-    const { email, ...updates } = args;
     const projectId = await ctx.db.insert("projects", {
-      ...updates,
+      name: args.name,
+      description: args.description,
+      department: args.department || "Unassigned",
       pmId: actor._id,
       status: args.status || "Planning",
-      requiredSkills: args.requiredSkills || [],
+      startDate: args.startDate,
+      endDate: args.endDate,
+      embedding: args.embedding,
+      requiredSkills: resolvedSkills,
       nlpExtractedSkills: args.nlpExtractedSkills || [],
       createdAt: now,
       updatedAt: now,
     });
-
-    // Notify relevant stakeholders about project creation
-    // Find HR and admin users who should know about new projects
     const stakeholders = await ctx.db
       .query("users")
       .filter((q) =>
@@ -190,7 +208,7 @@ export const create = mutation({
         userIds: stakeholders.map((u) => u._id),
         type: "project_status_changed",
         title: "New Project Created",
-        message: `${actor.name} created new project: "${args.name}" in ${args.department}`,
+        message: `${actor.name} created new project: "${args.name}"`,
         link: `/projects/${projectId}`,
         relatedResourceId: projectId,
         relatedResourceType: "project",
@@ -199,10 +217,7 @@ export const create = mutation({
         contextData: {
           projectName: args.name,
           department: args.department,
-          pmName: actor.name,
-          actionUserName: actor.name,
-          actionUserAvatar: actor.avatarUrl,
-          skillCount: (args.requiredSkills || []).length,
+          skillCount: resolvedSkills.length,
         },
       });
     }
@@ -210,7 +225,6 @@ export const create = mutation({
     return projectId;
   },
 });
-
 // PUT /api/projects
 export const update = mutation({
   args: {
@@ -248,6 +262,7 @@ export const update = mutation({
         })
       )
     ),
+    embedding: v.optional(v.array(v.float64())),
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
@@ -258,16 +273,14 @@ export const update = mutation({
     canEditProject(actor, project);
 
     const { id, email, ...updates } = args;
-    const oldProject = { ...project }; // Keep reference to old state
+    const oldProject = { ...project };
 
     await ctx.db.patch(id, {
       ...updates,
       updatedAt: Date.now(),
     });
 
-    // Check if status changed and notify team members
     if (updates.status && updates.status !== oldProject.status) {
-      // Find all users allocated to this project
       const allocations = await ctx.db
         .query("allocations")
         .withIndex("by_project", (q) => q.eq("projectId", id))
@@ -276,7 +289,7 @@ export const update = mutation({
 
       const teamMemberIds = allocations
         .map((a) => a.userId)
-        .filter((userId) => userId !== actor._id); // Don't notify the actor
+        .filter((userId) => userId !== actor._id);
 
       if (teamMemberIds.length > 0) {
         await createBulkNotifications(ctx, {
@@ -294,8 +307,6 @@ export const update = mutation({
             oldStatus: oldProject.status,
             newStatus: updates.status,
             updatedByName: actor.name,
-            actionUserName: actor.name,
-            actionUserAvatar: actor.avatarUrl,
           },
         });
       }
@@ -312,17 +323,12 @@ export const extractSkillsFromDescription = action({
     description: v.string(),
   },
   handler: async (ctx, args) => {
-    // Get actor info through a query since actions can't directly access db
     const actor = await ctx.runQuery(internal.projects.getActorByEmail, {
       email: args.email,
     });
 
     if (!actor || !["pm", "hr", "admin"].includes(actor.role)) {
       throw new Error("You don't have permission to perform this action.");
-    }
-
-    if (!args.description || args.description.trim() === "") {
-      throw new Error("Description is required.");
     }
 
     const nlpServiceUrl = `${
@@ -349,7 +355,6 @@ export const extractSkillsFromDescription = action({
 
       const extractedSkills = result.extracted_skills || [];
 
-      // Optionally persist to project using a mutation
       if (args.projectId) {
         await ctx.runMutation(internal.projects.updateProjectSkills, {
           projectId: args.projectId,
@@ -365,7 +370,6 @@ export const extractSkillsFromDescription = action({
   },
 });
 
-// Recommendations
 export const getRecommendations = action({
   args: {
     email: v.string(),
@@ -373,7 +377,6 @@ export const getRecommendations = action({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    // Get actor info and project through queries since actions can't directly access db
     const actor = await ctx.runQuery(internal.projects.getActorByEmail, {
       email: args.email,
     });
@@ -392,18 +395,10 @@ export const getRecommendations = action({
     }/recommend/users-for-project`;
 
     try {
-      console.log(`Calling Python microservice for project: ${args.projectId}`);
-
-      // Use simple payload structure that matches working REST implementation
       const payload = {
         id: args.projectId,
         limit: args.limit || 10,
       };
-
-      console.log(
-        "Payload to Python service:",
-        JSON.stringify(payload, null, 2)
-      );
 
       const response = await fetch(nlpServiceUrl, {
         method: "POST",
@@ -412,13 +407,8 @@ export const getRecommendations = action({
       });
 
       const result = await response.json();
-      console.log("Python service response:", JSON.stringify(result, null, 2));
 
       if (!response.ok) {
-        console.error(
-          `Python microservice error (Status: ${response.status}):`,
-          result.detail || result.error || result
-        );
         throw new Error(
           result.detail ||
             result.error ||
@@ -426,45 +416,18 @@ export const getRecommendations = action({
         );
       }
 
-      if (result && typeof result.recommendations !== "undefined") {
-        if (!Array.isArray(result.recommendations)) {
-          console.error(
-            "Python response 'recommendations' field was not an array:",
-            result
-          );
-          throw new Error(
-            "Invalid recommendation data format from service (not an array)."
-          );
-        }
-        console.log(
-          `Successfully got ${result.recommendations.length} recommendations`
-        );
+      if (result && Array.isArray(result.recommendations)) {
         return { success: true, users: result.recommendations };
       } else {
-        console.error("Python response missing 'recommendations' key:", result);
         throw new Error("Invalid or missing recommendation data from service.");
       }
     } catch (err) {
-      console.error("Detailed recommendation error:", {
-        message: err.message,
-        stack: err.stack,
-        cause: err.cause,
-      });
-
-      // More specific error handling
-      if (err.cause && err.cause.code === "ECONNREFUSED") {
-        throw new Error(
-          "Could not connect to the recommendation service. Please ensure the Python microservice is running on " +
-            (process.env.NLP_API_URL_LOCAL || "http://localhost:8000")
-        );
-      }
-
+      console.error("Recommendation error:", err);
       throw new Error(err.message || "Failed to fetch recommendations.");
     }
   },
 });
 
-// Utilization report
 export const getUtilizationReport = query({
   args: { email: v.string(), projectId: v.id("projects") },
   handler: async (ctx, args) => {
@@ -507,7 +470,6 @@ export const getUtilizationReport = query({
         endDate: allocation.endDate,
       });
     }
-
     const tasks = await ctx.db
       .query("tasks")
       .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
@@ -546,7 +508,6 @@ export const getUtilizationReport = query({
   },
 });
 
-// Org-level reporting
 export const getByOrganization = query({
   args: {
     email: v.string(),
@@ -612,7 +573,6 @@ export const getByOrganization = query({
   },
 });
 
-// Internal helper functions for actions
 export const getActorByEmail = internalQuery({
   args: { email: v.string() },
   handler: async (ctx, args) => {
@@ -639,11 +599,62 @@ export const updateProjectSkills = internalMutation({
   args: {
     projectId: v.id("projects"),
     nlpExtractedSkills: v.array(v.string()),
+    requiredSkills: v.optional(v.array(v.any())),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.projectId, {
+    const updates = {
       nlpExtractedSkills: args.nlpExtractedSkills,
       updatedAt: Date.now(),
-    });
+    };
+    if (args.requiredSkills) {
+      updates.requiredSkills = args.requiredSkills;
+    }
+    await ctx.db.patch(args.projectId, updates);
+  },
+});
+
+export const logFeedback = mutation({
+  args: {
+    userId: v.string(),
+    projectId: v.string(),
+    recommendationType: v.string(),
+    rating: v.number(),
+    comments: v.optional(v.string()),
+    timestamp: v.number(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.insert("recommendationFeedback", args);
+  },
+});
+
+export const getTeam = query({
+  args: {
+    projectId: v.id("projects"),
+    email: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const actor = await getActor(ctx, args.email);
+    const allocations = await ctx.db
+      .query("allocations")
+      .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
+      .filter((q) => q.eq(q.field("status"), "active"))
+      .collect();
+
+    if (allocations.length === 0) return [];
+    const teamMembers = await Promise.all(
+      allocations.map(async (a) => {
+        const user = await ctx.db.get(a.userId);
+        if (!user) return null;
+        return {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          avatarUrl: user.avatarUrl,
+          role: a.role,
+        };
+      })
+    );
+
+    return teamMembers.filter(Boolean);
   },
 });

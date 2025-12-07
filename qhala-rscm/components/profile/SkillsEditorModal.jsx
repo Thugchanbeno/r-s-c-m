@@ -12,7 +12,7 @@ import {
   Loader2,
   CheckCircle,
 } from "lucide-react";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 
@@ -45,6 +45,8 @@ const SkillsEditorModal = ({
     ) || [];
 
   const isOnboarding = mode === "current" && currentUserSkills.length === 0;
+
+  const refreshEmbedding = useAction(api.api.refreshUserEmbedding);
 
   const handleCVUpload = async (file) => {
     if (!file) return;
@@ -84,9 +86,13 @@ const SkillsEditorModal = ({
       let matchCount = 0;
 
       extractedSkills.forEach((extracted) => {
+        const skillName =
+          typeof extracted === "string" ? extracted : extracted?.name;
+
+        if (!skillName) return;
+
         const matchedDbSkill = allSkills?.find(
-          (dbSkill) =>
-            dbSkill.name.toLowerCase() === extracted.name.toLowerCase()
+          (dbSkill) => dbSkill.name.toLowerCase() === skillName.toLowerCase()
         );
 
         if (matchedDbSkill) {
@@ -172,13 +178,13 @@ const SkillsEditorModal = ({
 
     setIsSubmitting(true);
     try {
+      // 1. Save all skills to Convex
       for (const [skillId, details] of selectedSkills.entries()) {
         await createUserSkill({
           email: userEmail,
           skillId,
           isCurrent: mode === "current",
           isDesired: mode === "desired",
-          embedding: vector,
           proficiency: parseInt(details.proficiency),
           initialProof:
             mode === "current"
@@ -191,14 +197,20 @@ const SkillsEditorModal = ({
         });
       }
 
+      // 2. Trigger Embedding Refresh (NEW LOGIC)
+      if (userData?._id) {
+        await refreshEmbedding({ userId: userData._id });
+      }
+
       toast.success(
         mode === "current"
-          ? "Skills submitted for verification"
+          ? "Skills submitted & profile updated"
           : "Learning goals added"
       );
       setSelectedSkills(new Map());
       if (isOnboarding && onClose) onClose();
     } catch (error) {
+      console.error(error);
       toast.error("Failed to save skills");
     } finally {
       setIsSubmitting(false);
@@ -210,6 +222,8 @@ const SkillsEditorModal = ({
       const currentUserSkillsList = currentUserSkills.filter(
         (us) => us._id !== userSkillId
       );
+
+      // 1. Update DB
       if (mode === "current") {
         const skillsToKeep = currentUserSkillsList.map((us) => ({
           skillId: us.skillId._id || us.skillId,
@@ -228,7 +242,13 @@ const SkillsEditorModal = ({
           desiredSkillIds: skillIdsToKeep,
         });
       }
-      toast.success("Skill removed");
+
+      // 2. Trigger Embedding Refresh (NEW LOGIC)
+      if (userData?._id) {
+        await refreshEmbedding({ userId: userData._id });
+      }
+
+      toast.success("Skill removed & profile updated");
     } catch (error) {
       toast.error("Failed to remove skill");
     }

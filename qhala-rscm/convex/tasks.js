@@ -116,6 +116,7 @@ export const create = mutation({
     title: v.string(),
     description: v.optional(v.string()),
     assignedUserId: v.optional(v.id("users")),
+    assignedUserIds: v.optional(v.array(v.id("users"))),
     priority: v.union(
       v.literal("low"),
       v.literal("medium"),
@@ -203,6 +204,7 @@ export const update = mutation({
     title: v.optional(v.string()),
     description: v.optional(v.string()),
     assignedUserId: v.optional(v.id("users")),
+    assignedUserIds: v.optional(v.array(v.id("users"))),
     status: v.optional(
       v.union(
         v.literal("todo"),

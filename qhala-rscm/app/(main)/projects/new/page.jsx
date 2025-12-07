@@ -1,26 +1,18 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useProjects } from "@/lib/hooks/useProjects";
+import { toast } from "sonner";
 import ProjectFormNew from "@/components/projects/ProjectFormNew";
 
 const NewProjectPage = () => {
   const router = useRouter();
-  const { handleCreateProject } = useProjects();
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState(null);
-
-  const handleSubmit = async (formData) => {
-    setIsSubmitting(true);
-    setSubmitError(null);
-    try {
-      const id = await handleCreateProject(formData);
-      router.push(`/projects/${id}`);
-    } catch (err) {
-      setSubmitError(err.message);
-    } finally {
-      setIsSubmitting(false);
+  const handleSubmit = async (result) => {
+    if (result?.projectId) {
+      toast.success("Project created successfully");
+      router.push(`/projects/${result.projectId}`);
+    } else {
+      console.error("No Project ID returned", result);
+      toast.error("Error creating project");
     }
   };
 
@@ -29,8 +21,6 @@ const NewProjectPage = () => {
       isEditMode={false}
       onSubmit={handleSubmit}
       onCancel={() => router.push("/projects")}
-      isSubmitting={isSubmitting}
-      submitError={submitError}
     />
   );
 };

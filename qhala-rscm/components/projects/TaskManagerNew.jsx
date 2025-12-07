@@ -1,5 +1,8 @@
 "use client";
 import { useState } from "react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useAuth } from "@/lib/hooks/useAuth";
 import {
   Plus,
   Calendar,
@@ -16,9 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTasks } from "@/lib/hooks/useTasks";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { formatDatePickerDate, parseDatePickerDate } from "@/lib/dateUtils";
+import TaskFormModal from "./TaskFormModal";
 
 const taskStatuses = [
   {
@@ -131,10 +132,16 @@ export const TaskManagerLocal = ({ initialTasks = [], onTasksChange }) => {
 
 // Convex Task Manager (for existing projects)
 export const TaskManagerConvex = ({ projectId }) => {
+  const { user } = useAuth();
   const { tasks, handleCreateTask, handleUpdateTask, handleDeleteTask } =
     useTasks(projectId);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const projectTeam =
+    useQuery(
+      api.projects.getTeam,
+      projectId && user?.email ? { projectId, email: user.email } : "skip"
+    ) || [];
 
   const create = async (task) => {
     try {
@@ -165,6 +172,7 @@ export const TaskManagerConvex = ({ projectId }) => {
     <TaskManagerUI
       projectId={projectId}
       tasks={tasks || []}
+      projectTeam={projectTeam}
       showAddForm={showAddForm}
       setShowAddForm={setShowAddForm}
       editingTask={editingTask}
@@ -180,6 +188,7 @@ export const TaskManagerConvex = ({ projectId }) => {
 const TaskManagerUI = ({
   projectId,
   tasks,
+  projectTeam = [],
   showAddForm,
   setShowAddForm,
   editingTask,
@@ -211,38 +220,39 @@ const TaskManagerUI = ({
         </button>
       </div>
 
-      {showAddForm && (
-        <div className="bg-white border border-gray-100 rounded-lg">
-          <TaskForm
-            onSubmit={async (data) => {
-              await onCreateTask(data);
-              setShowAddForm(false);
-            }}
-            onCancel={() => setShowAddForm(false)}
-          />
-        </div>
-      )}
+      <TaskFormModal
+        isOpen={showAddForm}
+        initialData={null}
+        projectTeam={projectTeam}
+        isLocal={isLocal}
+        isEditing={false}
+        onSubmit={async (data) => {
+          await onCreateTask(data);
+          setShowAddForm(false);
+        }}
+        onCancel={() => setShowAddForm(false)}
+      />
 
-      {editingTask && (
-        <div className="bg-white border border-gray-100 rounded-lg">
-          <TaskForm
-            initialData={editingTask}
-            isEditing
-            onSubmit={async (data) => {
-              const taskId = editingTask.tempId || editingTask._id;
-              await onUpdateTask(taskId, data);
-              setEditingTask(null);
-            }}
-            onCancel={() => setEditingTask(null)}
-          />
-        </div>
-      )}
+      <TaskFormModal
+        isOpen={!!editingTask}
+        initialData={editingTask}
+        projectTeam={projectTeam}
+        isLocal={isLocal}
+        isEditing={true}
+        onSubmit={async (data) => {
+          const taskId = editingTask.tempId || editingTask._id;
+          await onUpdateTask(taskId, data);
+          setEditingTask(null);
+        }}
+        onCancel={() => setEditingTask(null)}
+      />
+      
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-3">
         {taskStatuses.map((status) => {
           const StatusIcon = status.icon;
           const statusTasks = tasks.filter((t) => t.status === status.value);
-          
+
           return (
             <div key={status.value} className="space-y-2">
               <div className="bg-white border-b border-gray-100 px-3 py-2">
@@ -253,7 +263,9 @@ const TaskManagerUI = ({
                       {status.label}
                     </h4>
                   </div>
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${status.color}`}>
+                  <span
+                    className={`px-2 py-0.5 rounded text-xs font-medium ${status.color}`}
+                  >
                     {statusTasks.length}
                   </span>
                 </div>
@@ -264,6 +276,7 @@ const TaskManagerUI = ({
                   <TaskCard
                     key={task.tempId || task._id}
                     task={task}
+                    projectTeam={projectTeam}
                     onEdit={() => setEditingTask(task)}
                     onDelete={() => onDeleteTask(task.tempId || task._id)}
                     onStatusChange={(s) =>
@@ -277,9 +290,7 @@ const TaskManagerUI = ({
                 {statusTasks.length === 0 && (
                   <div className="border border-dashed border-gray-200 rounded-md px-3 py-6 text-center">
                     <StatusIcon className="w-4 h-4 mx-auto text-gray-300 mb-1" />
-                    <p className="text-xs text-gray-400">
-                      No tasks
-                    </p>
+                    <p className="text-xs text-gray-400">No tasks</p>
                   </div>
                 )}
               </div>
@@ -318,6 +329,7 @@ const TaskCard = ({
   onDelete,
   priorityConfig,
   isLocal = false,
+  projectTeam = [],
 }) => {
   const formatDate = (timestamp) => {
     if (!timestamp) return null;
@@ -327,7 +339,13 @@ const TaskCard = ({
     });
   };
 
-  const PriorityIcon = task.priority ? priorityConfig[task.priority]?.icon : Flag;
+  const PriorityIcon = task.priority
+    ? priorityConfig[task.priority]?.icon
+    : Flag;
+
+  const assignedUsers = (task.assignedUserIds || []).map((userId) =>
+    projectTeam?.find((u) => u._id === userId)
+  ).filter(Boolean);
 
   return (
     <div className="group bg-white border border-gray-100 rounded-md hover:border-rscm-violet/30 transition-colors px-3 py-2.5">
@@ -393,191 +411,33 @@ const TaskCard = ({
           </div>
         )}
       </div>
-    </div>
-  );
-};
 
-const TaskForm = ({ initialData, onSubmit, onCancel, isEditing = false }) => {
-  const [formData, setFormData] = useState({
-    title: initialData?.title || "",
-    description: initialData?.description || "",
-    status: initialData?.status || "todo",
-    priority: initialData?.priority || "medium",
-    dueDate: initialData?.dueDate
-      ? formatDatePickerDate(new Date(initialData.dueDate))
-      : "",
-    estimatedHours: initialData?.estimatedHours || "",
-  });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async () => {
-    if (!formData.title.trim()) {
-      toast.error("Task title is required");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      await onSubmit({
-        ...formData,
-        dueDate: formData.dueDate
-          ? parseDatePickerDate(formData.dueDate)?.getTime()
-          : null,
-        estimatedHours: formData.estimatedHours
-          ? parseInt(formData.estimatedHours)
-          : null,
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <div className="px-4 py-3">
-      <div className="flex items-center gap-1.5 mb-4 pb-3 border-b border-gray-100">
-        {isEditing ? (
-          <Edit3 className="w-3.5 h-3.5 text-rscm-violet" />
-        ) : (
-          <Plus className="w-3.5 h-3.5 text-rscm-violet" />
-        )}
-        <h4 className="text-sm font-semibold text-rscm-dark-purple">
-          {isEditing ? "Edit Task" : "Create Task"}
-        </h4>
-      </div>
-
-      <div className="space-y-3">
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-rscm-dark-purple">
-            Task Title*
-          </label>
-          <input
-            type="text"
-            value={formData.title}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, title: e.target.value }))
-            }
-            required
-            className="w-full px-3 py-2 bg-gray-50 rounded-md focus:ring-2 focus:ring-rscm-violet/20 focus:bg-white outline-none transition-colors text-sm"
-            placeholder="Enter task title..."
-          />
-        </div>
-
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-rscm-dark-purple">
-            Description
-          </label>
-          <textarea
-            value={formData.description}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, description: e.target.value }))
-            }
-            rows={2}
-            className="w-full px-3 py-2 bg-gray-50 rounded-md focus:ring-2 focus:ring-rscm-violet/20 focus:bg-white outline-none transition-colors resize-none text-sm"
-            placeholder="Add details..."
-          />
-        </div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-rscm-dark-purple">
-              Status
-            </label>
-            <select
-              value={formData.status}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, status: e.target.value }))
-              }
-              className="w-full px-3 py-2 bg-gray-50 rounded-md focus:ring-2 focus:ring-rscm-violet/20 focus:bg-white outline-none transition-colors text-sm"
-            >
-              <option value="todo">To Do</option>
-              <option value="in_progress">In Progress</option>
-              <option value="review">Review</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-rscm-dark-purple">
-              Priority
-            </label>
-            <select
-              value={formData.priority}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, priority: e.target.value }))
-              }
-              className="w-full px-3 py-2 bg-gray-50 rounded-md focus:ring-2 focus:ring-rscm-violet/20 focus:bg-white outline-none transition-colors text-sm"
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-              <option value="urgent">Urgent</option>
-            </select>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-rscm-dark-purple">
-              Due Date
-            </label>
-            <DatePicker
-              selected={parseDatePickerDate(formData.dueDate)}
-              onChange={(date) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  dueDate: formatDatePickerDate(date),
-                }))
-              }
-              dateFormat="yyyy-MM-dd"
-              placeholderText="YYYY-MM-DD"
-              className="w-full px-3 py-2 bg-gray-50 rounded-md focus:ring-2 focus:ring-rscm-violet/20 focus:bg-white outline-none transition-colors text-sm"
-              wrapperClassName="w-full"
-              showPopperArrow={false}
-              isClearable
-              autoComplete="off"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-rscm-dark-purple">
-              Hours
-            </label>
-            <input
-              type="number"
-              min="0"
-              step="0.5"
-              value={formData.estimatedHours}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  estimatedHours: e.target.value,
-                }))
-              }
-              className="w-full px-3 py-2 bg-gray-50 rounded-md focus:ring-2 focus:ring-rscm-violet/20 focus:bg-white outline-none transition-colors text-sm"
-              placeholder="0"
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end gap-2 pt-3 border-t border-gray-100">
-          <button
-            onClick={onCancel}
-            className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting || !formData.title.trim()}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-rscm-violet text-white rounded-md hover:bg-rscm-plum transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs font-medium"
-          >
-            {isSubmitting && (
-              <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+      {assignedUsers.length > 0 && (
+        <div className="mt-2 pt-2 border-t border-gray-100 flex items-center justify-end">
+          <div className="flex -space-x-1">
+            {assignedUsers.slice(0, 4).map((u) => (
+              <div key={u._id} className="inline-block rounded-full border-2 border-white" title={u.name}>
+                {u.avatarUrl ? (
+                  <img
+                    src={u.avatarUrl}
+                    alt={u.name}
+                    className="w-5 h-5 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-5 h-5 rounded-full bg-rscm-violet/10 flex items-center justify-center text-[9px] font-bold text-rscm-violet">
+                    {u.name?.charAt(0) || "?"}
+                  </div>
+                )}
+              </div>
+            ))}
+            {assignedUsers.length > 4 && (
+              <div className="w-5 h-5 rounded-full bg-gray-100 text-gray-600 text-[9px] font-medium flex items-center justify-center border-2 border-white" title={`${assignedUsers.length - 4} more`}>
+                +{assignedUsers.length - 4}
+              </div>
             )}
-            {isEditing ? "Update" : "Create"}
-          </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

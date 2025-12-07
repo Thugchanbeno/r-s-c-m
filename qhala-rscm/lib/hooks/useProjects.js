@@ -61,9 +61,11 @@ export const useProjects = (pmId = null, filters = {}) => {
             projectId,
             title: task.title,
             description: task.description || undefined,
+            status: task.status || "todo",
             priority: task.priority || "medium",
             estimatedHours: task.estimatedHours || undefined,
             dueDate: task.dueDate || undefined,
+            assignedUserIds: task.assignedUserIds || [],
           };
           await handleCreateTask(taskPayload);
         }

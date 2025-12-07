@@ -33,11 +33,11 @@ const SkillSelectorNew = ({
   const [selectedSkillsMap, setSelectedSkillsMap] = useState(new Map());
   const [expandedCategories, setExpandedCategories] = useState({});
 
-  // Debounce search term (300ms delay for responsive feel)
+  // Debounce search term (700ms delay for responsive feel)
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 300);
+    }, 700);
 
     return () => clearTimeout(timer);
   }, [searchTerm]);

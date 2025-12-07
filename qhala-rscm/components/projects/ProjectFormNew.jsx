@@ -9,6 +9,10 @@ import { TaskManagerLocal } from "@/components/projects/TaskManagerNew";
 import { useAI } from "@/lib/hooks/useAI";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useAction, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { toast } from "sonner";
+import { useAuth } from "@/lib/hooks/useAuth";
 import {
   Briefcase,
   Building2,
@@ -33,6 +37,7 @@ const ProjectFormNew = ({
   isSubmitting = false,
   submitError = null,
 }) => {
+  const { user } = useAuth();
   const {
     projectData,
     localSubmitError,
@@ -51,6 +56,10 @@ const ProjectFormNew = ({
     handleQuickAskClear,
     handleExtractSkills,
   } = useAI();
+
+  const createProjectAction = useAction(api.api.createProjectAction);
+  const createTask = useMutation(api.tasks.create);
+  const [isLocalSubmitting, setIsLocalSubmitting] = useState(false);
 
   const [tasks, setTasks] = useState([]);
   const [currentStep, setCurrentStep] = useState(1);
@@ -161,7 +170,7 @@ const ProjectFormNew = ({
     handleQuickAskSkillSelected(skill);
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -184,24 +193,68 @@ const ProjectFormNew = ({
       return;
     }
 
-    const startDateTimestamp = projectData.startDate
-      ? new Date(projectData.startDate).getTime()
-      : null;
-    const endDateTimestamp = projectData.endDate
-      ? new Date(projectData.endDate).getTime()
-      : null;
+    setIsLocalSubmitting(true);
 
-    const dataToSubmit = {
-      projectData: {
-        ...projectData,
-        startDate: startDateTimestamp,
-        endDate: endDateTimestamp,
-      },
-      tasks: tasks,
-    };
+    try {
+      if (isEditMode) {
+        const dataToSubmit = {
+          projectData: {
+            ...projectData,
+            startDate: projectData.startDate
+              ? new Date(projectData.startDate).getTime()
+              : null,
+            endDate: projectData.endDate
+              ? new Date(projectData.endDate).getTime()
+              : null,
+          },
+          tasks: tasks,
+        };
+        if (onSubmit) onSubmit(dataToSubmit);
+      } else {
+        const result = await createProjectAction({
+          title: projectData.name,
+          description: projectData.description,
+          status: projectData.status,
+          startDate: projectData.startDate || undefined,
+          endDate: projectData.endDate || undefined,
+          email: user?.email,
+          department: projectData.department,
+        });
 
-    if (onSubmit) {
-      onSubmit(dataToSubmit);
+        const newProjectId = result.projectId;
+        toast.success("Project created successfully");
+
+        // Persist local tasks now that we have a real projectId
+        for (const t of tasks) {
+          try {
+            await createTask({
+              email: user?.email,
+              projectId: newProjectId,
+              title: t.title,
+              description: t.description || undefined,
+              status: t.status || "todo",
+              priority: t.priority || "medium",
+              estimatedHours: t.estimatedHours || undefined,
+              dueDate: t.dueDate || undefined,
+              // For local creation we shouldn't have assignees yet
+            });
+          } catch (taskErr) {
+            console.error("Failed to create task:", taskErr);
+          }
+        }
+
+        if (onSubmit) {
+          onSubmit({ projectId: newProjectId });
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      const msg = error.message?.includes("Python")
+        ? "Backend Error: Failed to generate project analysis."
+        : "Failed to create project.";
+      toast.error(msg);
+    } finally {
+      setIsLocalSubmitting(false);
     }
   };
 
@@ -222,6 +275,8 @@ const ProjectFormNew = ({
     { number: 3, label: "Tasks", icon: CheckSquare },
   ];
 
+  const isLoading = isSubmitting || isLocalSubmitting;
+
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -230,7 +285,7 @@ const ProjectFormNew = ({
             <button
               type="button"
               onClick={onCancel}
-              disabled={isSubmitting}
+              disabled={isLoading}
               className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-rscm-violet transition-colors disabled:opacity-50"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -583,7 +638,7 @@ const ProjectFormNew = ({
                 <button
                   type="button"
                   onClick={handleBack}
-                  disabled={isSubmitting}
+                  disabled={isLoading}
                   className="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
                 >
                   <ArrowLeft className="w-4 h-4" />
@@ -597,7 +652,7 @@ const ProjectFormNew = ({
                 <button
                   type="button"
                   onClick={onCancel}
-                  disabled={isSubmitting}
+                  disabled={isLoading}
                   className="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
                 >
                   Cancel
@@ -632,7 +687,7 @@ const ProjectFormNew = ({
                   <button
                     type="submit"
                     disabled={
-                      isSubmitting ||
+                      isLoading ||
                       (!isEditMode &&
                         projectData.requiredSkills.length === 0 &&
                         analysisDone)
@@ -643,7 +698,7 @@ const ProjectFormNew = ({
                         : "bg-rscm-violet hover:bg-rscm-plum text-white"
                     }`}
                   >
-                    {isSubmitting && (
+                    {isLoading && (
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     )}
                     {createConfirmation ? (

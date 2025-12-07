@@ -57,7 +57,7 @@ const ProjectsEmploymentSectionNew = ({
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">
                       <h3 className="font-medium text-sm text-rscm-dark-purple">
-                        {allocation.projectId?.name || "Unnamed Project"}
+                        {allocation.projectName || "Unnamed Project"}
                       </h3>
                       <p className="text-xs text-gray-400 mt-0.5">
                         {allocation.role || "Team Member"}

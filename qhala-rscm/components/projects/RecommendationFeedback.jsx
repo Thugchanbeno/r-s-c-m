@@ -8,7 +8,7 @@ import { toast } from "sonner";
 const RecommendationFeedback = ({ projectId, userId }) => {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
-  const logFeedback = useMutation(api.api.logFeedback);
+  const logFeedback = useMutation(api.projects.logFeedback);
 
   const handleFeedback = async (isPositive) => {
     const newStatus = isPositive ? "up" : "down";

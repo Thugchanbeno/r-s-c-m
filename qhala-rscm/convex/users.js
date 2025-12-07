@@ -1,9 +1,12 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
-import { createNotification, createBulkNotifications } from "./notificationUtils";
+import {
+  createNotification,
+  createBulkNotifications,
+} from "./notificationUtils";
 import { canEditUser } from "./rbac";
 
-
+// Helper: Get authenticated user
 async function getActor(ctx, email) {
   if (!email) throw new Error("Unauthorized: missing email");
   const actor = await ctx.db
@@ -70,7 +73,6 @@ export const getAll = query({
     return users.slice(skip, skip + limit);
   },
 });
-
 // GET /api/users/[id]
 export const getById = query({
   args: { id: v.id("users") },
@@ -78,7 +80,6 @@ export const getById = query({
     return await ctx.db.get(args.id);
   },
 });
-
 // POST /api/users
 export const create = mutation({
   args: {
@@ -95,6 +96,9 @@ export const create = mutation({
       )
     ),
     skills: v.optional(v.array(v.id("skills"))),
+    bio: v.optional(v.string()),
+    embedding: v.optional(v.array(v.float64())),
+    extractedSkills: v.optional(v.array(v.any())),
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
@@ -114,6 +118,9 @@ export const create = mutation({
       department: args.department,
       availabilityStatus: args.availabilityStatus || "available",
       authProviderId: "pending_invite",
+      bio: args.bio,
+      embedding: args.embedding,
+      extractedSkills: args.extractedSkills,
       createdAt: now,
       updatedAt: now,
     });
@@ -162,13 +169,15 @@ export const updateProfile = mutation({
     contractStartDate: v.optional(v.number()),
     contractEndDate: v.optional(v.number()),
     paymentTerms: v.optional(v.string()),
+    bio: v.optional(v.string()),
+    embedding: v.optional(v.array(v.float64())),
+    extractedSkills: v.optional(v.array(v.any())),
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
     canEditUser(actor, args.id);
     const { id, email, ...updates } = args;
 
-    // Get current user state before update
     const currentUser = await ctx.db.get(args.id);
     if (!currentUser) throw new Error("User not found");
 
@@ -201,6 +210,59 @@ export const updateProfile = mutation({
     return { success: true };
   },
 });
+// Mutation called by Python/AI flow to upsert user data from CV/Resume
+export const upsertFromCV = mutation({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    bio: v.string(),
+    skills: v.array(v.any()),
+    embedding: v.array(v.float64()),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        bio: args.bio,
+        extractedSkills: args.skills,
+        embedding: args.embedding,
+        updatedAt: Date.now(),
+      });
+      return existing._id;
+    } else {
+      return await ctx.db.insert("users", {
+        name: args.name,
+        email: args.email,
+        bio: args.bio,
+        extractedSkills: args.skills,
+        embedding: args.embedding,
+        role: "employee",
+        authProviderId: "pending_invite",
+        availabilityStatus: "available",
+        weeklyHours: 40,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+    }
+  },
+});
+// Mutation to just update the embedding (called by background refresh action)
+export const updateEmbedding = mutation({
+  args: {
+    userId: v.id("users"),
+    embedding: v.array(v.float64()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.userId, {
+      embedding: args.embedding,
+      updatedAt: Date.now(),
+    });
+  },
+});
 // GET /api/users/[userId]/allocations/summary
 export const getAllocationSummary = query({
   args: { email: v.string(), userId: v.id("users") },
@@ -224,19 +286,26 @@ export const getAllocationSummary = query({
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .collect();
 
-    const active = allocations.filter(
-      (a) =>
-        (!a.startDate || a.startDate <= now) && (!a.endDate || a.endDate >= now)
+    const active = allocations.filter((a) => a.status === "active");
+    const populatedAllocations = await Promise.all(
+      active.map(async (a) => {
+        const project = await ctx.db.get(a.projectId);
+        return {
+          ...a,
+          projectId: project || { name: "Unknown Project" },
+        };
+      })
     );
 
-    let totalAllocatedHours = 0;
-    active.forEach((a) => {
-      totalAllocatedHours += (a.allocationPercentage / 100) * weeklyHours;
+    let totalCapacityPercentage = 0;
+    populatedAllocations.forEach((a) => {
+      totalCapacityPercentage += a.allocationPercentage;
     });
 
-    const totalCurrentCapacityPercentage =
+    const totalCurrentCapacityPercentage = Math.round(totalCapacityPercentage);
+    const totalAllocatedHours =
       weeklyHours > 0
-        ? Math.round((totalAllocatedHours / weeklyHours) * 100)
+        ? Math.round((totalCurrentCapacityPercentage / 100) * weeklyHours * 100) / 100
         : 0;
 
     return {
@@ -244,8 +313,8 @@ export const getAllocationSummary = query({
       weeklyHours,
       totalCurrentCapacityPercentage,
       totalAllocatedHours,
-      activeAllocationCount: active.length,
-      allocations: active,
+      activeAllocationCount: populatedAllocations.length,
+      allocations: populatedAllocations,
     };
   },
 });
@@ -329,7 +398,9 @@ export const assignLineManager = mutation({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["admin", "hr"]);
+    if (!["admin", "hr"].includes(actor.role)) {
+      throw new Error("Only Admin or HR can assign line managers.");
+    }
 
     const target = await ctx.db.get(args.userId);
     if (!target) throw new Error("User not found.");
@@ -343,11 +414,9 @@ export const assignLineManager = mutation({
       lineManagerId: args.lineManagerId,
       updatedAt: Date.now(),
     });
-
-    // Notify the user about their new line manager
     await createNotification(ctx, {
       userId: args.userId,
-      type: "user_role_changed", // Using existing type for role/management changes
+      type: "user_role_changed",
       title: "Line Manager Assigned",
       message: `${lm.name} has been assigned as your line manager by ${actor.name}`,
       link: `/profile`,
@@ -363,11 +432,9 @@ export const assignLineManager = mutation({
         actionUserAvatar: actor.avatarUrl,
       },
     });
-
-    // Notify the line manager about their new direct report
     await createNotification(ctx, {
       userId: args.lineManagerId,
-      type: "user_role_changed", // Using existing type for management changes
+      type: "user_role_changed",
       title: "New Direct Report",
       message: `${target.name} has been assigned to report to you by ${actor.name}`,
       link: `/team`,
@@ -428,15 +495,14 @@ export const createUserFromAuth = mutation({
     // Notify HR and admin about new user registration
     const hrAndAdmins = await ctx.db
       .query("users")
-      .filter((q) => q.or(
-        q.eq(q.field("role"), "hr"),
-        q.eq(q.field("role"), "admin")
-      ))
+      .filter((q) =>
+        q.or(q.eq(q.field("role"), "hr"), q.eq(q.field("role"), "admin"))
+      )
       .collect();
 
     if (hrAndAdmins.length > 0) {
       await createBulkNotifications(ctx, {
-        userIds: hrAndAdmins.map(u => u._id),
+        userIds: hrAndAdmins.map((u) => u._id),
         type: "user_profile_incomplete",
         title: "New User Registration",
         message: `${args.name} (${args.email}) has registered and needs profile setup`,

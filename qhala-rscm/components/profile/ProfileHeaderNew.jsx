@@ -1,10 +1,19 @@
 "use client";
 import Image from "next/image";
 import { User, Building2, Mail, Clock, TrendingUp } from "lucide-react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const ProfileHeaderNew = ({ user, capacityData }) => {
-  const capacity = capacityData?.totalCurrentCapacityPercentage || 0;
-  const allocatedHours = capacityData?.totalAllocatedHours || 0;
+  const directAllocations = useQuery(
+    api.users.getAllocationSummary,
+    user?.email && user?._id
+      ? { email: user.email, userId: user._id }
+      : "skip"
+  );
+  
+  const capacity = (directAllocations?.totalCurrentCapacityPercentage) || (capacityData?.totalCurrentCapacityPercentage) || 0;
+  const allocatedHours = (directAllocations?.totalAllocatedHours) || (capacityData?.totalAllocatedHours) || 0;
   const standardHours = user?.weeklyHours || 40;
 
   const getCapacityColor = (cap) => {

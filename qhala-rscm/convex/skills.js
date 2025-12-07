@@ -1,8 +1,8 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 import { createNotification } from "./notificationUtils";
-import { canManageSkill } from "./rbac";
 
+// Helper for Role-Based Access Control
 async function getActor(ctx, email) {
   if (!email) throw new Error("Unauthorized: missing email");
   const actor = await ctx.db
@@ -12,7 +12,6 @@ async function getActor(ctx, email) {
   if (!actor) throw new Error("User not found");
   return actor;
 }
-
 // GET /api/skills
 export const getAll = query({
   args: {
@@ -38,7 +37,6 @@ export const getAll = query({
     return skills.sort((a, b) => a.name.localeCompare(b.name));
   },
 });
-
 // POST /api/skills
 export const create = mutation({
   args: {
@@ -46,7 +44,7 @@ export const create = mutation({
     name: v.string(),
     category: v.optional(v.string()),
     description: v.optional(v.string()),
-    embedding: v.array(v.float64()),
+    embedding: v.optional(v.array(v.float64())),
     aliases: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
@@ -63,6 +61,7 @@ export const create = mutation({
 
     const now = Date.now();
     const { email, ...skillData } = args;
+
     return await ctx.db.insert("skills", {
       ...skillData,
       aliases: args.aliases?.map((a) => a.trim().toLowerCase()) || [],
@@ -72,7 +71,19 @@ export const create = mutation({
     });
   },
 });
-
+// PATCH /api/skills/[id]/embedding
+export const updateEmbedding = mutation({
+  args: {
+    skillId: v.id("skills"),
+    embedding: v.array(v.float64()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.skillId, {
+      embedding: args.embedding,
+      updatedAt: Date.now(),
+    });
+  },
+});
 // DELETE /api/skills/[skillId]
 export const deleteSkill = mutation({
   args: { email: v.string(), skillId: v.id("skills") },
@@ -102,7 +113,6 @@ export const deleteSkill = mutation({
     };
   },
 });
-
 // GET /api/skills/distribution
 export const getDistribution = query({
   args: { email: v.string() },
@@ -149,12 +159,11 @@ export const getDistribution = query({
     return Object.values(categorized);
   },
 });
-
 // AI skill suggestions
 export const getSuggestions = mutation({
   args: { email: v.string(), description: v.string() },
   handler: async (ctx, args) => {
-    await getActor(ctx, args.email); // any logged-in user
+    await getActor(ctx, args.email);
 
     try {
       const suggestions = [
@@ -170,7 +179,6 @@ export const getSuggestions = mutation({
     }
   },
 });
-
 // Verify user skill
 export const verifyUserSkill = mutation({
   args: {
@@ -246,7 +254,6 @@ export const verifyUserSkill = mutation({
     return { success: true, message: `Skill ${args.action}d successfully.` };
   },
 });
-
 // Pending verifications
 export const getPendingVerifications = query({
   args: { email: v.string() },
@@ -291,7 +298,6 @@ export const getPendingVerifications = query({
     return enriched;
   },
 });
-
 // Upload proof document
 export const uploadProofDocument = mutation({
   args: {
@@ -351,7 +357,7 @@ export const uploadProofDocument = mutation({
         link: `/skills/verifications`,
         actionUrl: `/skills/verifications`,
         requiresAction: true,
-        expiresAt: now + 7 * 24 * 60 * 60 * 1000, // Expire in 7 days
+        expiresAt: now + 7 * 24 * 60 * 60 * 1000,
         relatedResourceId: args.userSkillId,
         relatedResourceType: "userSkill",
         actionUserId: user._id,
@@ -371,7 +377,6 @@ export const uploadProofDocument = mutation({
     return { success: true, message: "Proof document uploaded successfully." };
   },
 });
-
 // Remove proof document
 export const removeProofDocument = mutation({
   args: {
@@ -402,7 +407,6 @@ export const removeProofDocument = mutation({
     return { success: true, message: "Proof document removed successfully." };
   },
 });
-
 // Analytics
 export const getSkillAnalytics = query({
   args: {
@@ -412,7 +416,9 @@ export const getSkillAnalytics = query({
   },
   handler: async (ctx, args) => {
     const actor = await getActor(ctx, args.email);
-    requireRole(actor, ["admin", "hr", "pm", "line_manager"]);
+    if (!["admin", "hr", "pm", "line_manager"].includes(actor.role)) {
+      throw new Error("Unauthorized");
+    }
 
     let userSkills = await ctx.db.query("userSkills").collect();
     if (args.skillId) {

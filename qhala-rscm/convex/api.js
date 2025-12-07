@@ -1,6 +1,10 @@
-import { query, mutation, action, internalQuery } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { action, internalQuery } from "./_generated/server";
+import { api, internal } from "./_generated/api";
 import { v } from "convex/values";
+
+// convex/api.js
+
+// ... imports
 
 export const getUserInternal = internalQuery({
   args: { id: v.id("users") },
@@ -8,13 +12,60 @@ export const getUserInternal = internalQuery({
     const user = await ctx.db.get(args.id);
     if (!user) return null;
 
-    const allocations = await ctx.db
+    // 1. Get Skills
+    const userSkills = await ctx.db
+      .query("userSkills")
+      .withIndex("by_user", (q) => q.eq("userId", args.id))
+      .collect();
+
+    const skillNames = await Promise.all(
+      userSkills.map(async (us) => {
+        const skill = await ctx.db.get(us.skillId);
+        return skill ? skill.name : null;
+      })
+    );
+
+    const legacySkills =
+      user.extractedSkills?.map((s) => (typeof s === "string" ? s : s.name)) ||
+      [];
+    const allSkills = [
+      ...new Set([...legacySkills, ...skillNames.filter(Boolean)]),
+    ];
+
+    // 2. Get Allocations & POPULATE Project Data (Robust Fix)
+    const rawAllocations = await ctx.db
       .query("allocations")
       .withIndex("by_user", (q) => q.eq("userId", args.id))
       .filter((q) => q.eq(q.field("status"), "active"))
       .collect();
 
-    return { ...user, allocations };
+    const populatedAllocations = await Promise.all(
+      rawAllocations.map(async (a) => {
+        // Handle case where projectId might be missing
+        if (!a.projectId)
+          return { ...a, projectId: { name: "Unknown Project" } };
+
+        const project = await ctx.db.get(a.projectId);
+
+        // Fallback logic for legacy data
+        const safeName = project
+          ? project.name || project.title || "Untitled Project"
+          : "Deleted Project";
+
+        return {
+          ...a,
+          // We replace the ID string with an Object containing the name
+          projectId: { _id: a.projectId, name: safeName },
+        };
+      })
+    );
+
+    return {
+      ...user,
+      allocations: populatedAllocations,
+      skills: allSkills,
+      extractedSkills: allSkills,
+    };
   },
 });
 
@@ -28,7 +79,6 @@ export const searchUsers = action({
       vector: args.embedding,
       limit: args.limit * 2,
     });
-
     const users = await Promise.all(
       results.map(async (result) => {
         const user = await ctx.runQuery(internal.api.getUserInternal, {
@@ -37,6 +87,7 @@ export const searchUsers = action({
         if (!user) return null;
         if (user.availabilityStatus !== "available") return null;
 
+        // Attach score for UI ranking
         return { ...user, _score: result._score };
       })
     );
@@ -55,212 +106,30 @@ export const searchSkills = action({
   },
 });
 
-export const saveUserFromCV = mutation({
+export const createProjectAction = action({
   args: {
-    name: v.string(),
+    title: v.string(),
+    description: v.string(),
+    startDate: v.optional(v.string()),
+    endDate: v.optional(v.string()),
+    status: v.optional(v.string()),
     email: v.string(),
-    bio: v.string(),
-    skills: v.array(v.any()),
-    embedding: v.array(v.float64()),
-  },
-  handler: async (ctx, args) => {
-    const existing = await ctx.db
-      .query("users")
-      .withIndex("by_email", (q) => q.eq("email", args.email))
-      .first();
-
-    if (existing) {
-      await ctx.db.patch(existing._id, {
-        bio: args.bio,
-        extractedSkills: args.skills,
-        embedding: args.embedding,
-        updatedAt: Date.now(),
-      });
-      return existing._id;
-    } else {
-      return await ctx.db.insert("users", {
-        name: args.name,
-        email: args.email,
-        bio: args.bio,
-        extractedSkills: args.skills,
-        embedding: args.embedding,
-        role: "employee",
-        authProviderId: "pending_invite",
-        availabilityStatus: "available",
-        weeklyHours: 40,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      });
-    }
-  },
-});
-
-export const updateUserSkillsFromCV = mutation({
-  args: {
-    userId: v.id("users"),
-    skills: v.array(v.any()),
-    embedding: v.array(v.float64()),
-  },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.userId, {
-      extractedSkills: args.skills,
-      embedding: args.embedding,
-      updatedAt: Date.now(),
-    });
-  },
-});
-
-export const saveProjectAnalysis = mutation({
-  args: {
-    id: v.id("projects"),
-    embedding: v.array(v.float64()),
-    requiredSkills: v.array(v.any()),
-    nlpExtractedSkills: v.array(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const resolvedSkills = await Promise.all(
-      args.requiredSkills.map(async (skill) => {
-        const name = skill.skillName.trim();
-        let existingSkill = await ctx.db
-          .query("skills")
-          .withIndex("by_name", (q) => q.eq("name", name))
-          .first();
-
-        let skillId;
-        if (existingSkill) {
-          skillId = existingSkill._id;
-        } else {
-          skillId = await ctx.db.insert("skills", {
-            name: name,
-            category: skill.category || "Uncategorized",
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-          });
-        }
-
-        return {
-          skillId: skillId,
-          skillName: name,
-          proficiencyLevel: skill.proficiencyLevel || 1,
-          category: skill.category,
-          isRequired: true,
-        };
-      })
-    );
-
-    await ctx.db.patch(args.id, {
-      embedding: args.embedding,
-      requiredSkills: resolvedSkills,
-      nlpExtractedSkills: args.nlpExtractedSkills,
-    });
-  },
-});
-
-export const logFeedback = mutation({
-  args: {
-    userId: v.string(),
-    projectId: v.string(),
-    recommendationType: v.string(),
-    rating: v.number(),
-    comments: v.optional(v.string()),
-    timestamp: v.number(),
-  },
-  handler: async (ctx, args) => {
-    await ctx.db.insert("recommendationFeedback", args);
-  },
-});
-
-export const updateSkillEmbedding = mutation({
-  args: {
-    skillId: v.id("skills"),
-    embedding: v.array(v.float64()),
-  },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.skillId, {
-      embedding: args.embedding,
-      updatedAt: Date.now(),
-    });
-  },
-});
-
-export const saveSkill = mutation({
-  args: {
-    name: v.string(),
-    category: v.string(),
-    description: v.optional(v.string()),
-    aliases: v.optional(v.array(v.string())),
-    embedding: v.array(v.float64()),
-  },
-  handler: async (ctx, args) => {
-    const existing = await ctx.db
-      .query("skills")
-      .withIndex("by_name", (q) => q.eq("name", args.name))
-      .first();
-
-    if (existing) throw new Error("Skill already exists");
-
-    await ctx.db.insert("skills", {
-      name: args.name,
-      category: args.category,
-      description: args.description || "",
-      aliases: args.aliases || [],
-      embedding: args.embedding,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
-  },
-});
-
-export const getProject = query({
-  args: { id: v.id("projects") },
-  handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
-  },
-});
-
-export const debugGetAllUsers = query({
-  handler: async (ctx) => await ctx.db.query("users").collect(),
-});
-
-export const finalizeOnboarding = action({
-  args: {
-    name: v.string(),
-    email: v.string(),
-    role: v.string(),
     department: v.optional(v.string()),
-    bio: v.string(),
-    skills: v.array(v.any()),
   },
   handler: async (ctx, args) => {
     const nlpServiceUrl = process.env.API_URL;
     if (!nlpServiceUrl) throw new Error("API_URL not set");
-
-    const response = await fetch(`${nlpServiceUrl}/onboard/finalize`, {
+    const response = await fetch(`${nlpServiceUrl}/projects/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(args),
     });
 
     if (!response.ok) {
-      throw new Error(`Python service error: ${await response.text()}`);
+      const text = await response.text();
+      throw new Error(`Python Error: ${text}`);
     }
-    return await response.json();
-  },
-});
 
-export const searchTalent = action({
-  args: { query: v.string() },
-  handler: async (ctx, args) => {
-    const nlpServiceUrl = process.env.API_URL;
-    if (!nlpServiceUrl) throw new Error("API_URL not set");
-
-    const response = await fetch(`${nlpServiceUrl}/search/talent`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: args.query }),
-    });
-
-    if (!response.ok) throw new Error("Failed to search talent pool");
     return await response.json();
   },
 });
@@ -321,10 +190,105 @@ export const generateSkillEmbeddings = action({
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Python Error (${response.status}): ${errorText}`);
+      const text = await response.text();
+      throw new Error(`Python Error: ${text}`);
     }
 
     return await response.json();
+  },
+});
+
+export const finalizeOnboarding = action({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    role: v.string(),
+    department: v.optional(v.string()),
+    bio: v.string(),
+    skills: v.array(v.any()),
+  },
+  handler: async (ctx, args) => {
+    const nlpServiceUrl = process.env.API_URL;
+    if (!nlpServiceUrl) throw new Error("API_URL not set");
+
+    const response = await fetch(`${nlpServiceUrl}/onboard/finalize`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(args),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Python service error: ${await response.text()}`);
+    }
+    return await response.json();
+  },
+});
+
+export const searchTalent = action({
+  args: { query: v.string() },
+  handler: async (ctx, args) => {
+    const nlpServiceUrl = process.env.API_URL;
+    if (!nlpServiceUrl) throw new Error("API_URL not set");
+
+    const response = await fetch(`${nlpServiceUrl}/search/talent`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: args.query }),
+    });
+
+    if (!response.ok) throw new Error("Failed to search talent pool");
+    return await response.json();
+  },
+});
+
+export const refreshUserEmbedding = action({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    // 1. Fetch User Data
+    const user = await ctx.runQuery(internal.api.getUserInternal, {
+      id: args.userId,
+    });
+    if (!user) return;
+
+    // 2. Prepare Context
+    const skillsList = user.extractedSkills || [];
+    let skillNames = "";
+    if (skillsList.length > 0) {
+      skillNames = skillsList
+        .map((s) => {
+          if (typeof s === "string") return s;
+          if (s.name) return s.name;
+          return "";
+        })
+        .filter(Boolean)
+        .join(", ");
+    }
+
+    const profileContext = `Role: ${user.role}. Bio: ${user.bio || ""}. Skills: ${skillNames}`;
+
+    // 3. Call Python
+    const nlpServiceUrl = process.env.API_URL;
+    if (!nlpServiceUrl) throw new Error("API_URL not set");
+
+    const response = await fetch(`${nlpServiceUrl}/users/embed-profile`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: profileContext }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Python Embedding Error: ${text}`);
+    }
+
+    const { embedding } = await response.json();
+
+    // 4. Save Vector (Calls Domain Mutation in users.js)
+    await ctx.runMutation(api.users.updateEmbedding, {
+      userId: args.userId,
+      embedding,
+    });
+
+    return { success: true };
   },
 });
