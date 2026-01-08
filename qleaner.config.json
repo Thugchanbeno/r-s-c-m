@@ -1,0 +1,12 @@
+{
+  "excludeDir": ["node_modules", "dist", "build"],
+  "excludeFile": [],
+  "excludeExtensions": ["test.jsx", "test.js"],
+  "excludeFilePrint": ["page.jsx", "route.js", "layout.jsx", "error.jsx"],
+  "excludeDirAssets": [],
+  "excludeFileAssets": [],
+  "excludeDirCode": ["node_modules", "dist", "build"],
+  "excludeFileCode": ["index.jsx"],
+  "isRootFolderReferenced": false,
+  "alias": true
+}

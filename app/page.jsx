@@ -171,7 +171,7 @@ const HomePage = () => {
 
       <footer className="relative z-10 py-8 text-center">
         <p className="text-sm text-black/60">
-          © 2025 RSCM. All rights reserved.
+          © {new Date().getFullYear()} RSCM. All rights reserved.
         </p>
       </footer>
     </div>

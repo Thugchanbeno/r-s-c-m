@@ -1,0 +1,3455 @@
+{
+  "parentGraph": {
+    "graph": {
+      "/Users/winston/Repos/r-s-c-m/app/layout.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/layout.jsx",
+        "hash": "441dd290676c630ffd0e296aaa056e98",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/auth/AuthProvider.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/convex.js",
+          "/Users/winston/Repos/r-s-c-m/app/globals.css"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781043,
+        "size": 2927
+      },
+      "/Users/winston/Repos/r-s-c-m/app/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/page.jsx",
+        "hash": "5fd24ba56d00f353f0c062573c779092",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/assets/RSCM-full.png",
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780908,
+        "size": 6990
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/activities.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/activities.js",
+        "hash": "3a9d458904f45fba9135863c753754a8",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271780803,
+        "size": 5765
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/allocations.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/allocations.js",
+        "hash": "8cdbbd3e6ea86c038b885687d1bcfef5",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js",
+          "/Users/winston/Repos/r-s-c-m/convex/notificationUtils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/rbac.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271781163,
+        "size": 15172
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/api.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/api.js",
+        "hash": "a2bf7a35fcf2249e553cc597bef38a45",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js",
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271781199,
+        "size": 8305
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/cvCache.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/cvCache.js",
+        "hash": "f808c9878ebed9a3188954fc6e7f9409",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271781134,
+        "size": 5144
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js",
+        "hash": "09647724850170703df40c19e02233ba",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts",
+          "/Users/winston/Repos/r-s-c-m/app/api/allocations/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/events/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/notifications/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/resourcerequests/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/tasks/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/work-requests/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/userskills/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/allocations/[allocationId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/events/[eventId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/route.js"
+        ],
+        "lastModified": 1765271781163,
+        "size": 4278
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/events.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/events.js",
+        "hash": "bfc4c1b18a48fe8d6343ec826bc4a0de",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js",
+          "/Users/winston/Repos/r-s-c-m/convex/notificationUtils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271781163,
+        "size": 14853
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/files.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/files.js",
+        "hash": "b3d00d1c955817fd26e40a42b3ecee5e",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271780635,
+        "size": 814
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/notificationPreferences.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/notificationPreferences.js",
+        "hash": "33651966e036ad3fc6ac8951351e67e9",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271780827,
+        "size": 11422
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/notificationUtils.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/notificationUtils.js",
+        "hash": "4f1414a48ee1a697a13294163fec9e6a",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/allocations.js",
+          "/Users/winston/Repos/r-s-c-m/convex/events.js",
+          "/Users/winston/Repos/r-s-c-m/convex/projects.js",
+          "/Users/winston/Repos/r-s-c-m/convex/skills.js",
+          "/Users/winston/Repos/r-s-c-m/convex/tasks.js",
+          "/Users/winston/Repos/r-s-c-m/convex/users.js",
+          "/Users/winston/Repos/r-s-c-m/convex/workRequests.js",
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271780828,
+        "size": 16893
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/notifications.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/notifications.js",
+        "hash": "a1320a3cddce7078099953e60a990b8d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271780828,
+        "size": 10186
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/projectFeedback.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/projectFeedback.js",
+        "hash": "2348c98e4715c0c490d53ef6f09a2285",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271780636,
+        "size": 5334
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/projects.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/projects.js",
+        "hash": "0686dbe412afb70e216b91bbcec83d58",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js",
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/convex/notificationUtils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/rbac.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271781200,
+        "size": 19026
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/rbac.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/rbac.js",
+        "hash": "e8f3f4abcee198ed63bb458e5267e798",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/allocations.js",
+          "/Users/winston/Repos/r-s-c-m/convex/projects.js",
+          "/Users/winston/Repos/r-s-c-m/convex/resourceRequests.js",
+          "/Users/winston/Repos/r-s-c-m/convex/users.js",
+          "/Users/winston/Repos/r-s-c-m/convex/workRequests.js",
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271781164,
+        "size": 5881
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/resourceRequests.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/resourceRequests.js",
+        "hash": "bfbd094d84fac5e0ad9c926997f6a395",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js",
+          "/Users/winston/Repos/r-s-c-m/convex/rbac.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271781164,
+        "size": 12002
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/schema.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/schema.js",
+        "hash": "38e0e7c8225044c075fe94b6c5af7781",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/dataModel.d.ts"
+        ],
+        "lastModified": 1765271781200,
+        "size": 22586
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/skills.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/skills.js",
+        "hash": "6e6dde5da3c5180e8e71cd6e4115ae90",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js",
+          "/Users/winston/Repos/r-s-c-m/convex/notificationUtils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271781200,
+        "size": 14542
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/tasks.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/tasks.js",
+        "hash": "a5a35834ae6a5eee499fe8a32f9fb207",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js",
+          "/Users/winston/Repos/r-s-c-m/convex/notificationUtils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271781200,
+        "size": 10634
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/userSkills.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/userSkills.js",
+        "hash": "bf7e97e49781ad89d83b075817ffeb48",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271781146,
+        "size": 5220
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/users.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/users.js",
+        "hash": "c0dcccbd0a8abe71923e11764d26d32f",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js",
+          "/Users/winston/Repos/r-s-c-m/convex/notificationUtils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/rbac.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271781200,
+        "size": 16255
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/workRequests.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/workRequests.js",
+        "hash": "f8a119bf67c4f79604a11c5d50815090",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js",
+          "/Users/winston/Repos/r-s-c-m/convex/notificationUtils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/rbac.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts"
+        ],
+        "lastModified": 1765271781165,
+        "size": 15289
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/animations.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/animations.js",
+        "hash": "1c19cb74f2bd1f24aa44a15e4b50689b",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/CachedCVs.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/UserCreationForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/views/LineManagerRequestsView.jsx"
+        ],
+        "lastModified": 1765271780462,
+        "size": 962
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js",
+        "hash": "ac9a2d907bd0f08458fcd7e59e164804",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/authOptions.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/api/allocations/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/cv-cache/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/events/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/notifications/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/tasks/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/work-requests/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/userskills/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/allocations/summary/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/allocations/[allocationId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/events/[eventId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/notifications/[notificationId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/notifications/count/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/notifications/preferences/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/[skillId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/analytics/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/distribution/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/pending-verifications/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/suggestions/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/tasks/[taskId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/self-onboard/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/work-requests/leave/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/verify/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/work-requests/overtime/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/organization/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/cv/[cvId]/link/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/tasks/by-project/[projectId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/leave-balance/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/line-manager/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/status/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/allocation-summary/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/work-requests/[requestId]/approve/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/tasks/by-user/[userId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/userskills/[userSkillId]/proof/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/feedback/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/utilization/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/work-requests/[requestId]/cancel/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/extract-skills/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/feedback/analytics/route.js"
+        ],
+        "lastModified": 1765271781165,
+        "size": 1818
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/authOptions.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/authOptions.js",
+        "hash": "3b284cfb89f58b77019493ae6a533c08",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/cv/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/feedback/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/ai/get-recommendations/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/ai/extract-skills/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/auth/[...nextauth]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/cv/extract-entities/route.js"
+        ],
+        "lastModified": 1765271780638,
+        "size": 4303
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/convex.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/convex.js",
+        "hash": "2df5e1753626bb96324e253f41885eec",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/layout.jsx"
+        ],
+        "lastModified": 1765271780638,
+        "size": 305
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/convexServer.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+        "hash": "198c387404de4fb6bce0d9fb18fe3154",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/lib/authOptions.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/allocations/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/cv-cache/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/events/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/notifications/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/resourcerequests/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/tasks/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/work-requests/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/userskills/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/allocations/summary/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/allocations/[allocationId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/events/[eventId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/notifications/[notificationId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/notifications/count/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/notifications/preferences/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/resourcerequests/[requestId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/resourcerequests/report/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/[skillId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/analytics/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/distribution/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/pending-verifications/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/suggestions/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/tasks/[taskId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/self-onboard/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/work-requests/leave/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/skills/verify/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/work-requests/overtime/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/organization/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/cv/[cvId]/link/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/tasks/by-project/[projectId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/leave-balance/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/line-manager/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/status/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/allocation-summary/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/work-requests/[requestId]/approve/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/tasks/by-user/[userId]/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/userskills/[userSkillId]/proof/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/feedback/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/utilization/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/work-requests/[requestId]/cancel/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/extract-skills/route.js",
+          "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/feedback/analytics/route.js"
+        ],
+        "lastModified": 1765271780639,
+        "size": 328
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/dateUtils.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/dateUtils.js",
+        "hash": "a6faa56b8514f1a3a8be47165ecd0bb3",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFormNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/TaskFormModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/resources/AllocationModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/user/RequestResourceForm.jsx"
+        ],
+        "lastModified": 1765271780829,
+        "size": 1734
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/error-handler.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/error-handler.js",
+        "hash": "dd797be7621a2afd5c4a929d3d69574b",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/profile/EventFormModal.jsx"
+        ],
+        "lastModified": 1765271781166,
+        "size": 2576
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/projectconstants.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/projectconstants.js",
+        "hash": "bf79971a3a9bcdf2c864c174a7f20ea1",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjectFormData.js",
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFormNew.jsx"
+        ],
+        "lastModified": 1765271780368,
+        "size": 294
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/utils.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/utils.js",
+        "hash": "83545aa57e5a38a104b53d08868db698",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/CVUploader.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/PendingRequests.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/SkillsManagementNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/SkillVerificationsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/WorkRequestsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/notifications/EnhancedNotificationRow.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationFilters.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationRow.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/SkillSelectorNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserCard.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/avatar.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/card.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/checkbox.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/dialog.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/dropdown-menu.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/input.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/popover.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/progress.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/select.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/separator.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/tabs.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/textarea.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/views/LineManagerRequestsView.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsGrid.jsx"
+        ],
+        "lastModified": 1765271780529,
+        "size": 137
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/layout.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/layout.jsx",
+        "hash": "5f86e20bcda475fc62d9295fa514f663",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/layout/AppLayout.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780906,
+        "size": 783
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts",
+        "hash": "f32a0d4f257075218d49475f8114943b",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/activities.js",
+          "/Users/winston/Repos/r-s-c-m/convex/allocations.js",
+          "/Users/winston/Repos/r-s-c-m/convex/api.js",
+          "/Users/winston/Repos/r-s-c-m/convex/cvCache.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js",
+          "/Users/winston/Repos/r-s-c-m/convex/events.js",
+          "/Users/winston/Repos/r-s-c-m/convex/files.js",
+          "/Users/winston/Repos/r-s-c-m/convex/notificationPreferences.js",
+          "/Users/winston/Repos/r-s-c-m/convex/notificationUtils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/notifications.js",
+          "/Users/winston/Repos/r-s-c-m/convex/projectFeedback.js",
+          "/Users/winston/Repos/r-s-c-m/convex/projects.js",
+          "/Users/winston/Repos/r-s-c-m/convex/rbac.js",
+          "/Users/winston/Repos/r-s-c-m/convex/resourceRequests.js",
+          "/Users/winston/Repos/r-s-c-m/convex/skills.js",
+          "/Users/winston/Repos/r-s-c-m/convex/tasks.js",
+          "/Users/winston/Repos/r-s-c-m/convex/userSkills.js",
+          "/Users/winston/Repos/r-s-c-m/convex/users.js",
+          "/Users/winston/Repos/r-s-c-m/convex/workRequests.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781163,
+        "size": 2270
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+        "hash": "c5dea56b7ddd47516cbd4038de020e53",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/api.js",
+          "/Users/winston/Repos/r-s-c-m/convex/projects.js",
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAllocations.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAnalytics.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useDashboard.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useEnhancedNotifications.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useProfile.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjectDetailsData.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjects.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkills.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkillsManagement.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useTasks.js",
+          "/Users/winston/Repos/r-s-c-m/components/admin/PendingRequests.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/SkillsManagementNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/UserCreationForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/UserForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/EventsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTabNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/SkillVerificationsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/SkillVerificationsTabNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/WorkRequestsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/WorkRequestsTabNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/ActivityFeedWidget.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/AdminDashboard.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/EventsTodayWidget.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/PMDashboardNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/EmploymentDetailsModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/EventFormModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/EventsSectionNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/LeaveRequestModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/OvertimeRequestModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfileHeaderNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/SkillsEditorModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFormNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectsListNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/RecommendationFeedback.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/SkillSelectorNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/TaskManagerNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/resources/ResourcesListNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/user/RequestResourceForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/views/ResourcesViewNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/app/api/feedback/route.js",
+          "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/OnboardingForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/TalentPool.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/CreateSkillModal.jsx"
+        ],
+        "lastModified": 1765271780600,
+        "size": 414
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/_generated/dataModel.d.ts": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/_generated/dataModel.d.ts",
+        "hash": "91d99117f24db39b340c80bf37e37282",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/schema.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780601,
+        "size": 1725
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/_generated/server.d.ts": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/_generated/server.d.ts",
+        "hash": "03ae35a6f443482a26531c16304a083e",
+        "imports": [],
+        "importedBy": [],
+        "lastModified": 1765271780601,
+        "size": 5539
+      },
+      "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/_generated/server.js",
+        "hash": "7372284beb581fe265e921f64a5b530a",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/convex/activities.js",
+          "/Users/winston/Repos/r-s-c-m/convex/allocations.js",
+          "/Users/winston/Repos/r-s-c-m/convex/api.js",
+          "/Users/winston/Repos/r-s-c-m/convex/cvCache.js",
+          "/Users/winston/Repos/r-s-c-m/convex/events.js",
+          "/Users/winston/Repos/r-s-c-m/convex/files.js",
+          "/Users/winston/Repos/r-s-c-m/convex/notificationPreferences.js",
+          "/Users/winston/Repos/r-s-c-m/convex/notificationUtils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/notifications.js",
+          "/Users/winston/Repos/r-s-c-m/convex/projectFeedback.js",
+          "/Users/winston/Repos/r-s-c-m/convex/projects.js",
+          "/Users/winston/Repos/r-s-c-m/convex/resourceRequests.js",
+          "/Users/winston/Repos/r-s-c-m/convex/skills.js",
+          "/Users/winston/Repos/r-s-c-m/convex/tasks.js",
+          "/Users/winston/Repos/r-s-c-m/convex/userSkills.js",
+          "/Users/winston/Repos/r-s-c-m/convex/users.js",
+          "/Users/winston/Repos/r-s-c-m/convex/workRequests.js"
+        ],
+        "lastModified": 1765271780601,
+        "size": 3453
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/constants/roles.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/constants/roles.js",
+        "hash": "ffda7f0077467358eb25beebf075fdb6",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/resources/AllocationModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/user/RequestResourceForm.jsx"
+        ],
+        "lastModified": 1765271781113,
+        "size": 326
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useAI.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useAI.js",
+        "hash": "0297635a95e1a48330e08059eb8ec16d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFormNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/app/(main)/projects/[projectId]/page.jsx"
+        ],
+        "lastModified": 1765271781103,
+        "size": 3311
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useAllocations.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useAllocations.js",
+        "hash": "07bc0c345ff6be07bd9fc72a5f97e031",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/resources/AllocationsViewNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/views/ResourcesViewNew.jsx"
+        ],
+        "lastModified": 1765271781082,
+        "size": 5044
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useAnalytics.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useAnalytics.js",
+        "hash": "d95e1cc43b7f0e1f8a14c6767c67e4ff",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/AdminAnalyticsNew.jsx"
+        ],
+        "lastModified": 1765271781047,
+        "size": 11831
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+        "hash": "6e5755897f9b035d1b3717ad3bc13f67",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAI.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAllocations.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAnalytics.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useDashboard.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useProfile.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjectDetailsData.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjects.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkills.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkillsManagement.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useTasks.js",
+          "/Users/winston/Repos/r-s-c-m/components/admin/SkillsManagementNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/ActivityFeedWidget.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/EventsTodayWidget.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/EventFormModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFormNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectsListNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/SkillSelectorNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/TaskManagerNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/resources/ResourcesListNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/user/RequestResourceForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/views/ResourcesViewNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/app/(main)/dashboard/page.jsx",
+          "/Users/winston/Repos/r-s-c-m/app/(main)/admin/analytics/page.jsx",
+          "/Users/winston/Repos/r-s-c-m/app/(main)/admin/skills/page.jsx"
+        ],
+        "lastModified": 1765271781113,
+        "size": 573
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useDashboard.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useDashboard.js",
+        "hash": "0bcb87c8e0c0e796194914c46e953832",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/AdminDashboard.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/EmployeeDashboardNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/LineManagerDashboardNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/PMDashboardNew.jsx"
+        ],
+        "lastModified": 1765271781092,
+        "size": 6446
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useDebounce.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useDebounce.js",
+        "hash": "6cd557b26bed9e34a7551059b4cd5912",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/CachedCVs.jsx"
+        ],
+        "lastModified": 1765271780492,
+        "size": 363
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useEnhancedNotifications.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useEnhancedNotifications.js",
+        "hash": "1c4475c3edd1aaa5ef46db10060c4bd9",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useNotificationCount.js",
+          "/Users/winston/Repos/r-s-c-m/components/layout/NotificationRotator.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/views/NotificationsViewNew.jsx"
+        ],
+        "lastModified": 1765271780830,
+        "size": 9688
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useNotificationCount.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useNotificationCount.js",
+        "hash": "ca1d421d2c8aa28db2c7d8fdeab1bc2a",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useEnhancedNotifications.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780853,
+        "size": 275
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useNotificationsPage.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useNotificationsPage.js",
+        "hash": "3039a950c8a13c817d6a51b2a2f19a9b",
+        "imports": [],
+        "importedBy": [],
+        "lastModified": 1765271780584,
+        "size": 7021
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useOnboarding.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useOnboarding.js",
+        "hash": "5539e400893d294c7849c56352c1027c",
+        "imports": [],
+        "importedBy": [],
+        "lastModified": 1765271781146,
+        "size": 1799
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useProfile.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useProfile.js",
+        "hash": "49f0254ccb140498ce72345d8ad5d037",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx"
+        ],
+        "lastModified": 1765271781004,
+        "size": 12083
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjectDetailsData.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjectDetailsData.js",
+        "hash": "09b66dd2cec837e8fed0092556ff0ed0",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useTasks.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/projects/[projectId]/page.jsx"
+        ],
+        "lastModified": 1765271781146,
+        "size": 4968
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjectFormData.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjectFormData.js",
+        "hash": "670b40a42758eeb69386c9ac307354de",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/projectconstants.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFormNew.jsx"
+        ],
+        "lastModified": 1765271780398,
+        "size": 5184
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjects.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjects.js",
+        "hash": "eab8c02dd433f3f94f451563afdf1cb5",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useTasks.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781201,
+        "size": 3469
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useSettings.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useSettings.js",
+        "hash": "39405c7195835480557547e3428704f0",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx"
+        ],
+        "lastModified": 1765271780567,
+        "size": 1293
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkillDistribution.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkillDistribution.js",
+        "hash": "c830a261df3a54ba0557087cd9130d74",
+        "imports": [],
+        "importedBy": [],
+        "lastModified": 1765271780297,
+        "size": 4793
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkillSelector.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkillSelector.js",
+        "hash": "a8d18701165fbfe9277dcf1bd9838f93",
+        "imports": [],
+        "importedBy": [],
+        "lastModified": 1765271780398,
+        "size": 4513
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkills.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkills.js",
+        "hash": "1f636b9703df5e4b849d70b23126fdce",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780783,
+        "size": 7913
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkillsManagement.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkillsManagement.js",
+        "hash": "ba98fd237f6e986ddddd26e472605912",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsManagementNew.jsx"
+        ],
+        "lastModified": 1765271781176,
+        "size": 3057
+      },
+      "/Users/winston/Repos/r-s-c-m/lib/hooks/useTasks.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useTasks.js",
+        "hash": "99580560f9e34c7f601f846857762efd",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjectDetailsData.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjects.js",
+          "/Users/winston/Repos/r-s-c-m/components/projects/TaskManagerNew.jsx"
+        ],
+        "lastModified": 1765271780783,
+        "size": 1962
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/AdminAnalyticsNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/AdminAnalyticsNew.jsx",
+        "hash": "00703916a7e5849be67cd5a733e4b947",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAnalytics.js",
+          "/Users/winston/Repos/r-s-c-m/components/charts/ChartComponents.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/admin/analytics/page.jsx"
+        ],
+        "lastModified": 1765271781046,
+        "size": 14256
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/CVUploader.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/CVUploader.jsx",
+        "hash": "71eae2d3363d64218c2b1c384fbb4146",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/CreateUserFlow.jsx"
+        ],
+        "lastModified": 1765271780507,
+        "size": 7455
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/CachedCVs.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/CachedCVs.jsx",
+        "hash": "23f4c96f70146c45ae0565f504c48d5d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/ui/input.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/animations.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useDebounce.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/CreateUserFlow.jsx"
+        ],
+        "lastModified": 1765271780525,
+        "size": 4200
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/CreateUserFlow.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/CreateUserFlow.jsx",
+        "hash": "98d1e7069691a4e8b02be5bfc0029f58",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/CVUploader.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/UserCreationForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/CachedCVs.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780525,
+        "size": 2473
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/PendingRequests.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/PendingRequests.jsx",
+        "hash": "1174707b713cd382466f29abb76aa09d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/CustomColors.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781064,
+        "size": 8883
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/SkillsManagementNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/SkillsManagementNew.jsx",
+        "hash": "fd8cd536599b6f0bb09e70ae3b4ed31f",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/charts/ChartComponents.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781055,
+        "size": 29498
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/UserCreationForm.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/UserCreationForm.jsx",
+        "hash": "951aa8d652508f5db21f320e3295aff8",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/input.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/animations.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/CreateUserFlow.jsx"
+        ],
+        "lastModified": 1765271780851,
+        "size": 7175
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/UserForm.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/UserForm.jsx",
+        "hash": "ca0c704266658a0698b8a70f38c6b3c4",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780875,
+        "size": 8250
+      },
+      "/Users/winston/Repos/r-s-c-m/components/approvals/EventsTab.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/approvals/EventsTab.jsx",
+        "hash": "c7528c5aedf0c158eddf278b62fd737d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/ApprovalsViewNew.jsx"
+        ],
+        "lastModified": 1765271781160,
+        "size": 7733
+      },
+      "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTab.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTab.jsx",
+        "hash": "002beaf56a4d584c08aa175e48cb56b2",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/CustomColors.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/LineManagerRequestsView.jsx"
+        ],
+        "lastModified": 1765271781064,
+        "size": 9454
+      },
+      "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTabNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTabNew.jsx",
+        "hash": "4f48922659e5f894042d16a06536e82c",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/CustomColors.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/ApprovalsViewNew.jsx"
+        ],
+        "lastModified": 1765271781111,
+        "size": 10764
+      },
+      "/Users/winston/Repos/r-s-c-m/components/approvals/SkillVerificationsTab.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/approvals/SkillVerificationsTab.jsx",
+        "hash": "7b95370dd7b15629bc0300ef7a994cc3",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/LineManagerRequestsView.jsx"
+        ],
+        "lastModified": 1765271780875,
+        "size": 10858
+      },
+      "/Users/winston/Repos/r-s-c-m/components/approvals/SkillVerificationsTabNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/approvals/SkillVerificationsTabNew.jsx",
+        "hash": "9ecb5af055b186b6bc0407dfb4fc499d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/ApprovalsViewNew.jsx"
+        ],
+        "lastModified": 1765271781026,
+        "size": 11867
+      },
+      "/Users/winston/Repos/r-s-c-m/components/approvals/WorkRequestsTab.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/approvals/WorkRequestsTab.jsx",
+        "hash": "ab61970c8425f0e3feb0835986a8385f",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/LineManagerRequestsView.jsx"
+        ],
+        "lastModified": 1765271780876,
+        "size": 11973
+      },
+      "/Users/winston/Repos/r-s-c-m/components/approvals/WorkRequestsTabNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/approvals/WorkRequestsTabNew.jsx",
+        "hash": "8ed452584a5153f054595e0d00b673f9",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/ApprovalsViewNew.jsx"
+        ],
+        "lastModified": 1765271781026,
+        "size": 10022
+      },
+      "/Users/winston/Repos/r-s-c-m/components/auth/AuthProvider.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/auth/AuthProvider.jsx",
+        "hash": "3fb1272c3e4372f7acc95b21dc4efa83",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/layout.jsx"
+        ],
+        "lastModified": 1765271780068,
+        "size": 178
+      },
+      "/Users/winston/Repos/r-s-c-m/components/common/CustomColors.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/common/CustomColors.jsx",
+        "hash": "4c5d4f52dedabf6b854887f3e0c03324",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/PendingRequests.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTabNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectDetailPageNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserCard.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/recommendations/Scorebar.jsx"
+        ],
+        "lastModified": 1765271781081,
+        "size": 8425
+      },
+      "/Users/winston/Repos/r-s-c-m/components/common/FileUpload.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/common/FileUpload.jsx",
+        "hash": "ed3f55b3e60de0efd06ee5d227418d4e",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780696,
+        "size": 1186
+      },
+      "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+        "hash": "b64d091b48364fbf0ff3f4e765ddfb75",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/layout.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/CVUploader.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/CachedCVs.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/PendingRequests.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/SkillsManagementNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/UserForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/EventsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTabNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/SkillVerificationsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/SkillVerificationsTabNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/WorkRequestsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/WorkRequestsTabNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/AdminDashboard.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/EmployeeDashboardNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/LineManagerDashboardNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/PMDashboardNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/EventsSectionNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/LeaveRequestModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectDetailPageNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectsListNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/SkillSelectorNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/resources/AllocationsViewNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/resources/ResourcesListNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/views/ApprovalsViewNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/views/NotificationsViewNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/views/ResourcesViewNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/app/(main)/approvals/page.jsx",
+          "/Users/winston/Repos/r-s-c-m/app/(main)/dashboard/page.jsx",
+          "/Users/winston/Repos/r-s-c-m/app/(main)/notifications/page.jsx",
+          "/Users/winston/Repos/r-s-c-m/app/(main)/resources/page.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/CreateSkillModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsManagementNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/app/(main)/admin/analytics/page.jsx",
+          "/Users/winston/Repos/r-s-c-m/app/(main)/admin/skills/page.jsx"
+        ],
+        "lastModified": 1765271780926,
+        "size": 647
+      },
+      "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx",
+        "hash": "1b149da4d8d610a07f554ede11b2dc9c",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/settings/ApiKeysModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/DepartmentsModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/EmailNotificationsModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/InAppNotificationsModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/OnboardingModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/PasswordPolicyModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/SkillsDatabaseModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/SystemBackupModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/SystemLogsModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/TwoFactorAuthModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/UserRolesModal.jsx"
+        ],
+        "lastModified": 1765271781091,
+        "size": 2861
+      },
+      "/Users/winston/Repos/r-s-c-m/components/dashboard/ActivityFeedWidget.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/dashboard/ActivityFeedWidget.jsx",
+        "hash": "8950b70ee4b5c376bb88823edba0ef91",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/AdminDashboard.jsx"
+        ],
+        "lastModified": 1765271781160,
+        "size": 6495
+      },
+      "/Users/winston/Repos/r-s-c-m/components/dashboard/AdminDashboard.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/dashboard/AdminDashboard.jsx",
+        "hash": "29638c9cd8fc7a93dd1737633c9111b8",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useDashboard.js",
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/EventsTodayWidget.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/ActivityFeedWidget.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/main-dashboard.jsx"
+        ],
+        "lastModified": 1765271781161,
+        "size": 13309
+      },
+      "/Users/winston/Repos/r-s-c-m/components/dashboard/EmployeeDashboardNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/dashboard/EmployeeDashboardNew.jsx",
+        "hash": "439171408afbbf4586e6d4b2ae817b95",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useDashboard.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/main-dashboard.jsx"
+        ],
+        "lastModified": 1765271781091,
+        "size": 13152
+      },
+      "/Users/winston/Repos/r-s-c-m/components/dashboard/EventsTodayWidget.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/dashboard/EventsTodayWidget.jsx",
+        "hash": "e1d65754752cf802c9a0cd662992ea8d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/AdminDashboard.jsx"
+        ],
+        "lastModified": 1765271781161,
+        "size": 6452
+      },
+      "/Users/winston/Repos/r-s-c-m/components/dashboard/HRAdminDashboardNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/dashboard/HRAdminDashboardNew.jsx",
+        "hash": "0a7b48b289f17975b3ce0ca27ff3a97c",
+        "imports": [],
+        "importedBy": [],
+        "lastModified": 1765271780927,
+        "size": 7162
+      },
+      "/Users/winston/Repos/r-s-c-m/components/dashboard/LineManagerDashboardNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/dashboard/LineManagerDashboardNew.jsx",
+        "hash": "d71b1be3040ded5d235eb0d5abfcf1fb",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useDashboard.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/main-dashboard.jsx"
+        ],
+        "lastModified": 1765271781065,
+        "size": 13431
+      },
+      "/Users/winston/Repos/r-s-c-m/components/dashboard/PMDashboardNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/dashboard/PMDashboardNew.jsx",
+        "hash": "c2678a96b1dab65eca8782346ced13a5",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useDashboard.js",
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/main-dashboard.jsx"
+        ],
+        "lastModified": 1765271781065,
+        "size": 14609
+      },
+      "/Users/winston/Repos/r-s-c-m/components/dashboard/main-dashboard.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/dashboard/main-dashboard.jsx",
+        "hash": "cf1163594d4749e020440e1d59b9d43d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/EmployeeDashboardNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/PMDashboardNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/AdminDashboard.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/LineManagerDashboardNew.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/dashboard/page.jsx"
+        ],
+        "lastModified": 1765271780927,
+        "size": 949
+      },
+      "/Users/winston/Repos/r-s-c-m/components/layout/AppLayout.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/layout/AppLayout.jsx",
+        "hash": "6721b33234193bbb2dc3e54984dac58e",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/layout/AppSidebar.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/layout/NotificationRotator.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/layout.jsx"
+        ],
+        "lastModified": 1765271780928,
+        "size": 732
+      },
+      "/Users/winston/Repos/r-s-c-m/components/layout/AppSidebar.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/layout/AppSidebar.jsx",
+        "hash": "acc7764f460a90baa589168550d7093b",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/assets/RSCM.png"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/layout/AppLayout.jsx"
+        ],
+        "lastModified": 1765271781161,
+        "size": 10444
+      },
+      "/Users/winston/Repos/r-s-c-m/components/layout/NotificationRotator.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/layout/NotificationRotator.jsx",
+        "hash": "05c2b3586700be0f0173cd87c33bb322",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useEnhancedNotifications.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/layout/AppLayout.jsx"
+        ],
+        "lastModified": 1765271780928,
+        "size": 2575
+      },
+      "/Users/winston/Repos/r-s-c-m/components/notifications/EnhancedNotificationRow.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/notifications/EnhancedNotificationRow.jsx",
+        "hash": "18e86033593fc66519fe719b3736eb01",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/dropdown-menu.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780826,
+        "size": 11526
+      },
+      "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationCardNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationCardNew.jsx",
+        "hash": "65c6779a0e99d31063b0c6c9ef93ca11",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/NotificationsViewNew.jsx"
+        ],
+        "lastModified": 1765271781031,
+        "size": 8484
+      },
+      "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationFilters.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationFilters.jsx",
+        "hash": "72c8c372359110a526a78bad2f160628",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/input.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/select.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/popover.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/checkbox.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/separator.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780826,
+        "size": 14939
+      },
+      "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationRow.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationRow.jsx",
+        "hash": "1d432540008541dbf61f02bf683aa005",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js",
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780583,
+        "size": 3987
+      },
+      "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationStats.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationStats.jsx",
+        "hash": "c20a4dade8accef4910fc80ead5ad805",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/ui/card.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780826,
+        "size": 8713
+      },
+      "/Users/winston/Repos/r-s-c-m/components/profile/EmploymentDetailsModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/profile/EmploymentDetailsModal.jsx",
+        "hash": "0bf79c688892d81c417556f0bf1125af",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx"
+        ],
+        "lastModified": 1765271780943,
+        "size": 7622
+      },
+      "/Users/winston/Repos/r-s-c-m/components/profile/EventFormModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/profile/EventFormModal.jsx",
+        "hash": "b0aae0490a4560e8d201d9ac407bc8d7",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+          "/Users/winston/Repos/r-s-c-m/lib/error-handler.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/profile/EventsSectionNew.jsx"
+        ],
+        "lastModified": 1765271781161,
+        "size": 14991
+      },
+      "/Users/winston/Repos/r-s-c-m/components/profile/EventsSectionNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/profile/EventsSectionNew.jsx",
+        "hash": "d058c3b8d6b5a6db615c0be42dd4da40",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/profile/EventFormModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx"
+        ],
+        "lastModified": 1765271781162,
+        "size": 11036
+      },
+      "/Users/winston/Repos/r-s-c-m/components/profile/LeaveRequestModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/profile/LeaveRequestModal.jsx",
+        "hash": "53cc6acb5b787accf64e39a687b17e72",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx"
+        ],
+        "lastModified": 1765271780943,
+        "size": 7779
+      },
+      "/Users/winston/Repos/r-s-c-m/components/profile/LineManagerCardNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/profile/LineManagerCardNew.jsx",
+        "hash": "af82439d9ebe78f9931f22f1b6c3b239",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx"
+        ],
+        "lastModified": 1765271780943,
+        "size": 4173
+      },
+      "/Users/winston/Repos/r-s-c-m/components/profile/OvertimeRequestModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/profile/OvertimeRequestModal.jsx",
+        "hash": "ca4b3a748db18f77c8732450faa40d68",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx"
+        ],
+        "lastModified": 1765271780944,
+        "size": 7061
+      },
+      "/Users/winston/Repos/r-s-c-m/components/profile/ProfileHeaderNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/profile/ProfileHeaderNew.jsx",
+        "hash": "840438da30050eee98be6e212e0f39b5",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx"
+        ],
+        "lastModified": 1765271781197,
+        "size": 5224
+      },
+      "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx",
+        "hash": "86e532a1e175387e5cbd3bec02ce37f9",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useProfile.js",
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfileHeaderNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/SkillsSectionNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProjectsEmploymentSectionNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/LineManagerCardNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/WorkRequestsSectionNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/EventsSectionNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/LeaveRequestModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/OvertimeRequestModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/SkillsEditorModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/profile/EmploymentDetailsModal.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/profile/page.jsx"
+        ],
+        "lastModified": 1765271781162,
+        "size": 7119
+      },
+      "/Users/winston/Repos/r-s-c-m/components/profile/ProjectsEmploymentSectionNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/profile/ProjectsEmploymentSectionNew.jsx",
+        "hash": "48ba9a801dc090dacd0cdc486be31deb",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx"
+        ],
+        "lastModified": 1765271781198,
+        "size": 8544
+      },
+      "/Users/winston/Repos/r-s-c-m/components/profile/SkillsEditorModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/profile/SkillsEditorModal.jsx",
+        "hash": "81456f2a91008875ef8bf3e527b0b517",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx"
+        ],
+        "lastModified": 1765271781198,
+        "size": 21326
+      },
+      "/Users/winston/Repos/r-s-c-m/components/profile/SkillsSectionNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/profile/SkillsSectionNew.jsx",
+        "hash": "c8c62f1e29b15444744ea3d80713c942",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx"
+        ],
+        "lastModified": 1765271780945,
+        "size": 7842
+      },
+      "/Users/winston/Repos/r-s-c-m/components/profile/WorkRequestsSectionNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/profile/WorkRequestsSectionNew.jsx",
+        "hash": "12fcedc576a51e710ea1f2c4ed71aa6f",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx"
+        ],
+        "lastModified": 1765271780945,
+        "size": 6619
+      },
+      "/Users/winston/Repos/r-s-c-m/components/charts/ChartComponents.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/charts/ChartComponents.jsx",
+        "hash": "691c2779092a1b6eb74bb9b4e838230a",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/AdminAnalyticsNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/SkillsManagementNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/GradientScoreBar.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/RecommendedUserCard.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/SkillSelectorNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/user/RequestResourceForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/CreateSkillModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsGrid.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsStats.jsx",
+          "/Users/winston/Repos/r-s-c-m/app/(main)/projects/[projectId]/page.jsx"
+        ],
+        "lastModified": 1765271781046,
+        "size": 8975
+      },
+      "/Users/winston/Repos/r-s-c-m/components/projects/GradientScoreBar.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/projects/GradientScoreBar.jsx",
+        "hash": "55799caad0be035eeface80de673ecec",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/charts/ChartComponents.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/RecommendedUserCard.jsx"
+        ],
+        "lastModified": 1765271781145,
+        "size": 2732
+      },
+      "/Users/winston/Repos/r-s-c-m/components/projects/ProjectCard.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/projects/ProjectCard.jsx",
+        "hash": "fd76f90186d9263fa237387af762172c",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectsListNew.jsx"
+        ],
+        "lastModified": 1765271781037,
+        "size": 5460
+      },
+      "/Users/winston/Repos/r-s-c-m/components/projects/ProjectDetailPageNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/projects/ProjectDetailPageNew.jsx",
+        "hash": "276d21bb35574bdef091028573f87e93",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/TaskManagerNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/CustomColors.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/RecommendedUserList.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/projects/[projectId]/page.jsx"
+        ],
+        "lastModified": 1765271781101,
+        "size": 16222
+      },
+      "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFilters.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFilters.jsx",
+        "hash": "cceb47f768518eeb2743c42ce86f4686",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectsListNew.jsx"
+        ],
+        "lastModified": 1765271781003,
+        "size": 2999
+      },
+      "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFormNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFormNew.jsx",
+        "hash": "6384690113c268a1f531ab2c470a8a7d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjectFormData.js",
+          "/Users/winston/Repos/r-s-c-m/lib/projectconstants.js",
+          "/Users/winston/Repos/r-s-c-m/lib/dateUtils.js",
+          "/Users/winston/Repos/r-s-c-m/components/projects/SkillSelectorNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/quick-ask.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/TaskManagerNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAI.js",
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/projects/new/page.jsx"
+        ],
+        "lastModified": 1765271781198,
+        "size": 26996
+      },
+      "/Users/winston/Repos/r-s-c-m/components/projects/ProjectsListNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/projects/ProjectsListNew.jsx",
+        "hash": "8e280c1898831cb7e280c2c9f1ed5c0d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectCard.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFilters.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/projects/page.jsx"
+        ],
+        "lastModified": 1765271781046,
+        "size": 6440
+      },
+      "/Users/winston/Repos/r-s-c-m/components/projects/RecommendationFeedback.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/projects/RecommendationFeedback.jsx",
+        "hash": "b54e9ae6ce9e2b2b3748002a92b9d465",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/RecommendedUserCard.jsx"
+        ],
+        "lastModified": 1765271781198,
+        "size": 2400
+      },
+      "/Users/winston/Repos/r-s-c-m/components/projects/RecommendedUserCard.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/projects/RecommendedUserCard.jsx",
+        "hash": "2226f2add65a6ebf063c4f6c8d699a14",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/card.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/GradientScoreBar.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/RecommendationFeedback.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/charts/ChartComponents.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/RecommendedUserList.jsx"
+        ],
+        "lastModified": 1765271781145,
+        "size": 8596
+      },
+      "/Users/winston/Repos/r-s-c-m/components/projects/RecommendedUserList.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/projects/RecommendedUserList.jsx",
+        "hash": "a03bbee60357c788d43d66e2f5fa852b",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/RecommendedUserCard.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectDetailPageNew.jsx"
+        ],
+        "lastModified": 1765271781145,
+        "size": 1036
+      },
+      "/Users/winston/Repos/r-s-c-m/components/projects/SkillSelectorNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/projects/SkillSelectorNew.jsx",
+        "hash": "453633e68f57bf0101dab63b40270a71",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/charts/ChartComponents.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFormNew.jsx"
+        ],
+        "lastModified": 1765271781198,
+        "size": 17910
+      },
+      "/Users/winston/Repos/r-s-c-m/components/projects/TaskFormModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/projects/TaskFormModal.jsx",
+        "hash": "cf74548fc4beacfde81f87b9aa6ef320",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/dateUtils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/TaskManagerNew.jsx"
+        ],
+        "lastModified": 1765271781199,
+        "size": 11311
+      },
+      "/Users/winston/Repos/r-s-c-m/components/projects/TaskManagerNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/projects/TaskManagerNew.jsx",
+        "hash": "b928bf2d33b11c4c1e6cf5f6a4730ef2",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useTasks.js",
+          "/Users/winston/Repos/r-s-c-m/components/projects/TaskFormModal.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectDetailPageNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFormNew.jsx"
+        ],
+        "lastModified": 1765271781199,
+        "size": 13366
+      },
+      "/Users/winston/Repos/r-s-c-m/components/projects/quick-ask.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/projects/quick-ask.jsx",
+        "hash": "ffeca5cdc9a25fb7560bb2388a3a81dd",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFormNew.jsx"
+        ],
+        "lastModified": 1765271781091,
+        "size": 8066
+      },
+      "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserCard.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserCard.jsx",
+        "hash": "f1c87e761be8a24e45dfbdaf23ab876b",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/CustomColors.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/recommendations/Scorebar.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserList.jsx"
+        ],
+        "lastModified": 1765271780528,
+        "size": 7892
+      },
+      "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserCardNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserCardNew.jsx",
+        "hash": "075820558dfa4a617339e59e810c0603",
+        "imports": [],
+        "importedBy": [],
+        "lastModified": 1765271781004,
+        "size": 8289
+      },
+      "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserList.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserList.jsx",
+        "hash": "2c3dd9c9c4b211f6ae132cdf984e20c4",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserCard.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781091,
+        "size": 953
+      },
+      "/Users/winston/Repos/r-s-c-m/components/recommendations/Scorebar.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/recommendations/Scorebar.jsx",
+        "hash": "20d1457fb70f57ae48dee71f1d6c6f0a",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/CustomColors.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserCard.jsx"
+        ],
+        "lastModified": 1765271780462,
+        "size": 1334
+      },
+      "/Users/winston/Repos/r-s-c-m/components/resources/AllocationModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/resources/AllocationModal.jsx",
+        "hash": "6187717b964b2f729d79bf77061dd9d3",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/dateUtils.js",
+          "/Users/winston/Repos/r-s-c-m/lib/constants/roles.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/ResourcesViewNew.jsx"
+        ],
+        "lastModified": 1765271781112,
+        "size": 10288
+      },
+      "/Users/winston/Repos/r-s-c-m/components/resources/AllocationsViewNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/resources/AllocationsViewNew.jsx",
+        "hash": "6358fe82cf37cb468b7d0f6a69e419d8",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAllocations.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/ResourcesViewNew.jsx"
+        ],
+        "lastModified": 1765271781020,
+        "size": 11749
+      },
+      "/Users/winston/Repos/r-s-c-m/components/resources/ResourcesListNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/resources/ResourcesListNew.jsx",
+        "hash": "b2be5d70b75cb839577000573ed900d4",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/ResourcesViewNew.jsx"
+        ],
+        "lastModified": 1765271781020,
+        "size": 9994
+      },
+      "/Users/winston/Repos/r-s-c-m/components/resources/UserManagementModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/resources/UserManagementModal.jsx",
+        "hash": "741cabaf280cb69c63512c90385e31f6",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/ResourcesViewNew.jsx"
+        ],
+        "lastModified": 1765271781092,
+        "size": 10061
+      },
+      "/Users/winston/Repos/r-s-c-m/components/settings/ApiKeysModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/settings/ApiKeysModal.jsx",
+        "hash": "7b0a646fb852c510274d0fca1a9c67d7",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx"
+        ],
+        "lastModified": 1765271780565,
+        "size": 12059
+      },
+      "/Users/winston/Repos/r-s-c-m/components/settings/DepartmentsModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/settings/DepartmentsModal.jsx",
+        "hash": "5ad4f616c269d958eda4aaece8266984",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx"
+        ],
+        "lastModified": 1765271780565,
+        "size": 4779
+      },
+      "/Users/winston/Repos/r-s-c-m/components/settings/EmailNotificationsModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/settings/EmailNotificationsModal.jsx",
+        "hash": "8c44b92de774fe240a12aa8510c3b354",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx"
+        ],
+        "lastModified": 1765271780565,
+        "size": 6094
+      },
+      "/Users/winston/Repos/r-s-c-m/components/settings/InAppNotificationsModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/settings/InAppNotificationsModal.jsx",
+        "hash": "3636304d37c3d64c931a7a845dd73f6e",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx"
+        ],
+        "lastModified": 1765271780565,
+        "size": 8540
+      },
+      "/Users/winston/Repos/r-s-c-m/components/settings/OnboardingModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/settings/OnboardingModal.jsx",
+        "hash": "702d7d2901d6582f4291f84b043b2caf",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx"
+        ],
+        "lastModified": 1765271780565,
+        "size": 7812
+      },
+      "/Users/winston/Repos/r-s-c-m/components/settings/PasswordPolicyModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/settings/PasswordPolicyModal.jsx",
+        "hash": "393a57a0f7fd0916c578be592ca494f2",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx"
+        ],
+        "lastModified": 1765271780565,
+        "size": 2809
+      },
+      "/Users/winston/Repos/r-s-c-m/components/settings/SkillsDatabaseModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/settings/SkillsDatabaseModal.jsx",
+        "hash": "54c4e437e171ee02d548ceff1660e0fe",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx"
+        ],
+        "lastModified": 1765271780566,
+        "size": 12146
+      },
+      "/Users/winston/Repos/r-s-c-m/components/settings/SystemBackupModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/settings/SystemBackupModal.jsx",
+        "hash": "5b3a16cdb47a76cd246aa08ef6bf284a",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx"
+        ],
+        "lastModified": 1765271780566,
+        "size": 13139
+      },
+      "/Users/winston/Repos/r-s-c-m/components/settings/SystemLogsModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/settings/SystemLogsModal.jsx",
+        "hash": "e267a8d4f957f4cee90ac18316dc2a3c",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx"
+        ],
+        "lastModified": 1765271780566,
+        "size": 5017
+      },
+      "/Users/winston/Repos/r-s-c-m/components/settings/TwoFactorAuthModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/settings/TwoFactorAuthModal.jsx",
+        "hash": "9390e74d9f693f13eec5e67cdb182653",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx"
+        ],
+        "lastModified": 1765271780566,
+        "size": 12922
+      },
+      "/Users/winston/Repos/r-s-c-m/components/settings/UserRolesModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/settings/UserRolesModal.jsx",
+        "hash": "6923d90442af9dd299686cc5799d8ea3",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx"
+        ],
+        "lastModified": 1765271780566,
+        "size": 4291
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/avatar.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/avatar.jsx",
+        "hash": "b5051a7284266e6a7b5d2d750783e346",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780739,
+        "size": 1043
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx",
+        "hash": "47eaad1e8b6f86dc7cd3b2535f33baed",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/PendingRequests.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/SkillVerificationsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/WorkRequestsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/notifications/EnhancedNotificationRow.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationFilters.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationStats.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/RecommendedUserCard.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserCard.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/views/LineManagerRequestsView.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/CandidateDetailPanel.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/OnboardingForm.jsx"
+        ],
+        "lastModified": 1765271780528,
+        "size": 3519
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+        "hash": "f5e6d24eee134f00cebaae71fea96989",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/page.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/CreateUserFlow.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/PendingRequests.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/UserCreationForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/UserForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/EventsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/SkillVerificationsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/WorkRequestsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/FileUpload.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/Modal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/notifications/EnhancedNotificationRow.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationFilters.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationRow.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/RecommendedUserCard.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserCard.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/user/RequestResourceForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/CandidateDetailPanel.jsx"
+        ],
+        "lastModified": 1765271780528,
+        "size": 3659
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/card.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/card.jsx",
+        "hash": "c02e68030f61936813506567b70246d9",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationStats.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/projects/RecommendedUserCard.jsx"
+        ],
+        "lastModified": 1765271780528,
+        "size": 1767
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/checkbox.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/checkbox.jsx",
+        "hash": "0a969cb1ef908818531f67474ee6bc0c",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationFilters.jsx"
+        ],
+        "lastModified": 1765271780827,
+        "size": 894
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/dialog.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/dialog.jsx",
+        "hash": "335175b51dd8779a55c22b941c69b33d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/projects/[projectId]/page.jsx"
+        ],
+        "lastModified": 1765271780696,
+        "size": 3814
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/dropdown-menu.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/dropdown-menu.jsx",
+        "hash": "2794bc112f225fab29edae9efc7b6087",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/notifications/EnhancedNotificationRow.jsx"
+        ],
+        "lastModified": 1765271780827,
+        "size": 6359
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/input.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/input.jsx",
+        "hash": "d81a404cdbedcf13e9183c4cb66c182b",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/CachedCVs.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/UserCreationForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationFilters.jsx"
+        ],
+        "lastModified": 1765271780528,
+        "size": 1009
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/popover.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/popover.jsx",
+        "hash": "cf43e07668024a47517a246a62f83b8f",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationFilters.jsx"
+        ],
+        "lastModified": 1765271780827,
+        "size": 1230
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/progress.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/progress.jsx",
+        "hash": "3fa2bd1d0d05b9f850bb94242d80bcfc",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780634,
+        "size": 677
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/select.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/select.jsx",
+        "hash": "469fc07a0bc55eb6fb3f1c39a16bf65d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationFilters.jsx"
+        ],
+        "lastModified": 1765271780634,
+        "size": 5555
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/separator.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/separator.jsx",
+        "hash": "6e5e127f9675940335d93fb16bd9eb33",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationFilters.jsx"
+        ],
+        "lastModified": 1765271780827,
+        "size": 614
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/sonner.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/sonner.jsx",
+        "hash": "792945648216443e3bca71a6118324b5",
+        "imports": [],
+        "importedBy": [],
+        "lastModified": 1765271781047,
+        "size": 387
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/tabs.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/tabs.jsx",
+        "hash": "12440bc54f433879cb12bcbf68510878",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/views/LineManagerRequestsView.jsx"
+        ],
+        "lastModified": 1765271780634,
+        "size": 1755
+      },
+      "/Users/winston/Repos/r-s-c-m/components/ui/textarea.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/textarea.jsx",
+        "hash": "3e03f00dd1011ff26f46e0c5a121f11d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780634,
+        "size": 726
+      },
+      "/Users/winston/Repos/r-s-c-m/components/user/RequestResourceForm.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/user/RequestResourceForm.jsx",
+        "hash": "00b917bbdc4f5f814f9b51eb0a9878d2",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/charts/ChartComponents.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/dateUtils.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/constants/roles.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/projects/[projectId]/page.jsx"
+        ],
+        "lastModified": 1765271781112,
+        "size": 10958
+      },
+      "/Users/winston/Repos/r-s-c-m/components/views/ApprovalsViewNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/views/ApprovalsViewNew.jsx",
+        "hash": "13c7488c06e52acf630f8f110557a6a4",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/approvals/WorkRequestsTabNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTabNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/SkillVerificationsTabNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/EventsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/approvals/page.jsx"
+        ],
+        "lastModified": 1765271781162,
+        "size": 3785
+      },
+      "/Users/winston/Repos/r-s-c-m/components/views/LineManagerRequestsView.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/views/LineManagerRequestsView.jsx",
+        "hash": "78d5e2189679ee38a3af0a1d6ec3e061",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/ui/tabs.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/animations.js",
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/WorkRequestsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/SkillVerificationsTab.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/approvals/ResourceRequestsTab.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780876,
+        "size": 4882
+      },
+      "/Users/winston/Repos/r-s-c-m/components/views/NotificationsViewNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/views/NotificationsViewNew.jsx",
+        "hash": "704c4c7da7cbd7441cf916dc351be8ea",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationCardNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useEnhancedNotifications.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/notifications/page.jsx"
+        ],
+        "lastModified": 1765271781032,
+        "size": 11208
+      },
+      "/Users/winston/Repos/r-s-c-m/components/views/ResourcesViewNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/views/ResourcesViewNew.jsx",
+        "hash": "ff93251f4c630e65d1fbb34f6d1bbace",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAllocations.js",
+          "/Users/winston/Repos/r-s-c-m/components/resources/ResourcesListNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/resources/AllocationsViewNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/resources/AllocationModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/resources/UserManagementModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/resources/page.jsx"
+        ],
+        "lastModified": 1765271781021,
+        "size": 8183
+      },
+      "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx",
+        "hash": "b8757911f5288f2c096191e3331dd8b2",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/settings/UserRolesModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/DepartmentsModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/OnboardingModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/EmailNotificationsModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/InAppNotificationsModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/PasswordPolicyModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/TwoFactorAuthModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/ApiKeysModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/SkillsDatabaseModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/SystemBackupModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/settings/SystemLogsModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useSettings.js",
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780567,
+        "size": 10634
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/approvals/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/approvals/page.jsx",
+        "hash": "5c33fa27e7861afb9e8aa85aa2562271",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/views/ApprovalsViewNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781026,
+        "size": 1256
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/dashboard/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/dashboard/page.jsx",
+        "hash": "e7612d71355a41fe35630e4d6a9b941c",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+          "/Users/winston/Repos/r-s-c-m/components/dashboard/main-dashboard.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780906,
+        "size": 800
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/notifications/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/notifications/page.jsx",
+        "hash": "098db504c294da29323a79093cb001e5",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/views/NotificationsViewNew.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781031,
+        "size": 921
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/projects/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/projects/page.jsx",
+        "hash": "1f274e86a64d73fe04cd694fd5fd2d08",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectsListNew.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781002,
+        "size": 176
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/resources/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/resources/page.jsx",
+        "hash": "e91b5e303c4df33dca767354c00cae4f",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/views/ResourcesViewNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781019,
+        "size": 491
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/allocations/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/allocations/route.js",
+        "hash": "fb0fe00f41437cf9fb140c63b1265707",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781156,
+        "size": 1507
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/cv-cache/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/cv-cache/route.js",
+        "hash": "bbca53721eaaa766036e87bb09210f63",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780626,
+        "size": 679
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/cv/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/cv/route.js",
+        "hash": "897c53515957f4e0337eee6b1aa7b466",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/authOptions.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781143,
+        "size": 1019
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/profile/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/profile/page.jsx",
+        "hash": "dfbf4a5d7fd173d6d41802267471490f",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/profile/ProfilePageNew.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780942,
+        "size": 152
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/events/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/events/route.js",
+        "hash": "9b54a5aa2c438b8c3a73f07de6bc13d8",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781157,
+        "size": 1365
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/notifications/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/notifications/route.js",
+        "hash": "9c23277c98ae47a2567fdd58ea736318",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781157,
+        "size": 2062
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/feedback/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/feedback/route.js",
+        "hash": "78505690a0ddda1db0dda6c15cce8b5c",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/authOptions.js",
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781101,
+        "size": 983
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/resourcerequests/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/resourcerequests/route.js",
+        "hash": "52a4c7049f62f28e9d8c0238cea45f2a",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781158,
+        "size": 1318
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/skills/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/skills/route.js",
+        "hash": "1d783f4392b00e17d757a090cba5e322",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781175,
+        "size": 2636
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/tasks/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/tasks/route.js",
+        "hash": "2f63995fd347ed3746e24b9ebb6f127c",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781159,
+        "size": 1612
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/users/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/users/route.js",
+        "hash": "ea324ef1d5fadb603a316126ae641aaa",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781159,
+        "size": 1502
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/work-requests/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/work-requests/route.js",
+        "hash": "ac80f81a417e5342a538e10944b0460d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781159,
+        "size": 1053
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/CachedCVs.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/CachedCVs.jsx",
+        "hash": "a39f9f708f0090b20ec5cdf2beb681e0",
+        "imports": [],
+        "importedBy": [],
+        "lastModified": 1765271781143,
+        "size": 3359
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/CandidateDetailPanel.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/CandidateDetailPanel.jsx",
+        "hash": "3904a0bd853a2d931311fc1c8fec83b5",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/ui/button.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781130,
+        "size": 5274
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/CvUpload.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/CvUpload.jsx",
+        "hash": "c13bfc2af0e9a5bdb623a0d3871acb1f",
+        "imports": [],
+        "importedBy": [],
+        "lastModified": 1765271781131,
+        "size": 4925
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/OnboardingForm.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/OnboardingForm.jsx",
+        "hash": "0d40961f77e49418c966889760b89909",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/ui/badge.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/admin/onboarding/page.jsx"
+        ],
+        "lastModified": 1765271781144,
+        "size": 15902
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/TalentPool.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/TalentPool.jsx",
+        "hash": "ed9a918b25bb5930961e8c10ce7fe1f5",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/admin/onboarding/page.jsx"
+        ],
+        "lastModified": 1765271781132,
+        "size": 4218
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/UserCreationForm.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/UserCreationForm.jsx",
+        "hash": "f888a93fe9408646718cd4dc75c46c28",
+        "imports": [],
+        "importedBy": [],
+        "lastModified": 1765271781144,
+        "size": 4423
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/userskills/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/userskills/route.js",
+        "hash": "9ce16dd361fd3ee8a3a023bb12d25160",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781159,
+        "size": 1274
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/projects/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/projects/route.js",
+        "hash": "1a5826c2798fed4b9dc0529b022b8975",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781157,
+        "size": 1764
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/skills/CreateSkillModal.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/skills/CreateSkillModal.jsx",
+        "hash": "6ea9307f8a4f216cb4f3573a8b1007f3",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/convex/_generated/api.js",
+          "/Users/winston/Repos/r-s-c-m/components/charts/ChartComponents.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsManagementNew.jsx"
+        ],
+        "lastModified": 1765271781175,
+        "size": 8009
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsGrid.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsGrid.jsx",
+        "hash": "969c39d36377ca7aa6e408019e70aa54",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/charts/ChartComponents.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/utils.js"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsManagementNew.jsx"
+        ],
+        "lastModified": 1765271781175,
+        "size": 9523
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsManagementNew.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsManagementNew.jsx",
+        "hash": "935312a1b2915b388df2a79fb24c927d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkillsManagement.js",
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/CreateSkillModal.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsStats.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsGrid.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/(main)/admin/skills/page.jsx"
+        ],
+        "lastModified": 1765271781175,
+        "size": 3822
+      },
+      "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsStats.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsStats.jsx",
+        "hash": "3af22c9aec6405b5fdee385404492975",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/charts/ChartComponents.jsx"
+        ],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsManagementNew.jsx"
+        ],
+        "lastModified": 1765271781176,
+        "size": 2727
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/admin/analytics/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/admin/analytics/page.jsx",
+        "hash": "ea09e93f0b9293d5bbac34cb8e941d3a",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/AdminAnalyticsNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781054,
+        "size": 987
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/admin/onboarding/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/admin/onboarding/page.jsx",
+        "hash": "0f0dfe8f815e8ab80c8e27f1741feb71",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/OnboardingForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/TalentPool.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781129,
+        "size": 2203
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/admin/settings/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/admin/settings/page.jsx",
+        "hash": "38c2a834be2798bee937dcaaf95f6011",
+        "imports": [],
+        "importedBy": [],
+        "lastModified": 1765271781090,
+        "size": 248
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/admin/skills/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/admin/skills/page.jsx",
+        "hash": "a8122a1bb94494de2f2ae1fcc8a5e96a",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/admin/skills/SkillsManagementNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/common/LoadingSpinner.jsx",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAuth.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781174,
+        "size": 1034
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/projects/[projectId]/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/projects/[projectId]/page.jsx",
+        "hash": "0ac1c86a8038b5669b77478d6822c14f",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjectDetailsData.js",
+          "/Users/winston/Repos/r-s-c-m/lib/hooks/useAI.js",
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectDetailPageNew.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/user/RequestResourceForm.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/ui/dialog.jsx",
+          "/Users/winston/Repos/r-s-c-m/components/charts/ChartComponents.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781111,
+        "size": 3054
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/admin/users/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/admin/users/page.jsx",
+        "hash": "8fba4134547f5cf2321704f287c1fb0f",
+        "imports": [],
+        "importedBy": [],
+        "lastModified": 1765271781091,
+        "size": 3187
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/ai/get-recommendations/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/ai/get-recommendations/route.js",
+        "hash": "5fd9c6cfdbbe3284cedc28aec1071c6a",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/authOptions.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781129,
+        "size": 1160
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/projects/new/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/projects/new/page.jsx",
+        "hash": "0be45d3bc9edeb84494b2b5012298c26",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/components/projects/ProjectFormNew.jsx"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781197,
+        "size": 704
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/ai/extract-skills/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/ai/extract-skills/route.js",
+        "hash": "dda0a560548c028bc0e7178f714eb94a",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/authOptions.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781129,
+        "size": 1263
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/auth/[...nextauth]/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/auth/[...nextauth]/route.js",
+        "hash": "42709636d63d0fd04a4bf140325a4844",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/authOptions.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780063,
+        "size": 203
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/allocations/summary/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/allocations/summary/route.js",
+        "hash": "bba8b067da00f12cf9b20ba7efb81266",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780625,
+        "size": 1135
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/allocations/[allocationId]/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/allocations/[allocationId]/route.js",
+        "hash": "90213c59ea8bb681fe247043acbc85f8",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781156,
+        "size": 1284
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/cv/extract-entities/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/cv/extract-entities/route.js",
+        "hash": "436a09eacc16bba63038a229fa45dff4",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/authOptions.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781130,
+        "size": 1304
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/events/[eventId]/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/events/[eventId]/route.js",
+        "hash": "0e69f64f1c9e69f1a9ae875b0b494186",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781156,
+        "size": 1227
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/notifications/[notificationId]/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/notifications/[notificationId]/route.js",
+        "hash": "b92e469863108f18269104f1f6e643fd",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780626,
+        "size": 713
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/notifications/count/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/notifications/count/route.js",
+        "hash": "d1872f2898511ddb3409ed363a60f2c0",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780627,
+        "size": 539
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/notifications/preferences/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/notifications/preferences/route.js",
+        "hash": "aee8176b50f736ff60633ea34b2389ae",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780627,
+        "size": 672
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/resourcerequests/[requestId]/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/resourcerequests/[requestId]/route.js",
+        "hash": "f05ac7b0ec2a5a655369f91f1688f356",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780629,
+        "size": 596
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/resourcerequests/report/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/resourcerequests/report/route.js",
+        "hash": "1ec5de2a6b638ba498d9792d158d6e4a",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780629,
+        "size": 890
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/skills/[skillId]/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/skills/[skillId]/route.js",
+        "hash": "e0e311fae992ea2b658aca3ed1de6d7c",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780629,
+        "size": 586
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/skills/analytics/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/skills/analytics/route.js",
+        "hash": "e934deb16ed7f1a62ad438af89b258ca",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780629,
+        "size": 756
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/skills/distribution/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/skills/distribution/route.js",
+        "hash": "ddcb1086916285d8e282e3f839e2673e",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780629,
+        "size": 537
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/skills/pending-verifications/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/skills/pending-verifications/route.js",
+        "hash": "ec65845ac5502e4a74f24d2633df6d49",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780630,
+        "size": 548
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/skills/suggestions/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/skills/suggestions/route.js",
+        "hash": "cf39f5e3f0a4a6474e991ca363fdec5d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780630,
+        "size": 640
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/tasks/[taskId]/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/tasks/[taskId]/route.js",
+        "hash": "e9981e78779a1c0751e8ad5f6eae50c1",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780631,
+        "size": 1417
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/route.js",
+        "hash": "6eb59a1a1159eb05fa01a2d4e1188ffb",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781159,
+        "size": 1271
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/users/self-onboard/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/users/self-onboard/route.js",
+        "hash": "fe27382d6f3917759ee282ca022d4033",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780632,
+        "size": 402
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/work-requests/leave/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/work-requests/leave/route.js",
+        "hash": "3edeb84ae0724623795c36b92f3e94be",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780633,
+        "size": 599
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/skills/verify/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/skills/verify/route.js",
+        "hash": "d71c5f8d3aa9fd3f35c872ff43b68522",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780630,
+        "size": 695
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/work-requests/overtime/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/work-requests/overtime/route.js",
+        "hash": "09558aa2da7da1b959f791bdf986e41d",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780633,
+        "size": 605
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/route.js",
+        "hash": "b696b14be6552ceb5d81ca770494a8b4",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/convex/errorHandler.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271781157,
+        "size": 1051
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/projects/organization/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/projects/organization/route.js",
+        "hash": "01604a9e702892d7d1a7e4780cec414c",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780628,
+        "size": 925
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/cv/[cvId]/link/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/cv/[cvId]/link/route.js",
+        "hash": "cf5f2b28f45baedbc7c28c09ac736ec2",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780626,
+        "size": 673
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/tasks/by-project/[projectId]/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/tasks/by-project/[projectId]/route.js",
+        "hash": "b434fc266f8b460a2e6d0501e8158b9e",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780631,
+        "size": 1024
+      },
+      "/Users/winston/Repos/r-s-c-m/app/(main)/admin/users/new/page.jsx": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/(main)/admin/users/new/page.jsx",
+        "hash": "a17d9f7f7df0587302c8248c2c8768e1",
+        "imports": [],
+        "importedBy": [],
+        "lastModified": 1765271781090,
+        "size": 4283
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/leave-balance/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/leave-balance/route.js",
+        "hash": "13a9c594a588041f98ccf2c2ee1605b6",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780631,
+        "size": 596
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/line-manager/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/line-manager/route.js",
+        "hash": "294b9dce320d8168c7b3e089950d5b80",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780632,
+        "size": 687
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/status/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/status/route.js",
+        "hash": "113619fa2008cd28f69c16fa0ef005fb",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780632,
+        "size": 676
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/allocation-summary/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/users/[userId]/allocation-summary/route.js",
+        "hash": "96454f6d929eb6c2001c2aaed6d94403",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780631,
+        "size": 616
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/work-requests/[requestId]/approve/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/work-requests/[requestId]/approve/route.js",
+        "hash": "75f07695725ef17c834ab8f103ba252b",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780633,
+        "size": 727
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/tasks/by-user/[userId]/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/tasks/by-user/[userId]/route.js",
+        "hash": "2d1a17583df51220b6bc2fc8d340dd23",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780631,
+        "size": 925
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/userskills/[userSkillId]/proof/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/userskills/[userSkillId]/proof/route.js",
+        "hash": "b54ff25addf0dd8c5e592825b0ce770e",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780632,
+        "size": 1303
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/feedback/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/feedback/route.js",
+        "hash": "3a6eef22c3efea162389f787faa9af0b",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780628,
+        "size": 1397
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/utilization/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/utilization/route.js",
+        "hash": "53cec62b917abcf3cf3c3c577297bcca",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780628,
+        "size": 648
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/work-requests/[requestId]/cancel/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/work-requests/[requestId]/cancel/route.js",
+        "hash": "eaf4764bc586f96a23cd19522937729a",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780633,
+        "size": 610
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/extract-skills/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/extract-skills/route.js",
+        "hash": "4bea3f84575ab67a728b5bce48a3d52a",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780627,
+        "size": 725
+      },
+      "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/feedback/analytics/route.js": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/api/projects/[projectId]/feedback/analytics/route.js",
+        "hash": "9170c3ba54544979782e61f64c4a6cc6",
+        "imports": [
+          "/Users/winston/Repos/r-s-c-m/lib/convexServer.js",
+          "/Users/winston/Repos/r-s-c-m/lib/auth-utils.js"
+        ],
+        "importedBy": [],
+        "lastModified": 1765271780628,
+        "size": 661
+      },
+      "/Users/winston/Repos/r-s-c-m/app/globals.css": {
+        "file": "/Users/winston/Repos/r-s-c-m/app/globals.css",
+        "size": 3686,
+        "hash": "05e8128fe9fd836dbfc8ceb57d730632",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/layout.jsx"
+        ],
+        "lastModified": 1765271780908
+      },
+      "/Users/winston/Repos/r-s-c-m/assets/RSCM-full.png": {
+        "file": "/Users/winston/Repos/r-s-c-m/assets/RSCM-full.png",
+        "size": 60683,
+        "hash": "37cab29c314bffa327aa31a597dca2c6",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/app/page.jsx"
+        ],
+        "lastModified": 1765271780922
+      },
+      "/Users/winston/Repos/r-s-c-m/assets/RSCM.png": {
+        "file": "/Users/winston/Repos/r-s-c-m/assets/RSCM.png",
+        "size": 78863,
+        "hash": "9e22742a66f8f2e4d423b958e9ea7f3c",
+        "imports": [],
+        "importedBy": [
+          "/Users/winston/Repos/r-s-c-m/components/layout/AppSidebar.jsx"
+        ],
+        "lastModified": 1765271780923
+      }
+    },
+    "unusedFiles": [
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/_generated/api.d.ts",
+        "hash": "f32a0d4f257075218d49475f8114943b",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271781163,
+        "size": 2270
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/_generated/dataModel.d.ts",
+        "hash": "91d99117f24db39b340c80bf37e37282",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780601,
+        "size": 1725
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/convex/_generated/server.d.ts",
+        "hash": "03ae35a6f443482a26531c16304a083e",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780601,
+        "size": 5539
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useNotificationCount.js",
+        "hash": "ca1d421d2c8aa28db2c7d8fdeab1bc2a",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780853,
+        "size": 275
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useNotificationsPage.js",
+        "hash": "3039a950c8a13c817d6a51b2a2f19a9b",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780584,
+        "size": 7021
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useOnboarding.js",
+        "hash": "5539e400893d294c7849c56352c1027c",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271781146,
+        "size": 1799
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useProjects.js",
+        "hash": "eab8c02dd433f3f94f451563afdf1cb5",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271781201,
+        "size": 3469
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkillDistribution.js",
+        "hash": "c830a261df3a54ba0557087cd9130d74",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780297,
+        "size": 4793
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkillSelector.js",
+        "hash": "a8d18701165fbfe9277dcf1bd9838f93",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780398,
+        "size": 4513
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/lib/hooks/useSkills.js",
+        "hash": "1f636b9703df5e4b849d70b23126fdce",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780783,
+        "size": 7913
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/CreateUserFlow.jsx",
+        "hash": "98d1e7069691a4e8b02be5bfc0029f58",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780525,
+        "size": 2473
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/PendingRequests.jsx",
+        "hash": "1174707b713cd382466f29abb76aa09d",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271781064,
+        "size": 8883
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/SkillsManagementNew.jsx",
+        "hash": "fd8cd536599b6f0bb09e70ae3b4ed31f",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271781055,
+        "size": 29498
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/UserForm.jsx",
+        "hash": "ca0c704266658a0698b8a70f38c6b3c4",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780875,
+        "size": 8250
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/common/FileUpload.jsx",
+        "hash": "ed3f55b3e60de0efd06ee5d227418d4e",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780696,
+        "size": 1186
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/dashboard/HRAdminDashboardNew.jsx",
+        "hash": "0a7b48b289f17975b3ce0ca27ff3a97c",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780927,
+        "size": 7162
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/notifications/EnhancedNotificationRow.jsx",
+        "hash": "18e86033593fc66519fe719b3736eb01",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780826,
+        "size": 11526
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationFilters.jsx",
+        "hash": "72c8c372359110a526a78bad2f160628",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780826,
+        "size": 14939
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationRow.jsx",
+        "hash": "1d432540008541dbf61f02bf683aa005",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780583,
+        "size": 3987
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/notifications/NotificationStats.jsx",
+        "hash": "c20a4dade8accef4910fc80ead5ad805",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780826,
+        "size": 8713
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserCardNew.jsx",
+        "hash": "075820558dfa4a617339e59e810c0603",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271781004,
+        "size": 8289
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/recommendations/RecommendedUserList.jsx",
+        "hash": "2c3dd9c9c4b211f6ae132cdf984e20c4",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271781091,
+        "size": 953
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/progress.jsx",
+        "hash": "3fa2bd1d0d05b9f850bb94242d80bcfc",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780634,
+        "size": 677
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/ui/sonner.jsx",
+        "hash": "792945648216443e3bca71a6118324b5",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271781047,
+        "size": 387
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/views/LineManagerRequestsView.jsx",
+        "hash": "78d5e2189679ee38a3af0a1d6ec3e061",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780876,
+        "size": 4882
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/views/SettingsView.jsx",
+        "hash": "b8757911f5288f2c096191e3331dd8b2",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271780567,
+        "size": 10634
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/CachedCVs.jsx",
+        "hash": "a39f9f708f0090b20ec5cdf2beb681e0",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271781143,
+        "size": 3359
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/CandidateDetailPanel.jsx",
+        "hash": "3904a0bd853a2d931311fc1c8fec83b5",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271781130,
+        "size": 5274
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/CvUpload.jsx",
+        "hash": "c13bfc2af0e9a5bdb623a0d3871acb1f",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271781131,
+        "size": 4925
+      },
+      {
+        "file": "/Users/winston/Repos/r-s-c-m/components/admin/onboarding/UserCreationForm.jsx",
+        "hash": "f888a93fe9408646718cd4dc75c46c28",
+        "imports": {},
+        "importedBy": {},
+        "lastModified": 1765271781144,
+        "size": 4423
+      }
+    ]
+  },
+  "imageParentGraph": {
+    "imageGraph": {},
+    "unusedImages": []
+  }
+}
