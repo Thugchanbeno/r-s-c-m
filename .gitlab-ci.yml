@@ -1,0 +1,125 @@
+variables:
+  # AWS ECR setup
+  AWS_ECR_REGISTRY_URI: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_PROJECT_NAME}
+  AWS_ECR_IMAGE_URI: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_PROJECT_NAME}/${ECR_APP_NAME}
+
+stages:
+  - test
+  - build
+  - deploy
+
+default:
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind # Docker-in-Docker for building Docker images
+  before_script:
+    # Set up AWS CLI
+    - apk add --no-cache aws-cli gettext nodejs npm python3 make g++
+    
+    # Debug: Check if required variables are set
+    - echo "Checking AWS variables..."
+    - echo "AWS_REGION=${AWS_REGION}"
+    - echo "AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID}"
+    - echo "ECR_PROJECT_NAME=${ECR_PROJECT_NAME}"
+    - echo "ECR_APP_NAME=${ECR_APP_NAME}"
+    
+    # Ensure AWS_REGION is set
+    - |
+      if [ -z "$AWS_REGION" ]; then
+        echo "ERROR: AWS_REGION is not set!"
+        exit 1
+      fi
+    
+    # Export AWS credentials as environment variables
+    - export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+    - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    - export AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}  # Default to us-east-1 if AWS_REGION is empty
+    
+    # Verify AWS CLI setup
+    - aws --version
+    - echo "Testing AWS connectivity..."
+    - aws sts get-caller-identity
+    
+    # Generate .env file from template
+    - |
+      cat <<EOF > .env.local
+      # Application
+      
+      CONVEX_DEPLOYMENT=${CONVEX_DEPLOYMENT}
+      NEXT_PUBLIC_CONVEX_URL=${NEXT_PUBLIC_CONVEX_URL}
+      NEXT_PUBLIC_DOMAIN=${NEXT_PUBLIC_DOMAIN}
+      NEXT_PUBLIC_API_DOMAIN=${NEXT_PUBLIC_API_DOMAIN}
+      NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      NEXT_AUTH_URL=${NEXT_AUTH_URL}
+      NEXT_AUTH_SECRET=${NEXT_AUTH_SECRET}
+      GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      API_URL=${API_URL}
+      NLP_API_URL=${NLP_API_URL}
+      NLP_API_URL_LOCAL=${NLP_API_URL_LOCAL}
+      NEXT_PUBLIC_LLAMA_CLOUD_API_KEY=${NEXT_PUBLIC_LLAMA_CLOUD_API_KEY}
+      CRON_SECRET=${CRON_SECRET}
+
+      EOF
+
+.build_job_template:
+  stage: build
+  script:
+    # Log in to AWS ECR
+    - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ECR_REGISTRY_URI}
+    
+    # Build the Docker image with cache optimization
+    - docker build --pull -t ${ECR_APP_NAME}:${CI_COMMIT_SHORT_SHA} .
+    - docker tag ${ECR_APP_NAME}:${CI_COMMIT_SHORT_SHA} ${ECR_APP_NAME}:latest
+
+    # Tag for ECR and push
+    - docker tag ${ECR_APP_NAME}:${CI_COMMIT_SHORT_SHA} ${AWS_ECR_IMAGE_URI}:${CI_COMMIT_SHORT_SHA}
+    - docker tag ${ECR_APP_NAME}:latest ${AWS_ECR_IMAGE_URI}:latest
+    - docker push ${AWS_ECR_IMAGE_URI}:${CI_COMMIT_SHORT_SHA}
+    - docker push ${AWS_ECR_IMAGE_URI}:latest
+
+  after_script:
+    # Clean up (no AWS credential files to remove with env var approach)
+    - docker logout ${AWS_ECR_REGISTRY_URI}
+
+# Build job for the 'dev' environment
+build_dev:
+  extends: .build_job_template
+  environment:
+    name: release/dev
+  only:
+    - dev
+
+# Build job for the 'prod' environment
+build_prod:
+  extends: .build_job_template
+  environment:
+    name: release/prod
+  only:
+    - main
+
+.deploy_job_template:
+  stage: deploy
+  script:
+    # Trigger ECS deployment to update the service with the new image
+    - aws ecs update-service --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --force-new-deployment --region ${AWS_REGION} --query "service.deployments[?status=='PRIMARY'].[createdAt,updatedAt,rolloutState]" --output text
+
+  after_script:
+    # Clean up (no AWS credential files to remove with env var approach)
+    - echo "Deployment completed"
+
+# Deployment job for the 'dev' environment
+deploy_dev:
+  extends: .deploy_job_template
+  environment:
+    name: release/dev
+  only:
+    - dev
+
+# Deployment job for the 'prod' environment
+deploy_prod:
+  extends: .deploy_job_template
+  environment:
+    name: release/prod
+  only:
+    - main
