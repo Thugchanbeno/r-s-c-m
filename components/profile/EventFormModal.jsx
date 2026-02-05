@@ -36,7 +36,7 @@ export default function EventFormModal({ isOpen, onClose, onSuccess, initialEven
   const [showAttendeeDropdown, setShowAttendeeDropdown] = useState(false);
 
   const usersData = useQuery(
-    api.users.getAll,
+    api.users.getBasicList,
     user?.email ? { email: user.email } : "skip"
   ) || [];
 

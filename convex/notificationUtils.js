@@ -183,6 +183,9 @@ export const createNotification = internalMutation({
     // Auto-determine priority from type (can be overridden)
     const priority = args.priority || TYPE_TO_PRIORITY[args.type] || "medium";
     
+    // Use actionUrl if provided, fallback to link if actionUrl not provided
+    const finalActionUrl = args.actionUrl || args.link;
+    
     const notification = await ctx.db.insert("notifications", {
       userId: args.userId,
       type: args.type,
@@ -191,7 +194,7 @@ export const createNotification = internalMutation({
       title: args.title,
       message: args.message,
       link: args.link,
-      actionUrl: args.actionUrl,
+      actionUrl: finalActionUrl,
       isRead: false,
       requiresAction: args.requiresAction || false,
       actionCompleted: false,

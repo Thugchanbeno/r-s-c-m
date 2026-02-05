@@ -16,6 +16,21 @@ async function getActor(ctx, email) {
   if (!actor) throw new Error("User not found");
   return actor;
 }
+// GET /api/users - Basic list accessible to all authenticated users
+export const getBasicList = query({
+  args: {
+    email: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const actor = await getActor(ctx, args.email);
+    const users = await ctx.db.query("users").collect();
+    return users.map((u) => ({
+      _id: u._id,
+      name: u.name,
+      email: u.email,
+    }));
+  },
+});
 // GET /api/users
 export const getAll = query({
   args: {
@@ -181,6 +196,14 @@ export const updateProfile = mutation({
     const currentUser = await ctx.db.get(args.id);
     if (!currentUser) throw new Error("User not found");
 
+    // Validate lineManagerId if being changed
+    if (updates.lineManagerId && updates.lineManagerId !== currentUser.lineManagerId) {
+      const lm = await ctx.db.get(updates.lineManagerId);
+      if (!lm || lm.role !== "line_manager") {
+        throw new Error("The selected line manager is invalid.");
+      }
+    }
+
     await ctx.db.patch(args.id, { ...updates, updatedAt: Date.now() });
 
     // Notify user if their role changed
@@ -201,6 +224,53 @@ export const updateProfile = mutation({
           oldRole: currentUser.role,
           newRole: updates.role,
           updatedByName: actor.name,
+          actionUserName: actor.name,
+          actionUserAvatar: actor.avatarUrl,
+        },
+      });
+    }
+
+    // Notify user if line manager is assigned/changed
+    if (updates.lineManagerId && updates.lineManagerId !== currentUser.lineManagerId) {
+      const lm = await ctx.db.get(updates.lineManagerId);
+      
+      // Notify the employee
+      await createNotification(ctx, {
+        userId: args.id,
+        type: "user_role_changed",
+        title: "Line Manager Assigned",
+        message: `${lm.name} has been assigned as your line manager by ${actor.name}`,
+        link: `/profile`,
+        relatedResourceId: args.id,
+        relatedResourceType: "user",
+        actionUserId: actor._id,
+        actionUserRole: actor.role,
+        contextData: {
+          lineManagerName: lm.name,
+          lineManagerEmail: lm.email,
+          assignedByName: actor.name,
+          actionUserName: actor.name,
+          actionUserAvatar: actor.avatarUrl,
+        },
+      });
+      
+      // Notify the line manager
+      await createNotification(ctx, {
+        userId: updates.lineManagerId,
+        type: "user_role_changed",
+        title: "New Direct Report",
+        message: `${currentUser.name} has been assigned to report to you by ${actor.name}`,
+        link: `/team`,
+        actionUrl: `/team`,
+        requiresAction: true,
+        relatedResourceId: args.id,
+        relatedResourceType: "user",
+        actionUserId: actor._id,
+        actionUserRole: actor.role,
+        contextData: {
+          directReportName: currentUser.name,
+          directReportEmail: currentUser.email,
+          assignedByName: actor.name,
           actionUserName: actor.name,
           actionUserAvatar: actor.avatarUrl,
         },

@@ -212,9 +212,9 @@ const NotificationCardNew = ({
                 )}
               </div>
 
-              {notification.requiresAction && notification.actionUrl && (
+              {notification.requiresAction && (notification.actionUrl || notification.link) && (
                 <button
-                  onClick={() => router.push(notification.actionUrl)}
+                  onClick={() => router.push(notification.actionUrl || notification.link)}
                   className="px-3 py-1 text-xs font-medium text-white bg-rscm-violet rounded hover:bg-rscm-plum transition-colors"
                 >
                   Take Action

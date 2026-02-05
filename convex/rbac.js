@@ -11,6 +11,7 @@ export const PERMISSIONS = {
     CREATE: ["admin", "hr"],
     UPDATE_PROFILE: ["admin", "hr"],
     VIEW_ALL: ["admin", "hr", "pm", "line_manager"],
+    VIEW_BASIC: ["admin", "hr", "pm", "line_manager", "employee"],
     VIEW_SELF: ["admin", "hr", "pm", "line_manager", "employee"],
     UPDATE_STATUS: ["admin", "hr", "line_manager", "employee"],
     DELETE: ["admin", "hr"],
