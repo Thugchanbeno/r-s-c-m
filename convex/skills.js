@@ -194,7 +194,9 @@ export const verifyUserSkill = mutation({
     if (!userSkill) throw new Error("User skill not found.");
 
     const targetUser = await ctx.db.get(userSkill.userId);
-    if (!targetUser) throw new Error("Target user not found.");
+    if (!targetUser) {
+      throw new Error("Cannot verify skill: the associated user has been deleted. Please delete this skill verification record.");
+    }
 
     if (
       actor.role !== "line_manager" ||
@@ -285,6 +287,11 @@ export const getPendingVerifications = query({
     for (const us of userSkills) {
       const user = await ctx.db.get(us.userId);
       const skill = await ctx.db.get(us.skillId);
+      
+      if (!user) {
+        continue;
+      }
+      
       enriched.push({
         ...us,
         userName: user?.name,
