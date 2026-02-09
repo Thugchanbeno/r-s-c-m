@@ -69,7 +69,7 @@ export default defineSchema({
     .index("by_employee_type", ["employeeType"])
     .vectorIndex("by_embedding", {
       vectorField: "embedding",
-      dimensions: 768,
+      dimensions: 3072,
     }),
 
   // SKILLS
@@ -86,7 +86,7 @@ export default defineSchema({
     .index("by_category", ["category"])
     .vectorIndex("by_embedding", {
       vectorField: "embedding",
-      dimensions: 768,
+      dimensions: 3072,
     }),
 
   // USER SKILLS
@@ -175,7 +175,7 @@ export default defineSchema({
     .index("by_function", ["function"])
     .vectorIndex("by_embedding", {
       vectorField: "embedding",
-      dimensions: 768,
+      dimensions: 3072,
     }),
   // ALLOCATIONS
   allocations: defineTable({
